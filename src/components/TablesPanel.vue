@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { heatByPerson } from '../lib/heat'
+import type { TenseHeat } from '../lib/heat'
+import { heatByCell, sumByTensePerson } from '../lib/heat'
 import { loadStats } from '../lib/stats'
 import { endingsRow } from '../lib/tables'
 import { theme } from '../lib/theme'
@@ -22,20 +23,28 @@ const PERSON_SHORT: Record<Person, string> = {
   ellos: 'ellos',
 }
 
-const heat = computed(() => {
+const stats = computed(() => {
   // theme — пересчёт оттенков; loadStats — свежие счётчики
   void theme.value
-  const stats = loadStats()
-  const map = {} as Record<Tense, ReturnType<typeof heatByPerson>>
+  return loadStats()
+})
+
+const heat = computed(() => {
+  const map = {} as Record<Tense, TenseHeat>
   for (const tense of TENSES) {
-    map[tense] = heatByPerson(stats, tense)
+    map[tense] = heatByCell(stats.value, tense)
   }
   return map
 })
 
+/** Цвет ячейки — по своей группе (-ar / -er / -ir), а не по всей строке. */
+function cellStyle(tense: Tense, person: Person, verb: Verb): { backgroundColor: string } {
+  return { backgroundColor: heat.value[tense][person]![verb.group].color }
+}
 
-function cellStyle(tense: Tense, person: Person): { backgroundColor: string } {
-  return { backgroundColor: heat.value[tense]![person]!.color }
+/** Итог строки под местоимением: верные минус ошибки по всем трём группам. */
+function rowSum(tense: Tense, person: Person): number {
+  return sumByTensePerson(stats.value, tense, person)
 }
 </script>
 
@@ -51,8 +60,8 @@ function cellStyle(tense: Tense, person: Person): { backgroundColor: string } {
       <span class="tables__legend-sep">→</span>
       <span class="tables__swatch tables__swatch--hot" /> знаю хуже
       <span class="tables__legend-note">
-        Цвет строки — ваши ответы по этому лицу в правильных глаголах;
-        число под лицом — верные минус ошибки.
+        Цвет ячейки — ваши ответы в правильных глаголах на -ar / -er / -ir
+        для этого времени и лица; число под лицом — верные минус ошибки по строке.
       </span>
     </p>
     <p class="tables__shared-note">
@@ -75,15 +84,15 @@ function cellStyle(tense: Tense, person: Person): { backgroundColor: string } {
           </thead>
           <tbody class="tables__tbody">
             <tr v-for="person in personsFor(tense)" :key="person" class="tables__row">
-              <th class="tables__cell tables__person" scope="row" :style="cellStyle(tense, person)">
+              <th class="tables__cell tables__person" scope="row">
                 {{ tense === 'imperativo' ? personLabel(tense, person) : PERSON_SHORT[person] }}
-                <span class="tables__sum">{{ heat[tense][person]!.sum }}</span>
+                <span class="tables__sum">{{ rowSum(tense, person) }}</span>
               </th>
               <td
                 v-for="(cell, i) in endingsRow(EXAMPLES, tense, person)"
                 :key="EXAMPLES[i]!.infinitive + person"
                 class="tables__cell tables__form"
-                :style="cellStyle(tense, person)"
+                :style="cellStyle(tense, person, EXAMPLES[i]!)"
               >
                 <span class="tables__form-stem">{{ cell.stem }}</span><span
                   class="tables__form-ending"

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { heatByPerson, heatColor, sumByTensePerson } from './heat'
+import { heatByCell, heatColor, sumByTensePerson } from './heat'
 import type { CellStat, StatsStore } from './stats'
 
 function stat(ok: number, bad: number): CellStat {
@@ -26,20 +26,28 @@ describe('heat / sums', () => {
     expect(heatColor(5, 5, 5)).toBe('hsl(60 35% 92%)')
   })
 
-  it('heatByPerson colors rows by relative sums', () => {
-    const heat = heatByPerson(
-      { 'hablar|presente|yo': stat(4, 0), 'comer|presente|tú': stat(1, 0) },
-      'presente',
+  it('heatByCell scores each person × -ar / -er / -ir separately', () => {
+    const heat = heatByCell(
+      {
+        'hablar|imperfecto|tú': stat(4, 0),
+        'trabajar|imperfecto|tú': stat(1, 0),
+        'comer|imperfecto|tú': stat(0, 3),
+        'vivir|imperfecto|tú': stat(1, 1),
+        'ser|imperfecto|tú': stat(50, 0),
+      },
+      'imperfecto',
     )
-    expect(heat.yo!.sum).toBe(4)
-    expect(heat.tú!.sum).toBe(1)
-    expect(heat.él!.sum).toBe(0)
-    expect(heat.yo!.color).toMatch(/^hsl\(120/)
-    expect(heat.él!.color).toMatch(/^hsl\(0/)
+    expect(heat.tú!.ar.sum).toBe(5)
+    expect(heat.tú!.er.sum).toBe(-3)
+    expect(heat.tú!.ir.sum).toBe(0)
+    expect(heat.tú!.ar.color).toMatch(/^hsl\(120/)
+    expect(heat.tú!.er.color).toMatch(/^hsl\(0/)
+    // одна строка — разные цвета ячеек
+    expect(heat.tú!.ar.color).not.toBe(heat.tú!.ir.color)
   })
 
   it('imperativo has no yo row', () => {
-    const heat = heatByPerson({}, 'imperativo')
+    const heat = heatByCell({}, 'imperativo')
     expect(heat.yo).toBeUndefined()
     expect(Object.keys(heat)).toHaveLength(5)
   })
