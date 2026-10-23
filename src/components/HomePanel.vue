@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { currentStreak, daysLabel, loadDaily } from '../lib/daily'
+import { portionStatuses } from '../lib/portions'
 import { cellsForConfig, weakCount } from '../lib/session'
 import { configFromSettings } from '../lib/settings'
 import { settings } from '../lib/settingsState'
-import { describeSettings } from '../lib/settingsSummary'
+import { TENSE_SHORT_NAMES, describeSettings } from '../lib/settingsSummary'
 import type { SessionConfig, SessionMode } from '../types'
 import Icon from './Icon.vue'
 
@@ -18,7 +19,11 @@ const emit = defineEmits<{
 }>()
 
 const MODES: { mode: SessionMode; label: string; hint: string }[] = [
-  { mode: 'smart', label: 'Умная', hint: 'Чаще — формы с ошибками, реже — выученные.' },
+  {
+    mode: 'smart',
+    label: 'Умная',
+    hint: 'Новое — порциями, чаще — формы с ошибками, реже — выученные.',
+  },
   { mode: 'weak', label: 'Слабые', hint: 'Только формы, где были ошибки.' },
   { mode: 'random', label: 'Случайно', hint: 'Равномерно, без учёта прогресса.' },
 ]
@@ -37,6 +42,22 @@ const formsCount = computed(() => {
 })
 
 const summary = computed(() => describeSettings(settings))
+
+/**
+ * Умный режим вводит новое порциями (время × окончание) — показываем, что
+ * сейчас изучается. Одна порция в фильтре — вводить по частям нечего.
+ */
+const currentPortion = computed(() => {
+  if (settings.mode !== 'smart' || formsCount.value === 0) return null
+  const statuses = portionStatuses(cellsForConfig(config.value))
+  if (statuses.length < 2) return null
+  const current = statuses.find((s) => s.state === 'current')
+  if (!current) return null
+  return {
+    label: `${TENSE_SHORT_NAMES[current.tense]} -${current.group}`,
+    progress: `${current.personsDone} из ${current.personsTotal}`,
+  }
+})
 
 const modeHint = computed(() => MODES.find((m) => m.mode === settings.mode)!.hint)
 
@@ -126,6 +147,10 @@ function start() {
         </button>
       </div>
       <p class="group__note home__mode-note">{{ modeHint }}</p>
+      <p v-if="currentPortion" class="home__portion">
+        Сейчас новое: <b class="home__portion-name">{{ currentPortion.label }}</b>
+        <span class="home__portion-progress">· {{ currentPortion.progress }} лиц</span>
+      </p>
     </fieldset>
 
     <fieldset class="group home__filters">

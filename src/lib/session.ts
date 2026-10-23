@@ -4,7 +4,8 @@ import { VERBS, isRegularVerb } from '../data/verbs'
 import type { DrillCard, Person, SessionConfig, Tense, Verb } from '../types'
 import { personsFor } from '../types'
 import { conjugate, hasTense } from './conjugate'
-import type { StatsStore } from './stats'
+import { portionKey, portionStatuses } from './portions'
+import type { CellStat, StatsStore } from './stats'
 import { cellKey, cellWeight, isWeak, loadStats } from './stats'
 
 function shuffle<T>(items: T[]): T[] {
@@ -59,16 +60,17 @@ export interface Cell {
   verb: Verb
   tense: Tense
   person: Person
+  stat: CellStat | undefined
   weight: number
   weak: boolean
 }
 
-/** Все формы глагол × время × местоимение для фильтра, с весами. */
 /** Лица времени, отмеченные в настройках (в императиве нет yo). */
 function personsOf(config: SessionConfig, tense: Tense): Person[] {
   return personsFor(tense).filter((p) => config.persons.includes(p))
 }
 
+/** Все формы глагол × время × местоимение для фильтра, с весами. */
 export function cellsForConfig(
   config: SessionConfig,
   stats: StatsStore = loadStats(),
@@ -83,6 +85,7 @@ export function cellsForConfig(
           verb,
           tense,
           person,
+          stat,
           weight: cellWeight(stat),
           weak: isWeak(stat),
         })
@@ -151,6 +154,45 @@ function validate(config: SessionConfig): void {
 /** Максимум показов одной слабой формы в режиме «только слабые». */
 export const WEAK_REPEATS = 3
 
+/** Новая форма в уже освоенной порции: правило знакомо — это скорее повторение. */
+export const KNOWN_PATTERN_NEW_WEIGHT = 1.25
+
+/** Доля сессии на текущую порцию; остальное — повторение уже открытого. */
+export const CURRENT_PORTION_SHARE = 0.6
+
+/**
+ * Умный режим вводит новое порциями (время × окончание):
+ * - не начатые порции после текущей ждут своей очереди;
+ * - новые формы освоенных порций идут с весом повторения;
+ * - текущей порции — CURRENT_PORTION_SHARE всей сессии, сколько бы в ней ни было
+ *   глаголов (в -ar их вдвое больше, чем в -er, — иначе старое перевешивало бы новое).
+ */
+function smartPool(cells: Cell[]): Cell[] {
+  const state = new Map(
+    portionStatuses(cells).map((s) => [portionKey(s.tense, s.group), s.state]),
+  )
+  const stateOf = (c: Cell) => state.get(portionKey(c.tense, c.verb.group))
+
+  const pool = cells
+    .filter((c) => stateOf(c) !== 'locked')
+    .map((c) =>
+      !c.stat && stateOf(c) === 'mastered' ? { ...c, weight: KNOWN_PATTERN_NEW_WEIGHT } : c,
+    )
+
+  const total = (list: Cell[]) => list.reduce((sum, c) => sum + c.weight, 0)
+  const current = total(pool.filter((c) => stateOf(c) === 'current'))
+  const rest = total(pool.filter((c) => stateOf(c) !== 'current'))
+  if (current === 0 || rest === 0) return pool
+
+  return pool.map((c) => ({
+    ...c,
+    weight:
+      stateOf(c) === 'current'
+        ? (c.weight / current) * CURRENT_PORTION_SHARE
+        : (c.weight / rest) * (1 - CURRENT_PORTION_SHARE),
+  }))
+}
+
 /** Build a drill queue of the requested size. */
 export function buildSession(
   config: SessionConfig,
@@ -185,6 +227,7 @@ export function buildSession(
   }
 
   let size = config.size
+  if (config.mode === 'smart') cells = smartPool(cells)
   if (config.mode === 'weak') {
     cells = cells.filter((c) => c.weak)
     if (cells.length === 0) {
