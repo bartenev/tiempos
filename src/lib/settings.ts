@@ -1,5 +1,5 @@
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
-import type { SessionConfig, SessionMode, Tense } from '../types'
+import type { AnswerMode, SessionConfig, SessionMode, Tense } from '../types'
 
 export const SETTINGS_KEY = 'tiempos.settings.v1'
 
@@ -11,6 +11,7 @@ export interface SetupSettings {
   selectedIrregular: Record<string, boolean>
   size: number
   mode: SessionMode
+  answer: AnswerMode
 }
 
 export function defaultSelectedIrregular(
@@ -31,11 +32,14 @@ export const DEFAULT_SETTINGS: SetupSettings = {
   selectedIrregular: defaultSelectedIrregular(),
   size: 20,
   mode: 'smart',
+  answer: 'text',
 }
 
 const SIZES = new Set([10, 20, 30])
 
 const MODES = new Set<SessionMode>(['smart', 'weak', 'random'])
+
+const ANSWERS = new Set<AnswerMode>(['text', 'voice'])
 
 function isBool(value: unknown): value is boolean {
   return typeof value === 'boolean'
@@ -98,6 +102,10 @@ export function loadSettings(): SetupSettings {
         typeof parsed.mode === 'string' && MODES.has(parsed.mode)
           ? parsed.mode
           : DEFAULT_SETTINGS.mode,
+      answer:
+        typeof parsed.answer === 'string' && ANSWERS.has(parsed.answer)
+          ? parsed.answer
+          : DEFAULT_SETTINGS.answer,
     }
   } catch {
     return cloneDefaults()
@@ -124,6 +132,7 @@ export function configFromSettings(
     ),
     size: settings.size,
     mode: settings.mode,
+    answer: settings.answer,
     includeRegular: settings.includeRegular,
     includeIrregular: settings.includeIrregular,
     selectedIrregular: settings.includeIrregular

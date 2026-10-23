@@ -7,6 +7,7 @@ const base: SessionConfig = {
   tenses: ['presente'],
   size: 12,
   mode: 'random',
+  answer: 'text',
   includeRegular: true,
   includeIrregular: true,
   selectedIrregular: [...IRREGULAR_INFINITIVES],

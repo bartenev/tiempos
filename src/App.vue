@@ -181,6 +181,7 @@ function toSetup() {
       :correct="correct"
       :wrong="wrong"
       :streak="streak"
+      :voice="config?.answer === 'voice'"
       @correct="onCorrect"
       @wrong="onWrong"
       @skip="onSkip"

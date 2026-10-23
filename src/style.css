@@ -707,6 +707,66 @@ button {
   font-size: 0.82rem;
 }
 
+.voice-panel {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 3.25rem;
+  padding: 0.6rem 0.9rem;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--input-bg);
+  font-size: 0.95rem;
+}
+
+.voice-panel.listening {
+  border-color: var(--accent);
+}
+
+.voice-panel .voice-status {
+  flex: 1;
+}
+
+.mic-dot {
+  flex: none;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.voice-panel.listening .mic-dot {
+  background: var(--bad);
+  animation: mic-pulse 1.2s ease-in-out infinite;
+}
+
+.voice-panel.denied .mic-dot,
+.voice-panel.network .mic-dot {
+  background: var(--almost);
+}
+
+@keyframes mic-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--bad) 55%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 0.45rem transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-panel.listening .mic-dot {
+    animation: none;
+  }
+}
+
+.heard {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
 .drill-actions .primary {
   flex: 1;
 }
@@ -796,6 +856,42 @@ button {
 .badge.hot {
   background: var(--bad-bg);
   color: var(--bad);
+}
+
+.segmented {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+}
+
+.segmented button {
+  flex: 1;
+  min-height: 2.5rem;
+  font: inherit;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.segmented button.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.segmented button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.field-note {
+  margin: 0.6rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
 }
 
 .mode-option {

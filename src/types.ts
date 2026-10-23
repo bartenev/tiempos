@@ -47,10 +47,14 @@ export interface DrillCard {
  */
 export type SessionMode = 'smart' | 'weak' | 'random'
 
+/** Как отвечать: вписывать форму или произносить её. */
+export type AnswerMode = 'text' | 'voice'
+
 export interface SessionConfig {
   tenses: Tense[]
   size: number
   mode: SessionMode
+  answer: AnswerMode
   /** Включать правильные (регулярные) глаголы. */
   includeRegular: boolean
   /** Включать неправильные глаголы. */
