@@ -35,3 +35,26 @@ describe('verb sentences', () => {
     })
   })
 })
+
+describe('special sentences', () => {
+  it('haber indefinido uses pretérito anterior after apenas / en cuanto', () => {
+    const built = buildVerbSentence('haber', 'indefinido', 'yo')!
+    expect(built.sentence).toBe('Apenas yo ___ terminado, empezó a llover.')
+    expect(built.translation).toContain('Едва я …')
+  })
+
+  it('haber in other tenses keeps the regular pattern', () => {
+    expect(buildVerbSentence('haber', 'presente', 'yo')!.sentence).toBe(
+      'Hoy yo ___ terminado el trabajo.',
+    )
+  })
+})
+
+describe('tense-limited complements', () => {
+  it('vivir never says «Ayer viví en Madrid»', () => {
+    const all = <T,>(items: T[]) => items[items.length - 1]!
+    expect(buildVerbSentence('vivir', 'indefinido', 'yo')!.sentence).toMatch(/una gran aventura\.$/)
+    expect(buildVerbSentence('vivir', 'indefinido', 'yo', all)!.sentence).toMatch(/una gran aventura\.$/)
+    expect(buildVerbSentence('vivir', 'presente', 'yo')!.sentence).toMatch(/en Madrid\.$/)
+  })
+})

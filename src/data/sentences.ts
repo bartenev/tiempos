@@ -13,6 +13,8 @@ export interface Complement {
   /** Варианты для nosotros / vosotros / ellos (согласование по числу). */
   esPl?: string
   ruPl?: string
+  /** Только для этих времён (иначе — для всех). */
+  tenses?: Tense[]
 }
 
 interface Phrase {
@@ -39,7 +41,7 @@ export const TIME_MARKERS: Record<Tense, Phrase[]> = {
     { es: 'Antes', ru: 'Раньше' },
     { es: 'Cada verano', ru: 'Каждое лето' },
     { es: 'En aquella época', ru: 'В то время' },
-    { es: 'De pequeños, siempre', ru: 'В детстве всегда' },
+    { es: 'De pequeños,', ru: 'В детстве' },
   ],
 }
 
@@ -61,7 +63,7 @@ export const SUBJECTS: Record<Person, Phrase[]> = {
 }
 
 /** «De pequeños» — только для множественного числа. */
-const PLURAL_ONLY_MARKERS = new Set(['De pequeños, siempre'])
+const PLURAL_ONLY_MARKERS = new Set(['De pequeños,'])
 
 const PLURAL: ReadonlySet<Person> = new Set(['nosotros', 'vosotros', 'ellos'])
 
@@ -156,8 +158,10 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
 
   // —— Regular -ir ——
   vivir: [
-    { es: 'en Madrid', ru: 'в Мадриде' },
-    { es: 'cerca del mar', ru: 'у моря' },
+    // «Ayer viví en Madrid» — бессмыслица: место жительства не про один день.
+    { es: 'en Madrid', ru: 'в Мадриде', tenses: ['presente', 'imperfecto'] },
+    { es: 'cerca del mar', ru: 'у моря', tenses: ['presente', 'imperfecto'] },
+    { es: 'una gran aventura', ru: 'большое приключение', tenses: ['indefinido'] },
   ],
   escribir: [
     { es: 'una carta', ru: 'письмо' },
@@ -219,7 +223,7 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
   ],
   preferir: [
     { es: 'el té', ru: 'чай' },
-    { es: 'quedarse en casa', ru: 'остаться дома' },
+    { es: 'trabajar desde casa', ru: 'работать из дома' },
   ],
   sentir: [
     { es: 'frío', ru: 'холод' },
@@ -228,7 +232,7 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
 
   // —— Irregular ——
   ser: [
-    { es: 'de Madrid', ru: 'из Мадрида' },
+    { es: 'muy amable', esPl: 'muy amables', ru: 'очень любезен', ruPl: 'очень любезны' },
     { es: 'muy feliz', esPl: 'muy felices', ru: 'очень счастлив', ruPl: 'очень счастливы' },
   ],
   estar: [
@@ -245,7 +249,7 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
   ],
   tener: [
     { es: 'mucho trabajo', ru: 'много работы' },
-    { es: 'un perro', ru: 'собаку' },
+    { es: 'una reunión', ru: 'совещание' },
   ],
   hacer: [
     { es: 'los deberes', ru: 'домашнее задание' },
@@ -264,7 +268,7 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
     { es: 'en tren', ru: 'на поезде' },
   ],
   querer: [
-    { es: 'un café', ru: 'кофе' },
+    { es: 'ayudar a Ana', ru: 'помочь Ане' },
     { es: 'viajar', ru: 'путешествовать' },
   ],
   saber: [
@@ -313,6 +317,26 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
   ],
 }
 
+/**
+ * Своя конструкция для глагола в конкретном времени.
+ * `{s}` — подлежащее, `___` — пропуск.
+ * haber в indefinido (pretérito anterior) живёт только после apenas / cuando.
+ */
+export const SPECIAL_SENTENCES: Record<string, Partial<Record<Tense, Phrase[]>>> = {
+  haber: {
+    indefinido: [
+      {
+        es: 'Apenas {s} ___ terminado, empezó a llover.',
+        ru: 'Едва {s} … закончил(и) (haber + participio), пошёл дождь.',
+      },
+      {
+        es: 'En cuanto {s} ___ cenado, sonó el teléfono.',
+        ru: 'Как только {s} … поужинал(и) (haber + participio), зазвонил телефон.',
+      },
+    ],
+  },
+}
+
 export interface BuiltSentence {
   sentence: string
   translation: string
@@ -339,8 +363,20 @@ export function buildVerbSentence(
   person: Person,
   pick: Pick = firstPick,
 ): BuiltSentence | null {
-  const complements = VERB_COMPLEMENTS[infinitive]
-  if (!complements || complements.length === 0) return null
+  const special = SPECIAL_SENTENCES[infinitive]?.[tense]
+  if (special && special.length > 0) {
+    const pattern = pick(special)
+    const subject = pick(SUBJECTS[person])
+    return {
+      sentence: pattern.es.replace('{s}', subject.es),
+      translation: pattern.ru.replace('{s}', subject.ru),
+    }
+  }
+
+  const complements = (VERB_COMPLEMENTS[infinitive] ?? []).filter(
+    (c) => !c.tenses || c.tenses.includes(tense),
+  )
+  if (complements.length === 0) return null
 
   const plural = PLURAL.has(person)
   const markers = TIME_MARKERS[tense].filter(
