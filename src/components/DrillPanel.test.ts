@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { findVerb } from '../data/verbs'
 import { buildCard } from '../lib/session'
 import DrillPanel from './DrillPanel.vue'
@@ -52,9 +52,14 @@ describe('DrillPanel', () => {
 describe('DrillPanel — oral (self-check)', () => {
   let wrapper: ReturnType<typeof mountOral> | undefined
 
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
   afterEach(() => {
     wrapper?.unmount()
     wrapper = undefined
+    vi.useRealTimers()
   })
 
   function mountOral() {
@@ -87,6 +92,7 @@ describe('DrillPanel — oral (self-check)', () => {
   it('«Сказал верно» counts as correct and moves on', async () => {
     wrapper = mountOral()
     await wrapper.find('.reveal-btn').trigger('click')
+    vi.advanceTimersByTime(400)
     await wrapper.find('.grade.ok').trigger('click')
     expect(wrapper.emitted('correct')).toHaveLength(1)
     expect(wrapper.emitted('next')).toHaveLength(1)
@@ -95,6 +101,7 @@ describe('DrillPanel — oral (self-check)', () => {
   it('«Ошибся» counts as a mistake and moves on', async () => {
     wrapper = mountOral()
     await wrapper.find('.reveal-btn').trigger('click')
+    vi.advanceTimersByTime(400)
     await wrapper.find('.grade.bad').trigger('click')
     expect(wrapper.emitted('wrong')).toEqual([['']])
     expect(wrapper.emitted('next')).toHaveLength(1)
@@ -109,9 +116,23 @@ describe('DrillPanel — oral (self-check)', () => {
     await wrapper.vm.$nextTick()
     expect(wrapper.find('.blank').text()).toBe('habló')
 
+    vi.advanceTimersByTime(400)
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }))
     expect(wrapper.emitted('wrong')).toHaveLength(1)
     expect(wrapper.emitted('next')).toHaveLength(1)
+  })
+
+  it('a double tap does not grade by accident', async () => {
+    wrapper = mountOral()
+    await wrapper.find('.reveal-btn').trigger('click')
+    vi.advanceTimersByTime(100)
+    await wrapper.find('.grade.ok').trigger('click')
+    expect(wrapper.emitted('correct')).toBeUndefined()
+    expect(wrapper.emitted('next')).toBeUndefined()
+
+    vi.advanceTimersByTime(300)
+    await wrapper.find('.grade.ok').trigger('click')
+    expect(wrapper.emitted('correct')).toHaveLength(1)
   })
 
   it('stops listening to the keyboard when the screen closes', () => {

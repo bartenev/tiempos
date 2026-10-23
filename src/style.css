@@ -716,6 +716,10 @@ button {
   color: var(--accent);
 }
 
+.oral-dock {
+  margin-top: 1rem;
+}
+
 .reveal-btn {
   width: 100%;
   min-height: 6rem;
@@ -739,11 +743,10 @@ button {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.6rem;
-  margin-top: 1rem;
 }
 
 .grade {
-  min-height: 4rem;
+  min-height: 6rem;
   font: inherit;
   font-size: 1.05rem;
   font-weight: 600;
@@ -1093,6 +1096,27 @@ button {
 .cell.picked {
   outline: 2px solid var(--ink);
   outline-offset: 1px;
+}
+
+/* Телефон: зона тапа и оценки — внизу экрана, контент прокручивается над ней. */
+@media (max-width: 640px) {
+  .drill.oral-mode {
+    padding-bottom: calc(8rem + env(safe-area-inset-bottom));
+  }
+
+  .oral-dock {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    z-index: 3;
+    width: 100%;
+    max-width: 460px;
+    margin: 0;
+    padding: 1.5rem calc(1rem + env(safe-area-inset-right))
+      calc(0.9rem + env(safe-area-inset-bottom)) calc(1rem + env(safe-area-inset-left));
+    transform: translateX(-50%);
+    background: linear-gradient(to top, var(--bg) 75%, transparent);
+  }
 }
 
 @media (max-width: 380px) {

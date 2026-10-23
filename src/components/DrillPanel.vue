@@ -33,6 +33,12 @@ const input = ref('')
 const feedback = ref<AnswerCheck | null>(null)
 /** Устный режим: ответ открыт, ждём самооценку. */
 const shown = ref(false)
+/**
+ * Кнопки оценки появляются ровно под пальцем, которым открыли ответ, —
+ * короткая пауза, чтобы двойной тап не поставил оценку случайно.
+ */
+const GRADE_GUARD_MS = 350
+let shownAt = 0
 const inputEl = ref<HTMLInputElement | null>(null)
 /** Короткая зелёная вспышка: прошлый ответ верный, уже следующая карточка. */
 const flashOk = ref(false)
@@ -135,12 +141,14 @@ function insertAccent(ch: string) {
 }
 
 function reveal() {
-  if (props.oral) shown.value = true
+  if (!props.oral || shown.value) return
+  shown.value = true
+  shownAt = Date.now()
 }
 
 /** Самооценка в устном режиме; обе кнопки ведут к следующей карточке. */
 function grade(ok: boolean) {
-  if (!shown.value) return
+  if (!shown.value || Date.now() - shownAt < GRADE_GUARD_MS) return
   if (ok) {
     acceptCorrect()
     return
@@ -175,7 +183,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="panel drill">
+  <section class="panel drill" :class="{ 'oral-mode': oral }">
     <header class="bar">
       <button class="ghost small" type="button" @click="emit('quit')">‹ выход</button>
       <span class="prog">{{ progress }}</span>
@@ -222,18 +230,19 @@ onBeforeUnmount(() => {
       </p>
     </div>
 
-    <div v-if="oral" class="oral">
-      <button v-if="!shown" class="reveal-btn" type="button" @click="reveal">
-        Скажите форму вслух или про себя —<br />тапните, чтобы проверить
-      </button>
-      <template v-else>
-        <RuleHint v-if="hint" :hint="hint" />
-        <div class="grade-actions">
+    <template v-if="oral">
+      <RuleHint v-if="hint" :hint="hint" />
+      <!-- На телефоне закреплено внизу экрана — под большой палец. -->
+      <div class="oral-dock">
+        <button v-if="!shown" class="reveal-btn" type="button" @click="reveal">
+          Скажите форму вслух или про себя —<br />тапните, чтобы проверить
+        </button>
+        <div v-else class="grade-actions">
           <button class="grade bad" type="button" @click="grade(false)">✗ Ошибся</button>
           <button class="grade ok" type="button" @click="grade(true)">✓ Сказал верно</button>
         </div>
-      </template>
-    </div>
+      </div>
+    </template>
 
     <form v-else class="answer-form" @submit.prevent="submit">
       <label class="sr-only" for="answer">Форма глагола</label>
