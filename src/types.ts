@@ -128,6 +128,14 @@ export const TENSE_LABELS: Record<Tense, string> = {
   imperativo: 'Imperativo',
 }
 
+/** Как время называется по-русски. */
+export const TENSE_RU: Record<Tense, string> = {
+  presente: 'настоящее время',
+  indefinido: 'прошедшее законченное',
+  imperfecto: 'прошедшее незаконченное',
+  imperativo: 'повелительное наклонение',
+}
+
 export const TENSE_SHORT: Record<Tense, string> = {
   presente: 'pres.',
   indefinido: 'indef.',

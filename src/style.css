@@ -814,6 +814,17 @@ input[type='radio'] {
 
 /* ===== settings: экран настроек ===== */
 
+.settings__tense {
+  padding: var(--space-1) 0;
+}
+
+.settings__tense-ru {
+  display: block;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--muted);
+}
+
 .settings__persons-grid {
   /* как таблица спряжения: слева ед. число, справа мн. */
   display: grid;

@@ -3,7 +3,7 @@ import { IRREGULAR_INFINITIVES, findVerb } from '../data/verbs'
 import { settings } from '../lib/settingsState'
 import { setTheme, theme } from '../lib/theme'
 import type { Person } from '../types'
-import { PERSONS, TENSES, TENSE_LABELS, VERB_GROUPS } from '../types'
+import { PERSONS, TENSES, TENSE_LABELS, TENSE_RU, VERB_GROUPS } from '../types'
 import Icon from './Icon.vue'
 
 const emit = defineEmits<{
@@ -51,7 +51,10 @@ function setAllIrregular(value: boolean) {
       <legend class="group__legend settings__tenses-legend">Времена</legend>
       <label v-for="tense in TENSES" :key="tense" class="choice settings__tense">
         <input v-model="settings.selected[tense]" class="choice__input settings__tense-input" type="checkbox" />
-        <span class="choice__label settings__tense-label">{{ TENSE_LABELS[tense] }}</span>
+        <span class="choice__label settings__tense-label">
+          {{ TENSE_LABELS[tense] }}
+          <span class="settings__tense-ru">{{ TENSE_RU[tense] }}</span>
+        </span>
       </label>
     </fieldset>
 
