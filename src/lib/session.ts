@@ -4,8 +4,6 @@ import { VERBS, isRegularVerb } from '../data/verbs'
 import type { DrillCard, Person, SessionConfig, Tense, Verb } from '../types'
 import { PERSONS } from '../types'
 import { conjugate } from './conjugate'
-import type { ProgressStore } from './progress'
-import { loadProgress } from './progress'
 import type { StatsStore } from './stats'
 import { cellKey, cellWeight, isWeak, loadStats } from './stats'
 
@@ -68,20 +66,18 @@ export interface Cell {
 export function cellsForConfig(
   config: SessionConfig,
   stats: StatsStore = loadStats(),
-  progress: ProgressStore = loadProgress(),
 ): Cell[] {
   const cells: Cell[] = []
   for (const verb of verbsForConfig(config)) {
     for (const tense of config.tenses) {
       for (const person of PERSONS) {
         const stat = stats[cellKey(verb.infinitive, tense, person)]
-        const score = progress[verb.infinitive]?.[tense]?.[person] ?? 0
         cells.push({
           verb,
           tense,
           person,
-          weight: cellWeight(stat, score),
-          weak: isWeak(stat, score),
+          weight: cellWeight(stat),
+          weak: isWeak(stat),
         })
       }
     }
@@ -146,7 +142,6 @@ export const WEAK_REPEATS = 3
 export function buildSession(
   config: SessionConfig,
   stats: StatsStore = loadStats(),
-  progress: ProgressStore = loadProgress(),
 ): DrillCard[] {
   validate(config)
 
@@ -166,7 +161,7 @@ export function buildSession(
     return shuffle(cards)
   }
 
-  let cells = cellsForConfig(config, stats, progress)
+  let cells = cellsForConfig(config, stats)
   let size = config.size
   if (config.mode === 'weak') {
     cells = cells.filter((c) => c.weak)

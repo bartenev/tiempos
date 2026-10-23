@@ -1,9 +1,8 @@
 import type { Person, Tense } from '../types'
 
 /**
- * Подробная история по каждой форме глагол × время × местоимение.
- * В отличие от progress (счёт только для правильных глаголов),
- * ошибки пишутся для всех глаголов — по ним строится смарт-очередь.
+ * История по каждой форме глагол × время × местоимение —
+ * единственное хранилище прогресса (смарт-очередь, «Прогресс», «Таблицы»).
  */
 export const STATS_KEY = 'tiempos.stats.v1'
 
@@ -89,18 +88,15 @@ export function recordAttempt(
   return stat
 }
 
-/**
- * Слабая форма: была ошибка и с тех пор меньше RECOVER_STREAK верных подряд.
- * Без истории — смотрим на старый счёт progress (минус = слабая).
- */
-export function isWeak(stat: CellStat | undefined, score = 0): boolean {
-  if (!stat) return score < 0
+/** Слабая форма: была ошибка и с тех пор меньше RECOVER_STREAK верных подряд. */
+export function isWeak(stat: CellStat | undefined): boolean {
+  if (!stat) return false
   return stat.bad > 0 && stat.streak < RECOVER_STREAK
 }
 
-export function masteryOf(stat: CellStat | undefined, score = 0): Mastery {
-  if (isWeak(stat, score)) return 'weak'
-  if (!stat) return score > 0 ? 'learning' : 'new'
+export function masteryOf(stat: CellStat | undefined): Mastery {
+  if (isWeak(stat)) return 'weak'
+  if (!stat) return 'new'
   return stat.streak >= SOLID_STREAK ? 'solid' : 'learning'
 }
 
@@ -108,9 +104,9 @@ export function masteryOf(stat: CellStat | undefined, score = 0): Mastery {
  * Вес формы для смарт-очереди: слабые ×~4 чаще новых,
  * выученные — всё реже с ростом серии.
  */
-export function cellWeight(stat: CellStat | undefined, score = 0): number {
-  if (isWeak(stat, score)) return 8 + Math.min(stat?.bad ?? 1, 5)
-  if (!stat) return score > 0 ? 1.5 : 2.5
+export function cellWeight(stat: CellStat | undefined): number {
+  if (!stat) return 2.5
+  if (isWeak(stat)) return 8 + Math.min(stat.bad, 5)
   return Math.max(0.4, 2.5 / (1 + stat.streak * 0.5))
 }
 

@@ -87,6 +87,8 @@ export const MODE_LABELS: Record<SessionMode, string> = {
 
 export const PERSONS: Person[] = ['yo', 'tú', 'él', 'nosotros', 'vosotros', 'ellos']
 
+export const TENSES: Tense[] = ['presente', 'indefinido', 'imperfecto']
+
 export const TENSE_LABELS: Record<Tense, string> = {
   presente: 'Presente',
   indefinido: 'Pretérito indefinido',

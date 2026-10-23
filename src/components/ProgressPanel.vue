@@ -2,11 +2,10 @@
 import { computed, ref } from 'vue'
 import { VERBS, isRegularVerb } from '../data/verbs'
 import { conjugate } from '../lib/conjugate'
-import { PROGRESS_TENSES, loadProgress } from '../lib/progress'
 import type { CellStat, Mastery } from '../lib/stats'
 import { cellKey, errorRate, loadStats, masteryOf } from '../lib/stats'
 import type { Person, Tense, Verb } from '../types'
-import { PERSONS, TENSE_SHORT } from '../types'
+import { PERSONS, TENSES, TENSE_SHORT } from '../types'
 
 const emit = defineEmits<{
   back: []
@@ -14,14 +13,12 @@ const emit = defineEmits<{
 }>()
 
 const stats = loadStats()
-const progress = loadProgress()
 
 interface CellInfo {
   verb: Verb
   tense: Tense
   person: Person
   stat: CellStat | undefined
-  score: number
   mastery: Mastery
 }
 
@@ -34,11 +31,10 @@ const MASTERY_LABELS: Record<Mastery, string> = {
 
 const cells: CellInfo[] = []
 for (const verb of VERBS) {
-  for (const tense of PROGRESS_TENSES) {
+  for (const tense of TENSES) {
     for (const person of PERSONS) {
       const stat = stats[cellKey(verb.infinitive, tense, person)]
-      const score = progress[verb.infinitive]?.[tense]?.[person] ?? 0
-      cells.push({ verb, tense, person, stat, score, mastery: masteryOf(stat, score) })
+      cells.push({ verb, tense, person, stat, mastery: masteryOf(stat) })
     }
   }
 }
@@ -68,8 +64,9 @@ const topWeak = computed(() =>
   cells
     .filter((c) => c.mastery === 'weak')
     .sort((a, b) => {
-      const sa = a.stat ? a.stat.bad * (1 + errorRate(a.stat)) : -a.score
-      const sb = b.stat ? b.stat.bad * (1 + errorRate(b.stat)) : -b.score
+      // у слабых форм stat всегда есть
+      const sa = a.stat!.bad * (1 + errorRate(a.stat!))
+      const sb = b.stat!.bad * (1 + errorRate(b.stat!))
       if (sb !== sa) return sb - sa
       return (b.stat?.last ?? 0) - (a.stat?.last ?? 0)
     })
@@ -112,7 +109,7 @@ function tenseCounts(t: Tense): Record<Mastery, number> {
 const currentCounts = computed(() => tenseCounts(tense.value))
 
 function statLine(c: CellInfo): string {
-  if (!c.stat) return c.score !== 0 ? `счёт ${c.score}` : 'ещё не было'
+  if (!c.stat) return 'ещё не было'
   return `✓ ${c.stat.ok} · ✗ ${c.stat.bad} · серия ${c.stat.streak}`
 }
 </script>
@@ -170,7 +167,7 @@ function statLine(c: CellInfo): string {
     <h2 class="section-title">Сетка форм</h2>
     <div class="tabs" role="tablist">
       <button
-        v-for="t in PROGRESS_TENSES"
+        v-for="t in TENSES"
         :key="t"
         type="button"
         role="tab"

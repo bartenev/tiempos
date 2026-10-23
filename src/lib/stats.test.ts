@@ -31,10 +31,9 @@ describe('stats', () => {
     expect(isWeak(loadStats()[cellKey('ir', 'indefinido', 'él')])).toBe(false)
   })
 
-  it('falls back to legacy progress score without history', () => {
-    expect(isWeak(undefined, -1)).toBe(true)
-    expect(masteryOf(undefined, 0)).toBe('new')
-    expect(masteryOf(undefined, 2)).toBe('learning')
+  it('a form without history is new, not weak', () => {
+    expect(isWeak(undefined)).toBe(false)
+    expect(masteryOf(undefined)).toBe('new')
   })
 
   it('weak forms weigh more than new, new more than solid', () => {

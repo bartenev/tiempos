@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { PERSONS } from '../types'
-import { PROGRESS_TENSES } from '../lib/progress'
+import { PERSONS, TENSES } from '../types'
 import { VERB_COMPLEMENTS, buildVerbSentence } from './sentences'
 import { VERBS } from './verbs'
 
@@ -13,7 +12,7 @@ describe('verb sentences', () => {
 
   it('builds a sentence with one gap and a translation', () => {
     for (const verb of VERBS) {
-      for (const tense of PROGRESS_TENSES) {
+      for (const tense of TENSES) {
         for (const person of PERSONS) {
           const built = buildVerbSentence(verb.infinitive, tense, person)!
           expect(built.sentence.split('___').length - 1).toBe(1)

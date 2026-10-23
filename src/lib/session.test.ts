@@ -109,7 +109,7 @@ describe('smart / weak modes', () => {
     }
     let sessionsWithWeak = 0
     for (let run = 0; run < 200; run++) {
-      const cards = buildSession({ ...regularOnly, mode: 'smart', size: 20 }, stats, {})
+      const cards = buildSession({ ...regularOnly, mode: 'smart', size: 20 }, stats)
       if (cards.some((c) => c.verb.infinitive === 'hablar' && c.person === 'yo')) {
         sessionsWithWeak += 1
       }
@@ -124,7 +124,7 @@ describe('smart / weak modes', () => {
       'comer|presente|tú': { ok: 1, bad: 2, streak: 1, last: 0 },
       'vivir|presente|él': { ok: 5, bad: 1, streak: 4, last: 0 },
     }
-    const cards = buildSession({ ...regularOnly, mode: 'weak', size: 10 }, stats, {})
+    const cards = buildSession({ ...regularOnly, mode: 'weak', size: 10 }, stats)
     for (const c of cards) {
       expect(['hablar|yo', 'comer|tú']).toContain(`${c.verb.infinitive}|${c.person}`)
     }
@@ -138,10 +138,10 @@ describe('smart / weak modes', () => {
 
   it('weak mode caps the session at a few repeats per weak form', () => {
     const stats = { 'hablar|presente|yo': { ok: 0, bad: 1, streak: 0, last: 0 } }
-    expect(buildSession({ ...regularOnly, mode: 'weak', size: 20 }, stats, {})).toHaveLength(3)
+    expect(buildSession({ ...regularOnly, mode: 'weak', size: 20 }, stats)).toHaveLength(3)
   })
 
   it('weak mode throws when nothing is weak', () => {
-    expect(() => buildSession({ ...regularOnly, mode: 'weak' }, {}, {})).toThrow()
+    expect(() => buildSession({ ...regularOnly, mode: 'weak' }, {})).toThrow()
   })
 })

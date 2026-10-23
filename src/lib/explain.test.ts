@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { VERBS, findVerb } from '../data/verbs'
-import { PERSONS } from '../types'
+import { PERSONS, TENSES } from '../types'
 import { conjugate } from './conjugate'
-import { PROGRESS_TENSES } from './progress'
 import { explainForm } from './explain'
 
 describe('explainForm', () => {
@@ -39,7 +38,7 @@ describe('explainForm', () => {
 
   it('stem + ending always rebuilds the real form', () => {
     for (const verb of VERBS) {
-      for (const tense of PROGRESS_TENSES) {
+      for (const tense of TENSES) {
         for (const person of PERSONS) {
           const hint = explainForm(verb, tense, person)
           if (hint.stem === undefined) continue

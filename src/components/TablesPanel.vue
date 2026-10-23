@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { conjugate } from '../lib/conjugate'
-import { heatByPerson, loadProgress } from '../lib/progress'
+import { heatByPerson } from '../lib/heat'
+import { loadStats } from '../lib/stats'
 import { theme } from '../lib/theme'
 import type { Person, Tense, Verb } from '../types'
-import { PERSONS, TENSE_LABELS } from '../types'
+import { PERSONS, TENSES, TENSE_LABELS } from '../types'
 
 const emit = defineEmits<{
   back: []
@@ -16,8 +17,6 @@ const EXAMPLES: Verb[] = [
   { infinitive: 'vivir', group: 'ir' },
 ]
 
-const TENSES: Tense[] = ['presente', 'indefinido', 'imperfecto']
-
 const PERSON_SHORT: Record<Person, string> = {
   yo: 'yo',
   tú: 'tú',
@@ -28,12 +27,12 @@ const PERSON_SHORT: Record<Person, string> = {
 }
 
 const heat = computed(() => {
-  // theme — пересчёт оттенков; loadProgress — свежие счётчики верных
+  // theme — пересчёт оттенков; loadStats — свежие счётчики
   void theme.value
-  const progress = loadProgress()
+  const stats = loadStats()
   const map = {} as Record<Tense, ReturnType<typeof heatByPerson>>
   for (const tense of TENSES) {
-    map[tense] = heatByPerson(progress, tense)
+    map[tense] = heatByPerson(stats, tense)
   }
   return map
 })

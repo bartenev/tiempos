@@ -7,13 +7,6 @@ import SummaryPanel from './components/SummaryPanel.vue'
 import TablesPanel from './components/TablesPanel.vue'
 import { markPracticed } from './lib/daily'
 import { IRREGULAR_INFINITIVES } from './data/verbs'
-import {
-  PROGRESS_TENSES,
-  loadProgress,
-  recordCorrect,
-  recordWrong,
-  saveProgress,
-} from './lib/progress'
 import { buildSession, retryCard } from './lib/session'
 import { configFromSettings, loadSettings } from './lib/settings'
 import { recordAttempt } from './lib/stats'
@@ -25,9 +18,8 @@ import type {
   SessionMistake,
   SessionResult,
 } from './types'
+import { TENSES } from './types'
 
-/** Гарантируем полную матрицу глагол × время × местоимение в localStorage. */
-saveProgress(loadProgress())
 initTheme()
 
 /** Через сколько карточек вернуть форму, на которой ошиблись. */
@@ -103,7 +95,6 @@ function onCorrect() {
   bestStreak.value = Math.max(bestStreak.value, streak.value)
   const card = current.value
   if (!card) return
-  recordCorrect(card.verb.infinitive, card.tense, card.person)
   recordAttempt(card.verb.infinitive, card.tense, card.person, true)
 }
 
@@ -112,7 +103,6 @@ function onWrong(given: string) {
   streak.value = 0
   const card = current.value
   if (!card) return
-  recordWrong(card.verb.infinitive, card.tense, card.person)
   recordAttempt(card.verb.infinitive, card.tense, card.person, false)
   mistakes.value.push({
     infinitive: card.verb.infinitive,
@@ -146,7 +136,7 @@ function trainWeak() {
   start(
     configFromSettings(loadSettings(), {
       mode: 'weak',
-      tenses: [...PROGRESS_TENSES],
+      tenses: [...TENSES],
       includeRegular: true,
       includeIrregular: true,
       selectedIrregular: [...IRREGULAR_INFINITIVES],
