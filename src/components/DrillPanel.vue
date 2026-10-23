@@ -226,13 +226,10 @@ onBeforeUnmount(() => {
         }"
       >
         <span class="drill__sentence-before">{{ sentenceParts.before }}</span>
-        <span class="drill__blank">{{ filledBlank }}</span>
+        <span class="drill__blank">{{ filledBlank }}</span> <span class="drill__infinitive">({{ card.verb.infinitive }})</span>
         <span class="drill__sentence-after">{{ sentenceParts.after }}</span>
       </p>
       <p class="drill__translation">{{ card.translation }}</p>
-      <p class="drill__verb">
-        глагол: <b class="drill__verb-name">{{ card.verb.infinitive }}</b>
-      </p>
     </div>
 
     <p v-if="answerShown" class="drill__answer" lang="es">{{ card.answer }}</p>
