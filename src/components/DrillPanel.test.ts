@@ -34,7 +34,7 @@ describe('DrillPanel', () => {
     expect(wrapper.emitted('wrong')).toEqual([['hablas']])
     expect(wrapper.emitted('next')).toBeUndefined()
     expect(wrapper.find('.rule-hint').exists()).toBe(true)
-    expect(wrapper.find('.answer-big').text()).toBe('hablo')
+    expect(wrapper.find('.drill__answer').text()).toBe('hablo')
 
     await wrapper.find('form').trigger('submit')
     expect(wrapper.emitted('next')).toHaveLength(1)
@@ -81,31 +81,31 @@ describe('DrillPanel — oral (self-check)', () => {
   it('hides the answer until a tap, without a text field', async () => {
     wrapper = mountOral()
     expect(wrapper.find('#answer').exists()).toBe(false)
-    expect(wrapper.find('.blank').text()).toBe('___')
-    expect(wrapper.find('.grade-actions').exists()).toBe(false)
+    expect(wrapper.find('.drill__blank').text()).toBe('___')
+    expect(wrapper.find('.drill__grades').exists()).toBe(false)
 
-    expect(wrapper.find('.answer-big').exists()).toBe(false)
-    await wrapper.find('.prompt-card').trigger('click')
-    expect(wrapper.find('.blank').text()).toBe('habló')
-    expect(wrapper.find('.answer-big').text()).toBe('habló')
+    expect(wrapper.find('.drill__answer').exists()).toBe(false)
+    await wrapper.find('.drill__card').trigger('click')
+    expect(wrapper.find('.drill__blank').text()).toBe('habló')
+    expect(wrapper.find('.drill__answer').text()).toBe('habló')
     expect(wrapper.find('.rule-hint').exists()).toBe(true)
-    expect(wrapper.find('.grade-actions').exists()).toBe(true)
+    expect(wrapper.find('.drill__grades').exists()).toBe(true)
   })
 
   it('«Сказал верно» counts as correct and moves on', async () => {
     wrapper = mountOral()
-    await wrapper.find('.reveal-btn').trigger('click')
+    await wrapper.find('.drill__reveal').trigger('click')
     vi.advanceTimersByTime(400)
-    await wrapper.find('.grade.ok').trigger('click')
+    await wrapper.find('.drill__grade--ok').trigger('click')
     expect(wrapper.emitted('correct')).toHaveLength(1)
     expect(wrapper.emitted('next')).toHaveLength(1)
   })
 
   it('«Ошибся» counts as a mistake and moves on', async () => {
     wrapper = mountOral()
-    await wrapper.find('.reveal-btn').trigger('click')
+    await wrapper.find('.drill__reveal').trigger('click')
     vi.advanceTimersByTime(400)
-    await wrapper.find('.grade.bad').trigger('click')
+    await wrapper.find('.drill__grade--bad').trigger('click')
     expect(wrapper.emitted('wrong')).toEqual([['']])
     expect(wrapper.emitted('next')).toHaveLength(1)
   })
@@ -117,7 +117,7 @@ describe('DrillPanel — oral (self-check)', () => {
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' }))
     await wrapper.vm.$nextTick()
-    expect(wrapper.find('.blank').text()).toBe('habló')
+    expect(wrapper.find('.drill__blank').text()).toBe('habló')
 
     vi.advanceTimersByTime(400)
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }))
@@ -127,14 +127,14 @@ describe('DrillPanel — oral (self-check)', () => {
 
   it('a double tap does not grade by accident', async () => {
     wrapper = mountOral()
-    await wrapper.find('.reveal-btn').trigger('click')
+    await wrapper.find('.drill__reveal').trigger('click')
     vi.advanceTimersByTime(100)
-    await wrapper.find('.grade.ok').trigger('click')
+    await wrapper.find('.drill__grade--ok').trigger('click')
     expect(wrapper.emitted('correct')).toBeUndefined()
     expect(wrapper.emitted('next')).toBeUndefined()
 
     vi.advanceTimersByTime(300)
-    await wrapper.find('.grade.ok').trigger('click')
+    await wrapper.find('.drill__grade--ok').trigger('click')
     expect(wrapper.emitted('correct')).toHaveLength(1)
   })
 

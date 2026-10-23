@@ -84,6 +84,8 @@ body {
   min-height: 100dvh;
 }
 
+/* ===== app ===== */
+
 .app {
   position: relative;
   max-width: 460px;
@@ -98,7 +100,7 @@ button {
   touch-action: manipulation;
 }
 
-.theme-toggle {
+.app__theme-toggle {
   position: absolute;
   top: calc(1.25rem + env(safe-area-inset-top));
   right: calc(1rem + env(safe-area-inset-right));
@@ -114,22 +116,26 @@ button {
   cursor: pointer;
 }
 
-.theme-toggle:hover {
+.app__theme-toggle:hover {
   border-color: var(--muted);
 }
 
-.panel h1 {
+/* ===== screen: общие элементы экранов ===== */
+
+.screen__title {
   margin: 0 0 0.35rem;
   font-size: 2rem;
   letter-spacing: -0.02em;
 }
 
-.lead {
+.screen__lead {
   margin: 0 0 1.5rem;
   color: var(--muted);
 }
 
-.block {
+/* ===== group: карточка-fieldset в настройках ===== */
+
+.group {
   border: 1px solid var(--line);
   background: var(--card);
   border-radius: var(--radius);
@@ -137,14 +143,15 @@ button {
   margin: 0 0 1rem;
 }
 
-.block legend {
+.group__legend {
   padding: 0 0.35rem;
   font-size: 0.85rem;
   color: var(--muted);
 }
 
-.check,
-.radio {
+/* ===== choice: строка с чекбоксом / радио ===== */
+
+.choice {
   display: flex;
   align-items: center;
   gap: 0.55rem;
@@ -152,18 +159,20 @@ button {
   cursor: pointer;
 }
 
-.sizes {
+/* ===== setup ===== */
+
+.setup__sizes {
   display: flex;
   gap: 1rem;
 }
 
-.irregular-list {
+.setup__irregular {
   margin-top: 0.85rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--line);
 }
 
-.irregular-head {
+.setup__irregular-head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -172,18 +181,20 @@ button {
   margin-bottom: 0.5rem;
 }
 
-.irregular-title {
+.setup__irregular-title {
   margin: 0;
   font-size: 0.85rem;
   color: var(--muted);
 }
 
-.irregular-actions {
+.setup__irregular-actions {
   display: flex;
   gap: 0.65rem;
 }
 
-.linkish {
+/* ===== link-button: кнопка-ссылка ===== */
+
+.link-button {
   font: inherit;
   font-size: 0.8rem;
   padding: 0;
@@ -195,11 +206,11 @@ button {
   text-underline-offset: 2px;
 }
 
-.linkish:hover {
+.link-button:hover {
   color: var(--accent-hover);
 }
 
-.irregular-grid {
+.setup__irregular-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.15rem 0.75rem;
@@ -208,14 +219,15 @@ button {
   padding-right: 0.25rem;
 }
 
-.irregular-item {
+.setup__irregular-item {
   margin: 0.2rem 0;
   font-family: var(--mono);
   font-size: 0.9rem;
 }
 
-.primary,
-.ghost {
+/* ===== button ===== */
+
+.button {
   font: inherit;
   min-height: 2.75rem;
   border-radius: 999px;
@@ -224,47 +236,47 @@ button {
   border: 1px solid transparent;
 }
 
-.ghost.small {
+.button--small {
   min-height: 2.25rem;
   padding: 0.35rem 0.9rem;
   font-size: 0.9rem;
 }
 
-.primary {
+.button--primary {
   background: var(--accent);
   color: #fff;
 }
 
-.primary:hover:not(:disabled) {
+.button--primary:hover:not(:disabled) {
   background: var(--accent-hover);
 }
 
-.primary:disabled {
+.button--primary:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-.ghost {
+.button--ghost {
   background: transparent;
   color: var(--muted);
   border-color: var(--line);
 }
 
-.ghost:hover {
+.button--ghost:hover {
   color: var(--ink);
   border-color: var(--muted);
 }
 
-.actions {
+.screen__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.65rem;
   margin-top: 1rem;
 }
 
-.drill .bar,
-.tables .bar,
-.progress-panel .bar {
+/* ===== topbar: верхняя строка «‹ назад · заголовок · справа» ===== */
+
+.topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -274,38 +286,39 @@ button {
   color: var(--muted);
 }
 
-.tables h2 {
+/* ===== tables ===== */
+
+.tables__tense-title {
   margin: 1.5rem 0 0.65rem;
   font-size: 1.05rem;
 }
 
-.tables .tense-block:first-of-type h2 {
+.tables__tense:first-of-type .tables__tense-title {
   margin-top: 0.5rem;
 }
 
-.tables .table-wrap {
+.tables__wrap {
   overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--card);
 }
 
-.tables table {
+.tables__table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.88rem;
   font-family: var(--mono);
 }
 
-.tables th,
-.tables td {
+.tables__cell {
   padding: 0.45rem 0.55rem;
   text-align: left;
   border-bottom: 1px solid var(--line);
   white-space: nowrap;
 }
 
-.tables thead th {
+.tables__head {
   font-family: var(--font);
   font-weight: 600;
   font-size: 0.8rem;
@@ -314,7 +327,7 @@ button {
   vertical-align: bottom;
 }
 
-.tables thead .ex {
+.tables__head-verb {
   display: block;
   font-family: var(--mono);
   font-weight: 500;
@@ -323,13 +336,13 @@ button {
   margin-top: 0.15rem;
 }
 
-.tables tbody th {
+.tables__person {
   font-family: var(--font);
   font-weight: 500;
   color: var(--ink);
 }
 
-.tables tbody th .sum {
+.tables__sum {
   display: block;
   font-size: 0.7rem;
   font-weight: 500;
@@ -337,17 +350,16 @@ button {
   margin-top: 0.1rem;
 }
 
-.tables tbody tr:last-child th,
-.tables tbody tr:last-child td {
+.tables__row:last-child .tables__cell {
   border-bottom: none;
 }
 
-.tables .lead b {
+.tables__example {
   font-family: var(--mono);
   font-weight: 600;
 }
 
-.tables .heat-legend {
+.tables__legend {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -357,31 +369,33 @@ button {
   color: var(--muted);
 }
 
-.tables .heat-legend .swatch {
+.tables__swatch {
   width: 0.9rem;
   height: 0.9rem;
   border-radius: 3px;
   border: 1px solid var(--line);
 }
 
-.tables .heat-legend .swatch.hot {
+.tables__swatch--hot {
   background: var(--heat-hot); /* красный — хуже */
 }
 
-.tables .heat-legend .swatch.cold {
+.tables__swatch--cold {
   background: var(--heat-cold); /* зелёный — лучше */
 }
 
-.tables .heat-legend .sep {
+.tables__legend-sep {
   margin: 0 0.15rem;
 }
 
-.tables .heat-legend .note {
+.tables__legend-note {
   width: 100%;
   font-size: 0.78rem;
 }
 
-.prompt-card {
+/* ===== drill: карточка задания ===== */
+
+.drill__card {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -390,7 +404,7 @@ button {
   margin-bottom: 1.25rem;
 }
 
-.prompt-card.flash-ok {
+.drill__card--flash {
   animation: flash-ok 0.6s ease-out;
 }
 
@@ -406,19 +420,19 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .prompt-card.flash-ok {
+  .drill__card--flash {
     animation: none;
   }
 }
 
-.prompt-card .meta {
+.drill__tense {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--muted);
 }
 
-.prompt-card .sentence {
+.drill__sentence {
   margin: 0.85rem 0 0.5rem;
   font-size: 1.35rem;
   font-weight: 550;
@@ -426,7 +440,7 @@ button {
   text-wrap: balance;
 }
 
-.prompt-card .blank {
+.drill__blank {
   display: inline-block;
   min-width: 3.5ch;
   padding: 0 0.15em;
@@ -437,22 +451,22 @@ button {
   color: var(--accent);
 }
 
-.prompt-card .sentence.ok .blank {
+.drill__sentence--ok .drill__blank {
   border-color: var(--ok);
   color: var(--ok);
 }
 
-.prompt-card .sentence.almost .blank {
+.drill__sentence--almost .drill__blank {
   border-color: var(--almost);
   color: var(--almost);
 }
 
-.prompt-card .sentence.bad .blank {
+.drill__sentence--bad .drill__blank {
   border-color: var(--bad);
   color: var(--bad);
 }
 
-.prompt-card .answer-big {
+.drill__answer {
   margin: 0.15rem 0 0.6rem;
   font-family: var(--mono);
   /* comprendisteis (14 знаков) — в одну строку на телефоне */
@@ -473,30 +487,32 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .prompt-card .answer-big {
+  .drill__answer {
     animation: none;
   }
 }
 
-.prompt-card .translation {
+.drill__translation {
   margin: 0.35rem 0 0;
   color: var(--muted);
   font-size: 0.95rem;
 }
 
-.prompt-card .hint-verb {
+.drill__verb {
   margin: 0.85rem 0 0;
   font-size: 1.25rem;
   color: var(--muted);
 }
 
-.prompt-card .hint-verb b {
+.drill__verb-name {
   color: var(--ink);
   font-family: var(--mono);
   font-size: 1.45rem;
 }
 
-.answer-form input {
+/* ===== drill: ввод текстом ===== */
+
+.drill__input {
   width: 100%;
   font: inherit;
   font-size: 1.4rem;
@@ -510,44 +526,48 @@ button {
   outline: none;
 }
 
-.answer-form input:focus {
+.drill__input:focus {
   border-color: var(--accent);
 }
 
-.answer-form input.ok {
+.drill__input--ok {
   border-color: var(--ok);
   background: var(--ok-bg);
 }
 
-.answer-form input.almost {
+.drill__input--almost {
   border-color: var(--almost);
   background: var(--almost-bg);
 }
 
-.answer-form input.bad {
+.drill__input--bad {
   border-color: var(--bad);
   background: var(--bad-bg);
 }
 
-.hint {
+/* ===== notice: строка-сообщение (ошибка, «почти», пояснение) ===== */
+
+.notice {
   min-height: 1.4em;
   margin: 0.65rem 0 0;
   font-size: 0.95rem;
 }
 
-.ok-text {
-  color: var(--ok);
+.notice--muted {
+  color: var(--muted);
 }
 
-.almost-text {
+.notice--almost {
   color: var(--almost);
 }
 
-.bad-text {
+.notice--bad {
   color: var(--bad);
 }
 
-.stats {
+/* ===== stat-list: список «название — число» ===== */
+
+.stat-list {
   list-style: none;
   margin: 0 0 1.25rem;
   padding: 0;
@@ -557,15 +577,23 @@ button {
   overflow: hidden;
 }
 
-.stats li {
+.stat-list__item {
   display: flex;
   justify-content: space-between;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--line);
 }
 
-.stats li:last-child {
+.stat-list__item:last-child {
   border-bottom: none;
+}
+
+.stat-list__item--ok {
+  color: var(--ok);
+}
+
+.stat-list__item--bad {
+  color: var(--bad);
 }
 
 .sr-only {
@@ -580,13 +608,13 @@ button {
   border: 0;
 }
 
-/* —— Drill: прогресс сессии, акценты, подсказка правила —— */
+/* ===== drill: прогресс сессии, буквы с ударением ===== */
 
-.drill .bar {
+.drill__bar {
   padding-right: 3rem; /* место под переключатель темы */
 }
 
-.session-meter {
+.drill__meter {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -595,7 +623,7 @@ button {
   color: var(--muted);
 }
 
-.meter-track {
+.drill__meter-track {
   flex: 1;
   height: 6px;
   border-radius: 999px;
@@ -603,14 +631,14 @@ button {
   overflow: hidden;
 }
 
-.meter-fill {
+.drill__meter-fill {
   height: 100%;
   background: var(--accent);
   border-radius: inherit;
   transition: width 0.25s ease;
 }
 
-.meter-stats {
+.drill__meter-stats {
   display: flex;
   gap: 0.6rem;
   min-width: 5.5rem;
@@ -618,12 +646,12 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
-.streak {
+.drill__streak {
   color: var(--almost);
   font-weight: 600;
 }
 
-.retry-tag {
+.drill__retry {
   margin-left: 0.4rem;
   padding: 0.05rem 0.45rem;
   border-radius: 999px;
@@ -633,14 +661,14 @@ button {
   letter-spacing: 0.04em;
 }
 
-.accent-keys {
+.drill__accents {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 0.35rem;
   margin-top: 0.55rem;
 }
 
-.accent-key {
+.drill__accent {
   font: inherit;
   font-family: var(--mono);
   font-size: 1.15rem;
@@ -653,15 +681,17 @@ button {
   cursor: pointer;
 }
 
-.accent-key:active:not(:disabled) {
+.drill__accent:active:not(:disabled) {
   background: var(--bg-accent);
   border-color: var(--accent);
 }
 
-.accent-key:disabled {
+.drill__accent:disabled {
   opacity: 0.4;
   cursor: default;
 }
+
+/* ===== rule-hint: подсказка правила после ошибки ===== */
 
 .rule-hint {
   margin-top: 0.75rem;
@@ -673,27 +703,27 @@ button {
   font-size: 0.9rem;
 }
 
-.rule-hint .rule {
+.rule-hint__rule {
   margin: 0;
 }
 
-.rule-hint .formula {
+.rule-hint__formula {
   margin: 0.5rem 0 0;
   font-family: var(--mono);
   font-size: 1.2rem;
 }
 
-.rule-hint .formula .plus {
+.rule-hint__plus {
   margin: 0 0.35rem;
   color: var(--muted);
 }
 
-.rule-hint .formula .ending {
+.rule-hint__ending {
   color: var(--accent);
   font-weight: 700;
 }
 
-.rule-hint .row {
+.rule-hint__row {
   list-style: none;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -702,7 +732,7 @@ button {
   padding: 0;
 }
 
-.rule-hint .row li {
+.rule-hint__item {
   display: flex;
   flex-direction: column;
   padding: 0.3rem 0.45rem;
@@ -711,42 +741,44 @@ button {
   min-width: 0;
 }
 
-.rule-hint .row li.current {
+.rule-hint__item--current {
   background: var(--almost-bg);
   outline: 1.5px solid var(--almost);
 }
 
-.rule-hint .row .p {
+.rule-hint__person {
   font-size: 0.7rem;
   color: var(--muted);
 }
 
-.rule-hint .row .v {
+.rule-hint__value {
   font-family: var(--mono);
   font-size: 0.88rem;
   overflow-wrap: anywhere;
 }
 
-.rule-hint .note {
+.rule-hint__note {
   margin: 0.55rem 0 0;
   color: var(--muted);
   font-size: 0.82rem;
 }
 
-.prompt-card.tappable {
+/* ===== drill: устный режим ===== */
+
+.drill__card--tappable {
   cursor: pointer;
 }
 
-.prompt-card .sentence.shown .blank {
+.drill__sentence--shown .drill__blank {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.oral-dock {
+.drill__dock {
   margin-top: 1rem;
 }
 
-.reveal-btn {
+.drill__reveal {
   width: 100%;
   min-height: 6rem;
   padding: 1rem;
@@ -760,18 +792,18 @@ button {
   cursor: pointer;
 }
 
-.reveal-btn:hover {
+.drill__reveal:hover {
   border-color: var(--accent);
   color: var(--ink);
 }
 
-.grade-actions {
+.drill__grades {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.6rem;
 }
 
-.grade {
+.drill__grade {
   min-height: 6rem;
   font: inherit;
   font-size: 1.05rem;
@@ -781,24 +813,25 @@ button {
   cursor: pointer;
 }
 
-.grade.bad {
+.drill__grade--bad {
   background: var(--bad-bg);
   border-color: var(--bad);
   color: var(--bad);
 }
 
-.grade.ok {
+.drill__grade--ok {
   background: var(--ok-bg);
   border-color: var(--ok);
   color: var(--ok);
 }
 
-.drill-actions .primary {
+.drill__submit {
   flex: 1;
 }
 
-/* Кнопка старта всегда под пальцем, даже при длинном списке глаголов. */
-.setup-actions {
+/* ===== setup: кнопка старта всегда под пальцем ===== */
+
+.setup__actions {
   position: sticky;
   bottom: 0;
   z-index: 2;
@@ -807,30 +840,31 @@ button {
   background: linear-gradient(to top, var(--bg) 70%, transparent);
 }
 
-.setup-actions .primary {
+.setup__start {
   flex: 1 1 100%;
 }
 
-.setup-actions .ghost {
+.setup__to-progress,
+.setup__to-tables {
   flex: 1;
 }
 
-/* —— Сводка и прогресс —— */
-
-.daily {
+.setup__daily {
   margin: -0.9rem 0 1.25rem;
   font-weight: 600;
   color: var(--almost);
 }
 
-.big-stats {
+/* ===== stat-tiles: три плитки с крупными числами ===== */
+
+.stat-tiles {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.5rem;
   margin: 0 0 1rem;
 }
 
-.big-stat {
+.stat-tiles__item {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
@@ -841,17 +875,17 @@ button {
   text-align: center;
 }
 
-.big-stat b {
+.stat-tiles__value {
   font-size: 1.35rem;
   font-variant-numeric: tabular-nums;
 }
 
-.big-stat span {
+.stat-tiles__label {
   font-size: 0.75rem;
   color: var(--muted);
 }
 
-.section-title {
+.screen__section-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -859,13 +893,12 @@ button {
   font-size: 1.05rem;
 }
 
-.muted {
+.progress__weak-empty {
   color: var(--muted);
-}
-
-.small-text {
   font-size: 0.9rem;
 }
+
+/* ===== badge: счётчик-пилюля ===== */
 
 .badge {
   display: inline-block;
@@ -879,10 +912,12 @@ button {
   text-align: center;
 }
 
-.badge.hot {
+.badge--hot {
   background: var(--bad-bg);
   color: var(--bad);
 }
+
+/* ===== segmented: переключатель из двух-трёх кнопок ===== */
 
 .segmented {
   display: flex;
@@ -893,7 +928,7 @@ button {
   background: var(--bg);
 }
 
-.segmented button {
+.segmented__item {
   flex: 1;
   min-height: 2.5rem;
   font: inherit;
@@ -904,37 +939,39 @@ button {
   cursor: pointer;
 }
 
-.segmented button.active {
+.segmented__item--active {
   background: var(--accent);
   color: #fff;
 }
 
-.segmented button:disabled {
+.segmented__item:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-.field-note {
+.group__note {
   margin: 0.6rem 0 0;
   font-size: 0.8rem;
   color: var(--muted);
 }
 
-.mode-option {
+.setup__mode-option {
   align-items: flex-start;
 }
 
-.mode-option input {
+.setup__mode-input {
   margin-top: 0.3rem;
 }
 
-.mode-option small {
+.setup__mode-hint {
   display: block;
   color: var(--muted);
   font-size: 0.8rem;
 }
 
-.mistakes {
+/* ===== form-list: список форм (ошибки, слабые формы) ===== */
+
+.form-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -944,7 +981,7 @@ button {
   overflow: hidden;
 }
 
-.mistakes li {
+.form-list__item {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -953,16 +990,16 @@ button {
   border-bottom: 1px solid var(--line);
 }
 
-.mistakes li:last-child {
+.form-list__item:last-child {
   border-bottom: none;
 }
 
-.mistakes .m-meta {
+.form-list__meta {
   font-size: 0.85rem;
   color: var(--muted);
 }
 
-.mistakes .m-forms {
+.form-list__forms {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -972,10 +1009,21 @@ button {
   text-align: right;
 }
 
-.mistakes .m-forms small {
+.form-list__given {
+  color: var(--bad);
+}
+
+.form-list__answer--ok {
+  color: var(--ok);
+}
+
+.form-list__stat {
   font-family: var(--font);
   font-size: 0.75rem;
+  color: var(--muted);
 }
+
+/* ===== tabs: вкладки времён ===== */
 
 .tabs {
   display: flex;
@@ -986,7 +1034,7 @@ button {
   background: var(--card);
 }
 
-.tab {
+.tabs__tab {
   flex: 1;
   min-width: 0;
   padding: 0 0.25rem;
@@ -1000,12 +1048,14 @@ button {
   cursor: pointer;
 }
 
-.tab.active {
+.tabs__tab--active {
   background: var(--accent);
   color: #fff;
 }
 
-.legend {
+/* ===== progress ===== */
+
+.progress__legend {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem 0.9rem;
@@ -1014,39 +1064,39 @@ button {
   color: var(--muted);
 }
 
-.legend-item {
+.progress__legend-item {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
 }
 
-.dot {
+.progress__dot {
   width: 0.8rem;
   height: 0.8rem;
   border-radius: 3px;
 }
 
-.dot.solid,
-.cell.solid {
+.progress__dot--solid,
+.progress__cell--solid {
   background: var(--m-solid);
 }
 
-.dot.learning,
-.cell.learning {
+.progress__dot--learning,
+.progress__cell--learning {
   background: var(--m-learning);
 }
 
-.dot.weak,
-.cell.weak {
+.progress__dot--weak,
+.progress__cell--weak {
   background: var(--m-weak);
 }
 
-.dot.new,
-.cell.new {
+.progress__dot--new,
+.progress__cell--new {
   background: var(--m-new);
 }
 
-.cell-detail {
+.progress__detail {
   position: sticky;
   bottom: calc(0.75rem + env(safe-area-inset-bottom));
   z-index: 1;
@@ -1062,39 +1112,43 @@ button {
   box-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
 }
 
-.cell-detail b {
+.progress__detail-form {
   font-family: var(--mono);
   font-size: 1.15rem;
 }
 
-.grid-group {
+.progress__detail-stat {
+  color: var(--muted);
+}
+
+.progress__group {
   margin-bottom: 1rem;
 }
 
-.grid-title {
+.progress__group-title {
   margin: 0.75rem 0 0.35rem;
   font-size: 0.8rem;
   color: var(--muted);
 }
 
-.mastery-grid {
+.progress__grid {
   width: 100%;
   border-collapse: separate;
   border-spacing: 3px;
   table-layout: fixed;
 }
 
-.mastery-grid thead th {
+.progress__col {
   font-size: 0.7rem;
   font-weight: 500;
   color: var(--muted);
 }
 
-.mastery-grid .verb-col {
+.progress__col--verb {
   width: 6.75rem;
 }
 
-.mastery-grid tbody th {
+.progress__verb {
   padding-right: 0.35rem;
   font-family: var(--mono);
   font-size: 0.8rem;
@@ -1105,11 +1159,11 @@ button {
   text-overflow: ellipsis;
 }
 
-.mastery-grid td {
+.progress__td {
   padding: 0;
 }
 
-.cell {
+.progress__cell {
   display: block;
   width: 100%;
   height: 1.6rem;
@@ -1119,18 +1173,18 @@ button {
   cursor: pointer;
 }
 
-.cell.picked {
+.progress__cell--picked {
   outline: 2px solid var(--ink);
   outline-offset: 1px;
 }
 
 /* Телефон: зона тапа и оценки — внизу экрана, контент прокручивается над ней. */
 @media (max-width: 640px) {
-  .drill.oral-mode {
+  .drill--oral {
     padding-bottom: calc(8rem + env(safe-area-inset-bottom));
   }
 
-  .oral-dock {
+  .drill__dock {
     position: fixed;
     left: 50%;
     bottom: 0;
@@ -1146,15 +1200,15 @@ button {
 }
 
 @media (max-width: 380px) {
-  .mastery-grid .verb-col {
+  .progress__col--verb {
     width: 6rem;
   }
 
-  .mastery-grid tbody th {
+  .progress__verb {
     font-size: 0.75rem;
   }
 
-  .prompt-card .sentence {
+  .drill__sentence {
     font-size: 1.2rem;
   }
 }

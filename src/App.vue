@@ -152,7 +152,7 @@ function toSetup() {
 <template>
   <div class="app">
     <button
-      class="theme-toggle"
+      class="app__theme-toggle"
       type="button"
       :title="theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'"
       :aria-label="theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'"

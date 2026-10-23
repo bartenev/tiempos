@@ -125,47 +125,51 @@ function statLine(c: CellInfo): string {
 </script>
 
 <template>
-  <section class="panel progress-panel">
-    <header class="bar">
-      <button class="ghost small" type="button" @click="emit('back')">‹ назад</button>
-      <span class="prog">Прогресс</span>
-      <span />
+  <section class="progress">
+    <header class="topbar progress__bar">
+      <button class="button button--ghost button--small topbar__back progress__back" type="button" @click="emit('back')">‹ назад</button>
+      <span class="topbar__title progress__bar-title">Прогресс</span>
+      <span class="topbar__aside progress__bar-aside" />
     </header>
 
-    <div class="big-stats">
-      <div class="big-stat">
-        <b>{{ totals.answered }}</b>
-        <span>ответов</span>
+    <div class="stat-tiles progress__tiles">
+      <div class="stat-tiles__item progress__answered">
+        <b class="stat-tiles__value progress__answered-value">{{ totals.answered }}</b>
+        <span class="stat-tiles__label progress__answered-label">ответов</span>
       </div>
-      <div class="big-stat">
-        <b>{{ totals.accuracy === null ? '—' : `${totals.accuracy}%` }}</b>
-        <span>точность</span>
+      <div class="stat-tiles__item progress__accuracy">
+        <b class="stat-tiles__value progress__accuracy-value">{{ totals.accuracy === null ? '—' : `${totals.accuracy}%` }}</b>
+        <span class="stat-tiles__label progress__accuracy-label">точность</span>
       </div>
-      <div class="big-stat">
-        <b>{{ totals.counts.solid }}</b>
-        <span>выучено из {{ totals.total }}</span>
+      <div class="stat-tiles__item progress__solid">
+        <b class="stat-tiles__value progress__solid-value">{{ totals.counts.solid }}</b>
+        <span class="stat-tiles__label progress__solid-label">выучено из {{ totals.total }}</span>
       </div>
     </div>
 
-    <h2 class="section-title">
+    <h2 class="screen__section-title progress__weak-title">
       Слабые формы
-      <span class="badge" :class="{ hot: totals.counts.weak > 0 }">{{ totals.counts.weak }}</span>
+      <span class="badge progress__weak-count" :class="{ 'badge--hot': totals.counts.weak > 0 }">{{ totals.counts.weak }}</span>
     </h2>
-    <p v-if="topWeak.length === 0" class="muted small-text">
+    <p v-if="topWeak.length === 0" class="progress__weak-empty">
       Пока нет — ошибки появятся здесь, и умная очередь будет показывать их чаще.
     </p>
-    <ul v-else class="mistakes weak-list">
-      <li v-for="c in topWeak" :key="cellKey(c.verb.infinitive, c.tense, c.person)">
-        <span class="m-meta">{{ c.verb.infinitive }} · {{ TENSE_SHORT[c.tense] }} · {{ personLabel(c.tense, c.person) }}</span>
-        <span class="m-forms">
-          <b>{{ conjugate(c.verb, c.tense, c.person) }}</b>
-          <small class="muted">{{ statLine(c) }}</small>
+    <ul v-else class="form-list progress__weak-list">
+      <li
+        v-for="c in topWeak"
+        :key="cellKey(c.verb.infinitive, c.tense, c.person)"
+        class="form-list__item progress__weak-item"
+      >
+        <span class="form-list__meta progress__weak-meta">{{ c.verb.infinitive }} · {{ TENSE_SHORT[c.tense] }} · {{ personLabel(c.tense, c.person) }}</span>
+        <span class="form-list__forms progress__weak-forms">
+          <b class="form-list__answer progress__weak-answer">{{ conjugate(c.verb, c.tense, c.person) }}</b>
+          <small class="form-list__stat progress__weak-stat">{{ statLine(c) }}</small>
         </span>
       </li>
     </ul>
-    <div class="actions">
+    <div class="screen__actions progress__actions">
       <button
-        class="primary"
+        class="button button--primary progress__train"
         type="button"
         :disabled="totals.counts.weak === 0"
         @click="emit('train-weak')"
@@ -174,15 +178,15 @@ function statLine(c: CellInfo): string {
       </button>
     </div>
 
-    <h2 class="section-title">Сетка форм</h2>
-    <div class="tabs" role="tablist">
+    <h2 class="screen__section-title progress__grid-title">Сетка форм</h2>
+    <div class="tabs progress__tabs" role="tablist">
       <button
         v-for="t in TENSES"
         :key="t"
+        class="tabs__tab progress__tab"
+        :class="{ 'tabs__tab--active': tense === t }"
         type="button"
         role="tab"
-        class="tab"
-        :class="{ active: tense === t }"
         :aria-selected="tense === t"
         @click="tense = t; selectedKey = null"
       >
@@ -190,29 +194,32 @@ function statLine(c: CellInfo): string {
       </button>
     </div>
 
-    <p class="legend">
-      <span v-for="m in (['solid', 'learning', 'weak', 'new'] as Mastery[])" :key="m" class="legend-item">
-        <span class="dot" :class="m" /> {{ MASTERY_LABELS[m] }} · {{ currentCounts[m] }}
+    <p class="progress__legend">
+      <span v-for="m in (['solid', 'learning', 'weak', 'new'] as Mastery[])" :key="m" class="progress__legend-item">
+        <span class="progress__dot" :class="`progress__dot--${m}`" /> {{ MASTERY_LABELS[m] }} · {{ currentCounts[m] }}
       </span>
     </p>
 
-    <div v-for="g in groups" :key="g.title" class="grid-group">
-      <p class="grid-title">{{ g.title }}</p>
-      <table class="mastery-grid">
-        <thead>
-          <tr>
-            <th class="verb-col" />
-            <th v-for="p in personsFor(tense)" :key="p" scope="col">{{ COLUMN_LABELS[personLabel(tense, p)] ?? p }}</th>
+    <div v-for="g in groups" :key="g.title" class="progress__group">
+      <p class="progress__group-title">{{ g.title }}</p>
+      <table class="progress__grid">
+        <thead class="progress__grid-head">
+          <tr class="progress__grid-head-row">
+            <th class="progress__col progress__col--verb" />
+            <th v-for="p in personsFor(tense)" :key="p" class="progress__col" scope="col">{{ COLUMN_LABELS[personLabel(tense, p)] ?? p }}</th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="verb in g.verbs.filter((v) => hasTense(v, tense))" :key="verb.infinitive">
-            <th scope="row">{{ verb.infinitive }}</th>
-            <td v-for="p in personsFor(tense)" :key="p">
+        <tbody class="progress__grid-body">
+          <tr v-for="verb in g.verbs.filter((v) => hasTense(v, tense))" :key="verb.infinitive" class="progress__row">
+            <th class="progress__verb" scope="row">{{ verb.infinitive }}</th>
+            <td v-for="p in personsFor(tense)" :key="p" class="progress__td">
               <button
+                class="progress__cell"
+                :class="[
+                  `progress__cell--${cellOf(verb, p).mastery}`,
+                  { 'progress__cell--picked': selectedKey === cellKey(verb.infinitive, tense, p) },
+                ]"
                 type="button"
-                class="cell"
-                :class="[cellOf(verb, p).mastery, { picked: selectedKey === cellKey(verb.infinitive, tense, p) }]"
                 :aria-label="`${verb.infinitive}, ${p}: ${MASTERY_LABELS[cellOf(verb, p).mastery]}`"
                 @click="select(verb, p)"
               />
@@ -222,10 +229,10 @@ function statLine(c: CellInfo): string {
       </table>
     </div>
 
-    <div v-if="selected" class="cell-detail">
-      <b>{{ conjugate(selected.verb, selected.tense, selected.person) }}</b>
-      <span>{{ selected.verb.infinitive }} · {{ personLabel(selected.tense, selected.person) }} · {{ MASTERY_LABELS[selected.mastery] }}</span>
-      <small class="muted">{{ statLine(selected) }}</small>
+    <div v-if="selected" class="progress__detail">
+      <b class="progress__detail-form">{{ conjugate(selected.verb, selected.tense, selected.person) }}</b>
+      <span class="progress__detail-meta">{{ selected.verb.infinitive }} · {{ personLabel(selected.tense, selected.person) }} · {{ MASTERY_LABELS[selected.mastery] }}</span>
+      <small class="progress__detail-stat">{{ statLine(selected) }}</small>
     </div>
   </section>
 </template>

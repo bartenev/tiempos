@@ -188,74 +188,80 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="panel drill" :class="{ 'oral-mode': oral }">
-    <header class="bar">
-      <button class="ghost small" type="button" @click="emit('quit')">‹ выход</button>
-      <span class="prog">{{ progress }}</span>
-      <span class="score">
+  <section class="drill" :class="{ 'drill--oral': oral }">
+    <header class="topbar drill__bar">
+      <button class="button button--ghost button--small topbar__back drill__quit" type="button" @click="emit('quit')">‹ выход</button>
+      <span class="topbar__title drill__counter">{{ progress }}</span>
+      <span class="topbar__aside drill__score">
         ✓ {{ correct }} · ✗ {{ wrong }}
       </span>
     </header>
 
-    <div class="session-meter" aria-live="polite">
-      <div class="meter-track">
-        <div class="meter-fill" :style="{ width: `${((index) / total) * 100}%` }" />
+    <div class="drill__meter" aria-live="polite">
+      <div class="drill__meter-track">
+        <div class="drill__meter-fill" :style="{ width: `${((index) / total) * 100}%` }" />
       </div>
-      <span class="meter-stats">
-        <span v-if="accuracy !== null">{{ accuracy }}%</span>
-        <span v-if="streak >= 2" class="streak">🔥 {{ streak }}</span>
+      <span class="drill__meter-stats">
+        <span v-if="accuracy !== null" class="drill__accuracy">{{ accuracy }}%</span>
+        <span v-if="streak >= 2" class="drill__streak">🔥 {{ streak }}</span>
       </span>
     </div>
 
     <div
-      class="prompt-card"
-      :class="{ 'flash-ok': flashOk, tappable: oral && !shown }"
+      class="drill__card"
+      :class="{ 'drill__card--flash': flashOk, 'drill__card--tappable': oral && !shown }"
       @click="reveal"
     >
-      <div class="meta">
+      <div class="drill__tense">
         {{ TENSE_LABELS[card.tense] }}
-        <span v-if="card.retry" class="retry-tag">повтор</span>
+        <span v-if="card.retry" class="drill__retry">повтор</span>
       </div>
       <p
-        class="sentence"
+        class="drill__sentence"
         :class="{
-          ok: feedback === 'exact',
-          almost: feedback === 'almost',
-          bad: feedback === 'wrong',
-          shown,
+          'drill__sentence--ok': feedback === 'exact',
+          'drill__sentence--almost': feedback === 'almost',
+          'drill__sentence--bad': feedback === 'wrong',
+          'drill__sentence--shown': shown,
         }"
       >
-        <span>{{ sentenceParts.before }}</span>
-        <span class="blank">{{ filledBlank }}</span>
-        <span>{{ sentenceParts.after }}</span>
+        <span class="drill__sentence-before">{{ sentenceParts.before }}</span>
+        <span class="drill__blank">{{ filledBlank }}</span>
+        <span class="drill__sentence-after">{{ sentenceParts.after }}</span>
       </p>
-      <p v-if="answerShown" class="answer-big" lang="es">{{ card.answer }}</p>
-      <p class="translation">{{ card.translation }}</p>
-      <p class="hint-verb">
-        глагол: <b>{{ card.verb.infinitive }}</b>
+      <p v-if="answerShown" class="drill__answer" lang="es">{{ card.answer }}</p>
+      <p class="drill__translation">{{ card.translation }}</p>
+      <p class="drill__verb">
+        глагол: <b class="drill__verb-name">{{ card.verb.infinitive }}</b>
       </p>
     </div>
 
     <template v-if="oral">
-      <RuleHint v-if="hint" :hint="hint" />
+      <RuleHint v-if="hint" class="drill__hint" :hint="hint" />
       <!-- На телефоне закреплено внизу экрана — под большой палец. -->
-      <div class="oral-dock">
-        <button v-if="!shown" class="reveal-btn" type="button" @click="reveal">
-          Скажите форму вслух или про себя —<br />тапните, чтобы проверить
+      <div class="drill__dock">
+        <button v-if="!shown" class="drill__reveal" type="button" @click="reveal">
+          Скажите форму вслух или про себя —<br class="drill__reveal-break" />тапните, чтобы проверить
         </button>
-        <div v-else class="grade-actions">
-          <button class="grade bad" type="button" @click="grade(false)">✗ Ошибся</button>
-          <button class="grade ok" type="button" @click="grade(true)">✓ Сказал верно</button>
+        <div v-else class="drill__grades">
+          <button class="drill__grade drill__grade--bad" type="button" @click="grade(false)">✗ Ошибся</button>
+          <button class="drill__grade drill__grade--ok" type="button" @click="grade(true)">✓ Сказал верно</button>
         </div>
       </div>
     </template>
 
-    <form v-else class="answer-form" @submit.prevent="submit">
-      <label class="sr-only" for="answer">Форма глагола</label>
+    <form v-else class="drill__form" @submit.prevent="submit">
+      <label class="sr-only drill__label" for="answer">Форма глагола</label>
       <input
         id="answer"
         ref="inputEl"
         v-model="input"
+        class="drill__input"
+        :class="{
+          'drill__input--ok': feedback === 'exact',
+          'drill__input--almost': feedback === 'almost',
+          'drill__input--bad': feedback === 'wrong',
+        }"
         type="text"
         inputmode="text"
         enterkeyhint="go"
@@ -265,20 +271,15 @@ onBeforeUnmount(() => {
         spellcheck="false"
         lang="es"
         :readonly="revealed"
-        :class="{
-          ok: feedback === 'exact',
-          almost: feedback === 'almost',
-          bad: feedback === 'wrong',
-        }"
         placeholder="форма глагола…"
       />
 
-      <div class="accent-keys" role="group" aria-label="Буквы с ударением">
+      <div class="drill__accents" role="group" aria-label="Буквы с ударением">
         <button
           v-for="ch in ACCENTS"
           :key="ch"
+          class="drill__accent"
           type="button"
-          class="accent-key"
           tabindex="-1"
           :disabled="revealed"
           @pointerdown.prevent
@@ -288,20 +289,20 @@ onBeforeUnmount(() => {
         </button>
       </div>
 
-      <p v-if="feedback === 'almost'" class="hint almost-text">
-        Почти — проверьте ударения. Правильно: <b>{{ card.answer }}</b>
+      <p v-if="feedback === 'almost'" class="notice notice--almost drill__feedback">
+        Почти — проверьте ударения. Правильно: <b class="drill__correct-form">{{ card.answer }}</b>
       </p>
-      <p v-else-if="feedback === 'wrong'" class="hint bad-text">
-        Неверно. Правильно: <b>{{ card.answer }}</b>
+      <p v-else-if="feedback === 'wrong'" class="notice notice--bad drill__feedback">
+        Неверно. Правильно: <b class="drill__correct-form">{{ card.answer }}</b>
       </p>
 
-      <RuleHint v-if="hint" :hint="hint" />
+      <RuleHint v-if="hint" class="drill__hint" :hint="hint" />
 
-      <div class="actions drill-actions">
-        <button class="primary" type="submit" :disabled="!canSubmit">
+      <div class="screen__actions drill__actions">
+        <button class="button button--primary drill__submit" type="submit" :disabled="!canSubmit">
           {{ revealed ? 'Дальше' : 'Проверить' }}
         </button>
-        <button v-if="!revealed" class="ghost" type="button" @click="skip">
+        <button v-if="!revealed" class="button button--ghost drill__skip" type="button" @click="skip">
           Пропустить
         </button>
       </div>

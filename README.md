@@ -65,6 +65,20 @@ npm run build
 После первого открытия работает офлайн: `vite.config.ts` при сборке генерирует `sw.js`
 со списком всех файлов сборки.
 
+## Разметка и стили
+
+Классы по БЭМ, у каждого элемента в разметке есть свой класс — его удобно назвать,
+когда нужно что-то поменять. Блок = экран или общий компонент:
+
+- экраны: `setup`, `drill`, `summary`, `progress`, `tables` — элементы `drill__card`, `drill__answer`, `setup__start`…;
+- общие блоки: `button`, `topbar`, `screen` (`screen__title`, `screen__lead`, `screen__actions`),
+  `group`, `choice`, `segmented`, `badge`, `notice`, `stat-tiles`, `stat-list`, `form-list`,
+  `tabs`, `rule-hint`, `link-button`;
+- состояния — модификаторы: `drill__sentence--bad`, `tabs__tab--active`, `progress__cell--weak`.
+
+Элемент обычно несёт и общий, и свой класс (`button button--primary setup__start`):
+общий задаёт вид, свой — точка для правок конкретного места. Все стили — в `src/style.css`.
+
 ## Стек
 
 Vue 3 + Vite + TypeScript + Vitest. Без бэкенда и без IndexedDB, без PWA-плагинов.
