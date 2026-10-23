@@ -29,6 +29,9 @@ const ACCENTS = ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü']
 const input = ref('')
 const feedback = ref<AnswerCheck | null>(null)
 const inputEl = ref<HTMLInputElement | null>(null)
+/** Короткая зелёная вспышка: прошлый ответ верный, уже следующая карточка. */
+const flashOk = ref(false)
+let flashTimer: ReturnType<typeof setTimeout> | undefined
 
 const progress = computed(() => `${props.index + 1} / ${props.total}`)
 const revealed = computed(() => feedback.value !== null)
@@ -81,9 +84,21 @@ function submit() {
   }
   if (!canCheck.value) return
   const result = checkAnswer(input.value, props.card.answer)
+  if (result === 'exact') {
+    // Верно — сразу к следующему заданию, без «Дальше».
+    emit('correct')
+    emit('next')
+    flashOk.value = false
+    clearTimeout(flashTimer)
+    // снять класс и поставить заново в следующем тике — анимация перезапустится
+    nextTick(() => {
+      flashOk.value = true
+      flashTimer = setTimeout(() => (flashOk.value = false), 600)
+    })
+    return
+  }
   feedback.value = result
-  if (result === 'exact') emit('correct')
-  else emit('wrong', input.value.trim())
+  emit('wrong', input.value.trim())
   focusInput()
 }
 
@@ -129,7 +144,7 @@ function insertAccent(ch: string) {
       </span>
     </div>
 
-    <div class="prompt-card">
+    <div class="prompt-card" :class="{ 'flash-ok': flashOk }">
       <div class="meta">
         {{ TENSE_LABELS[card.tense] }}
         <span v-if="card.retry" class="retry-tag">повтор</span>
@@ -190,8 +205,7 @@ function insertAccent(ch: string) {
         </button>
       </div>
 
-      <p v-if="feedback === 'exact'" class="hint ok-text">Верно!</p>
-      <p v-else-if="feedback === 'almost'" class="hint almost-text">
+      <p v-if="feedback === 'almost'" class="hint almost-text">
         Почти — проверьте ударения. Правильно: <b>{{ card.answer }}</b>
       </p>
       <p v-else-if="feedback === 'wrong'" class="hint bad-text">

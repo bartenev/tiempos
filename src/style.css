@@ -390,6 +390,27 @@ button {
   margin-bottom: 1.25rem;
 }
 
+.prompt-card.flash-ok {
+  animation: flash-ok 0.6s ease-out;
+}
+
+@keyframes flash-ok {
+  0% {
+    border-color: var(--ok);
+    box-shadow: 0 0 0 3px var(--ok-bg);
+  }
+  100% {
+    border-color: var(--line);
+    box-shadow: 0 0 0 3px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prompt-card.flash-ok {
+    animation: none;
+  }
+}
+
 .prompt-card .meta {
   font-size: 0.8rem;
   text-transform: uppercase;
