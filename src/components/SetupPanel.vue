@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { IRREGULAR_INFINITIVES } from '../data/verbs'
+import { IRREGULAR_INFINITIVES, findVerb } from '../data/verbs'
 import { currentStreak, daysLabel, loadDaily } from '../lib/daily'
 import { cellsForConfig, weakCount } from '../lib/session'
 import { configFromSettings, loadSettings, saveSettings } from '../lib/settings'
 import type { AnswerMode, Person, SessionConfig, SessionMode, Tense } from '../types'
-import { MODE_LABELS, PERSONS, TENSE_LABELS } from '../types'
+import { MODE_LABELS, PERSONS, TENSE_LABELS, VERB_GROUPS } from '../types'
 
 defineProps<{
   error?: string
@@ -21,6 +21,7 @@ const saved = loadSettings()
 
 const selected = ref({ ...saved.selected })
 const persons = ref({ ...saved.persons })
+const groups = ref({ ...saved.groups })
 const includeRegular = ref(saved.includeRegular)
 const includeIrregular = ref(saved.includeIrregular)
 const selectedIrregular = ref({ ...saved.selectedIrregular })
@@ -51,6 +52,7 @@ const days = currentStreak(loadDaily())
 const settings = computed(() => ({
   selected: { ...selected.value },
   persons: { ...persons.value },
+  groups: { ...groups.value },
   includeRegular: includeRegular.value,
   includeIrregular: includeIrregular.value,
   selectedIrregular: { ...selectedIrregular.value },
@@ -68,7 +70,7 @@ const weak = computed(() => weakCount(config.value))
 /** Сколько форм под фильтр (0, например, если только yo и только imperativo). */
 const formsCount = computed(() => {
   const cfg = config.value
-  if (cfg.tenses.length === 0 || cfg.persons.length === 0) return 0
+  if (cfg.tenses.length === 0 || cfg.persons.length === 0 || cfg.groups.length === 0) return 0
   return cellsForConfig(cfg).length
 })
 
@@ -76,6 +78,7 @@ const canStart = computed(() => {
   const cfg = config.value
   if (cfg.tenses.length === 0) return false
   if (cfg.persons.length === 0) return false
+  if (cfg.groups.length === 0) return false
   if (!cfg.includeRegular && !cfg.includeIrregular) return false
   if (cfg.includeIrregular && cfg.selectedIrregular.length === 0) return false
   if (formsCount.value === 0) return false
@@ -86,6 +89,12 @@ const canStart = computed(() => {
 function start() {
   if (!canStart.value) return
   emit('start', config.value)
+}
+
+/** Неправильный глагол отсеян фильтром окончаний — показываем приглушённым. */
+function irregularOff(infinitive: string): boolean {
+  const verb = findVerb(infinitive)
+  return verb ? !groups.value[verb.group] : false
 }
 
 function setAllIrregular(value: boolean) {
@@ -173,6 +182,16 @@ function setAllIrregular(value: boolean) {
       </p>
     </fieldset>
 
+    <fieldset class="group setup__groups">
+      <legend class="group__legend setup__groups-legend">Окончание</legend>
+      <div class="setup__groups-row">
+        <label v-for="group in VERB_GROUPS" :key="group" class="choice setup__group">
+          <input v-model="groups[group]" class="choice__input setup__group-input" type="checkbox" />
+          <span class="choice__label setup__group-label">-{{ group }}</span>
+        </label>
+      </div>
+    </fieldset>
+
     <fieldset class="group setup__verbs">
       <legend class="group__legend setup__verbs-legend">Глаголы</legend>
       <label class="choice setup__verb-kind setup__verb-kind--regular">
@@ -201,6 +220,7 @@ function setAllIrregular(value: boolean) {
             v-for="inf in irregularList"
             :key="inf"
             class="choice setup__irregular-item"
+            :class="{ 'setup__irregular-item--off': irregularOff(inf) }"
           >
             <input v-model="selectedIrregular[inf]" class="choice__input setup__irregular-input" type="checkbox" />
             <span class="choice__label setup__irregular-label">{{ inf }}</span>
@@ -220,10 +240,11 @@ function setAllIrregular(value: boolean) {
     </fieldset>
 
     <p
-      v-if="config.tenses.length > 0 && config.persons.length > 0 && formsCount === 0"
+      v-if="config.tenses.length > 0 && config.persons.length > 0 && config.groups.length > 0 && formsCount === 0"
       class="notice notice--muted setup__no-forms"
     >
-      Под этот выбор нет форм — например, в imperativo нет yo.
+      Под этот выбор нет форм — проверьте окончания и глаголы
+      (и что в imperativo нет yo).
     </p>
     <p v-if="mode === 'weak' && weak === 0" class="notice notice--muted setup__weak-empty">
       Слабых форм в выбранных временах нет — начните с умной очереди.

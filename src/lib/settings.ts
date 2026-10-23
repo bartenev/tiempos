@@ -1,6 +1,6 @@
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
-import type { AnswerMode, Person, SessionConfig, SessionMode, Tense } from '../types'
-import { PERSONS } from '../types'
+import type { AnswerMode, Person, SessionConfig, SessionMode, Tense, VerbGroup } from '../types'
+import { PERSONS, VERB_GROUPS } from '../types'
 
 export const SETTINGS_KEY = 'tiempos.settings.v1'
 
@@ -8,6 +8,8 @@ export interface SetupSettings {
   selected: Record<Tense, boolean>
   /** Чекбоксы местоимений. */
   persons: Record<Person, boolean>
+  /** Чекбоксы спряжений -ar / -er / -ir. */
+  groups: Record<VerbGroup, boolean>
   includeRegular: boolean
   includeIrregular: boolean
   /** Чекбоксы неправильных глаголов: infinitive → выбран. */
@@ -37,6 +39,11 @@ export const DEFAULT_SETTINGS: SetupSettings = {
     nosotros: true,
     vosotros: true,
     ellos: true,
+  },
+  groups: {
+    ar: true,
+    er: true,
+    ir: true,
   },
   includeRegular: true,
   includeIrregular: true,
@@ -76,6 +83,16 @@ function parsePersons(raw: unknown): Record<Person, boolean> {
   return base
 }
 
+function parseGroups(raw: unknown): Record<VerbGroup, boolean> {
+  const base = { ...DEFAULT_SETTINGS.groups }
+  if (!raw || typeof raw !== 'object') return base
+  const obj = raw as Record<string, unknown>
+  for (const group of VERB_GROUPS) {
+    if (isBool(obj[group])) base[group] = obj[group]
+  }
+  return base
+}
+
 /**
  * Актуальный список неправильных из банка.
  * Новые глаголы → true; сохранённые снятые галки сохраняются.
@@ -98,6 +115,7 @@ function cloneDefaults(): SetupSettings {
     ...DEFAULT_SETTINGS,
     selected: { ...DEFAULT_SETTINGS.selected },
     persons: { ...DEFAULT_SETTINGS.persons },
+    groups: { ...DEFAULT_SETTINGS.groups },
     selectedIrregular: defaultSelectedIrregular(),
   }
 }
@@ -110,6 +128,7 @@ export function loadSettings(): SetupSettings {
     return {
       selected: parseSelected(parsed.selected),
       persons: parsePersons(parsed.persons),
+      groups: parseGroups(parsed.groups),
       includeRegular: isBool(parsed.includeRegular)
         ? parsed.includeRegular
         : DEFAULT_SETTINGS.includeRegular,
@@ -154,6 +173,7 @@ export function configFromSettings(
       (t) => settings.selected[t],
     ),
     persons: PERSONS.filter((p) => settings.persons[p]),
+    groups: VERB_GROUPS.filter((g) => settings.groups[g]),
     size: settings.size,
     mode: settings.mode,
     answer: settings.answer,

@@ -18,7 +18,7 @@ import type {
   SessionMistake,
   SessionResult,
 } from './types'
-import { PERSONS, TENSES } from './types'
+import { PERSONS, TENSES, VERB_GROUPS } from './types'
 
 initTheme()
 
@@ -138,6 +138,7 @@ function trainWeak() {
       mode: 'weak',
       tenses: [...TENSES],
       persons: [...PERSONS],
+      groups: [...VERB_GROUPS],
       includeRegular: true,
       includeIrregular: true,
       selectedIrregular: [...IRREGULAR_INFINITIVES],

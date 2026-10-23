@@ -48,6 +48,7 @@ export function retryCard(card: DrillCard): DrillCard {
 export function verbsForConfig(config: SessionConfig): Verb[] {
   const irregularSet = new Set(config.selectedIrregular)
   return VERBS.filter((verb) => {
+    if (!config.groups.includes(verb.group)) return false
     const regular = isRegularVerb(verb)
     if (regular) return config.includeRegular
     return config.includeIrregular && irregularSet.has(verb.infinitive)
@@ -132,6 +133,9 @@ function validate(config: SessionConfig): void {
   }
   if (config.persons.length === 0) {
     throw new Error('Выберите хотя бы одно местоимение')
+  }
+  if (config.groups.length === 0) {
+    throw new Error('Выберите хотя бы одно спряжение: -ar, -er или -ir')
   }
   if (!config.includeRegular && !config.includeIrregular) {
     throw new Error('Выберите правильные и/или неправильные глаголы')

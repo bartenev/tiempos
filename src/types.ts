@@ -54,6 +54,8 @@ export interface SessionConfig {
   tenses: Tense[]
   /** Какие местоимения тренировать (usted / ustedes — вместе с él / ellos). */
   persons: Person[]
+  /** Какие спряжения: глаголы на -ar / -er / -ir (и правильные, и неправильные). */
+  groups: VerbGroup[]
   size: number
   mode: SessionMode
   answer: AnswerMode
@@ -94,6 +96,8 @@ export const MODE_LABELS: Record<SessionMode, string> = {
 }
 
 export const PERSONS: Person[] = ['yo', 'tú', 'él', 'nosotros', 'vosotros', 'ellos']
+
+export const VERB_GROUPS: VerbGroup[] = ['ar', 'er', 'ir']
 
 export const TENSES: Tense[] = ['presente', 'indefinido', 'imperfecto', 'imperativo']
 

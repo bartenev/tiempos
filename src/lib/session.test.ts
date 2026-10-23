@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { IRREGULAR_INFINITIVES, findVerb, isRegularVerb } from '../data/verbs'
 import { buildCard, buildSession, cellsForConfig } from './session'
 import type { SessionConfig } from '../types'
-import { PERSONS } from '../types'
+import { PERSONS, VERB_GROUPS } from '../types'
 
 const base: SessionConfig = {
   tenses: ['presente'],
   persons: [...PERSONS],
+  groups: [...VERB_GROUPS],
   size: 12,
   mode: 'random',
   answer: 'text',
@@ -204,5 +205,31 @@ describe('person filter', () => {
 
   it('throws without persons', () => {
     expect(() => buildSession({ ...base, persons: [] }, {})).toThrow()
+  })
+})
+
+describe('verb group filter (-ar / -er / -ir)', () => {
+  for (const mode of ['random', 'smart'] as const) {
+    it(`${mode}: only -ar verbs, regular and irregular`, () => {
+      const cards = buildSession({ ...base, groups: ['ar'], mode, size: 200 }, {})
+      for (const c of cards) expect(c.verb.group).toBe('ar')
+      expect(cards.some((c) => !isRegularVerb(c.verb))).toBe(true)
+    })
+  }
+
+  it('-er + -ir excludes -ar', () => {
+    const cells = cellsForConfig({ ...base, groups: ['er', 'ir'] }, {})
+    expect(cells.length).toBeGreaterThan(0)
+    expect(cells.some((c) => c.verb.group === 'ar')).toBe(false)
+  })
+
+  it('no forms when the group and the irregular picks do not overlap', () => {
+    const cfg = { ...base, groups: ['ar' as const], includeRegular: false, selectedIrregular: ['ser', 'ir'] }
+    expect(cellsForConfig(cfg, {})).toHaveLength(0)
+    expect(() => buildSession(cfg, {})).toThrow()
+  })
+
+  it('throws without groups', () => {
+    expect(() => buildSession({ ...base, groups: [] }, {})).toThrow()
   })
 })

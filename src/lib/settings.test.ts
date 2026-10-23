@@ -32,6 +32,7 @@ describe('settings', () => {
     saveSettings({
       selected: { presente: true, indefinido: false, imperfecto: true, imperativo: false },
       persons: { yo: true, tú: false, él: true, nosotros: true, vosotros: false, ellos: true },
+      groups: { ar: true, er: false, ir: true },
       includeRegular: true,
       includeIrregular: true,
       selectedIrregular,
@@ -51,12 +52,14 @@ describe('settings', () => {
     expect(loaded.persons.tú).toBe(false)
     expect(loaded.persons.vosotros).toBe(false)
     expect(configFromSettings(loaded).persons).toEqual(['yo', 'él', 'nosotros', 'ellos'])
+    expect(configFromSettings(loaded).groups).toEqual(['ar', 'ir'])
   })
 
   it('all persons are on by default and for settings saved before the filter', () => {
     expect(Object.values(loadSettings().persons).every(Boolean)).toBe(true)
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({ size: 10 }))
     expect(configFromSettings(loadSettings()).persons).toHaveLength(6)
+    expect(configFromSettings(loadSettings()).groups).toEqual(['ar', 'er', 'ir'])
   })
 
   it('falls back to text for the removed voice mode', () => {
