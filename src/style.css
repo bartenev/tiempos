@@ -798,7 +798,7 @@ input[type='radio'] {
   text-align: right;
 }
 
-/* «Empezar» всегда видна — закреплена над панелью вкладок */
+/* «Начать» всегда видна — закреплена над панелью вкладок */
 .home__actions {
   position: sticky;
   bottom: calc(4rem + env(safe-area-inset-bottom));

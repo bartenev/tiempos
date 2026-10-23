@@ -166,7 +166,7 @@ function start() {
 
     <div class="screen__actions home__actions">
       <button class="button button--primary home__start" type="button" :disabled="!canStart" @click="start">
-        Empezar
+        Начать
       </button>
     </div>
   </section>
