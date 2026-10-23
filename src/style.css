@@ -713,11 +713,6 @@ button {
   font-size: 1.2rem;
 }
 
-.rule-hint__plus {
-  margin: 0 0.35rem;
-  color: var(--muted);
-}
-
 .rule-hint__ending {
   color: var(--accent);
   font-weight: 700;
