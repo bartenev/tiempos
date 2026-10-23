@@ -19,10 +19,26 @@ export interface CellStat {
 
 export type StatsStore = Record<string, CellStat>
 
-/** Сколько верных подряд нужно, чтобы форма перестала быть «слабой». */
+/** Минимум верных подряд, чтобы форма перестала быть «слабой» (при 1–2 ошибках). */
 export const RECOVER_STREAK = 2
-/** С какой серии форма считается выученной. */
+/** Потолок: даже при многих ошибках хватит стольких верных подряд. */
+export const MAX_RECOVER_STREAK = 4
+/** С какой серии форма без ошибок считается выученной. */
 export const SOLID_STREAK = 3
+
+/**
+ * Сколько верных подряд нужно, чтобы выйти из слабых: чем больше ошибок
+ * в форме за всё время, тем выше планка. 1–2 ошибки → 2, 3–4 → 3, 5+ → 4.
+ */
+export function recoveryStreak(bad: number): number {
+  if (bad <= 0) return 0
+  return Math.min(MAX_RECOVER_STREAK, RECOVER_STREAK + Math.floor((bad - 1) / 2))
+}
+
+/** С какой серии форма выучена: на одну больше, чем нужно для выхода из слабых. */
+export function solidStreak(bad: number): number {
+  return Math.max(SOLID_STREAK, recoveryStreak(bad) + 1)
+}
 
 export type Mastery = 'new' | 'weak' | 'learning' | 'solid'
 
@@ -88,16 +104,16 @@ export function recordAttempt(
   return stat
 }
 
-/** Слабая форма: была ошибка и с тех пор меньше RECOVER_STREAK верных подряд. */
+/** Слабая форма: были ошибки и с тех пор меньше recoveryStreak(bad) верных подряд. */
 export function isWeak(stat: CellStat | undefined): boolean {
   if (!stat) return false
-  return stat.bad > 0 && stat.streak < RECOVER_STREAK
+  return stat.bad > 0 && stat.streak < recoveryStreak(stat.bad)
 }
 
 export function masteryOf(stat: CellStat | undefined): Mastery {
   if (isWeak(stat)) return 'weak'
   if (!stat) return 'new'
-  return stat.streak >= SOLID_STREAK ? 'solid' : 'learning'
+  return stat.streak >= solidStreak(stat.bad) ? 'solid' : 'learning'
 }
 
 /**

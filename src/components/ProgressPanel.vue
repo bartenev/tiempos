@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { VERBS, isRegularVerb } from '../data/verbs'
 import { conjugate, hasTense } from '../lib/conjugate'
 import type { CellStat, Mastery } from '../lib/stats'
-import { cellKey, errorRate, loadStats, masteryOf } from '../lib/stats'
+import { cellKey, errorRate, loadStats, masteryOf, recoveryStreak } from '../lib/stats'
 import type { Person, Tense, Verb } from '../types'
 import { TENSES, TENSE_SHORT, personLabel, personsFor } from '../types'
 
@@ -119,7 +119,12 @@ const currentCounts = computed(() => tenseCounts(tense.value))
 
 function statLine(c: CellInfo): string {
   if (!c.stat) return 'ещё не было'
-  return `✓ ${c.stat.ok} · ✗ ${c.stat.bad} · серия ${c.stat.streak}`
+  // у слабой формы видно, сколько верных подряд осталось до выхода из слабых
+  const streak =
+    c.mastery === 'weak'
+      ? `серия ${c.stat.streak} из ${recoveryStreak(c.stat.bad)}`
+      : `серия ${c.stat.streak}`
+  return `✓ ${c.stat.ok} · ✗ ${c.stat.bad} · ${streak}`
 }
 </script>
 

@@ -7,6 +7,7 @@ import {
   loadStats,
   masteryOf,
   recordAttempt,
+  recoveryStreak,
 } from './stats'
 
 beforeEach(() => {
@@ -29,6 +30,21 @@ describe('stats', () => {
     expect(isWeak(loadStats()[cellKey('ir', 'indefinido', 'él')])).toBe(true)
     recordAttempt('ir', 'indefinido', 'él', true)
     expect(isWeak(loadStats()[cellKey('ir', 'indefinido', 'él')])).toBe(false)
+  })
+
+  it('more mistakes need a longer correct streak to recover', () => {
+    expect([1, 2, 3, 4, 5, 6, 10].map(recoveryStreak)).toEqual([2, 2, 3, 3, 4, 4, 4])
+    expect(isWeak({ ok: 2, bad: 3, streak: 2, last: 0 })).toBe(true)
+    expect(isWeak({ ok: 3, bad: 3, streak: 3, last: 0 })).toBe(false)
+    expect(isWeak({ ok: 3, bad: 5, streak: 3, last: 0 })).toBe(true)
+    expect(isWeak({ ok: 4, bad: 5, streak: 4, last: 0 })).toBe(false)
+  })
+
+  it('«learning» stays between weak and solid even after many mistakes', () => {
+    expect(masteryOf({ ok: 4, bad: 5, streak: 4, last: 0 })).toBe('learning')
+    expect(masteryOf({ ok: 5, bad: 5, streak: 5, last: 0 })).toBe('solid')
+    expect(masteryOf({ ok: 2, bad: 1, streak: 2, last: 0 })).toBe('learning')
+    expect(masteryOf({ ok: 3, bad: 1, streak: 3, last: 0 })).toBe('solid')
   })
 
   it('a form without history is new, not weak', () => {
