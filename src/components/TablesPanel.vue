@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { conjugate } from '../lib/conjugate'
 import { heatByPerson } from '../lib/heat'
 import { loadStats } from '../lib/stats'
+import { endingsRow } from '../lib/tables'
 import { theme } from '../lib/theme'
 import type { Person, Tense, Verb } from '../types'
 import { TENSES, TENSE_LABELS, personLabel, personsFor } from '../types'
@@ -37,9 +37,6 @@ const heat = computed(() => {
   return map
 })
 
-function form(verb: Verb, tense: Tense, person: Person): string {
-  return conjugate(verb, tense, person)
-}
 
 function cellStyle(tense: Tense, person: Person): { backgroundColor: string } {
   return { backgroundColor: heat.value[tense]![person]!.color }
@@ -65,6 +62,10 @@ function cellStyle(tense: Tense, person: Person): { backgroundColor: string } {
       <span class="tables__swatch tables__swatch--hot" /> хуже знаю
       <span class="tables__legend-note">(правильные глаголы: верный +1, ошибка −1)</span>
     </p>
+    <p class="tables__shared-note">
+      <b class="tables__shared-sample">ía</b> — окончание совпадает у разных спряжений
+      (например, -er и -ir в imperfecto).
+    </p>
 
     <section v-for="tense in TENSES" :key="tense" class="tables__tense">
       <h2 class="tables__tense-title">{{ TENSE_LABELS[tense] }}</h2>
@@ -86,12 +87,15 @@ function cellStyle(tense: Tense, person: Person): { backgroundColor: string } {
                 <span class="tables__sum">{{ heat[tense][person]!.sum }}</span>
               </th>
               <td
-                v-for="verb in EXAMPLES"
-                :key="verb.infinitive + person"
+                v-for="(cell, i) in endingsRow(EXAMPLES, tense, person)"
+                :key="EXAMPLES[i]!.infinitive + person"
                 class="tables__cell tables__form"
                 :style="cellStyle(tense, person)"
               >
-                {{ form(verb, tense, person) }}
+                <span class="tables__form-stem">{{ cell.stem }}</span><span
+                  class="tables__form-ending"
+                  :class="{ 'tables__form-ending--shared': cell.shared }"
+                >{{ cell.ending }}</span>
               </td>
             </tr>
           </tbody>

@@ -413,6 +413,29 @@ button {
   font-size: 0.78rem;
 }
 
+.tables__shared-note {
+  margin: -0.75rem 0 1.25rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/*
+ * Окончание совпадает у разных спряжений в этой строке.
+ * Подложка цвета карточки — чтобы акцент читался на любой heat-заливке ячейки;
+ * тени только сверху и снизу: колонки не шире и основа слева не перекрыта.
+ */
+.tables__shared-sample,
+.tables__form-ending--shared {
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--card);
+  border-radius: 3px;
+  box-shadow:
+    0 -2px 0 var(--card),
+    0 2px 0 var(--card);
+}
+
 /* ===== drill: карточка задания ===== */
 
 .drill__card {
