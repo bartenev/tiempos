@@ -128,32 +128,33 @@ function start() {
       <p class="group__note home__mode-note">{{ modeHint }}</p>
     </fieldset>
 
-    <button class="home__filters" type="button" @click="emit('settings')">
-      <span class="home__filters-head">
-        <span class="home__filters-title">Что тренируем</span>
+    <fieldset class="group home__filters">
+      <legend class="group__legend home__filters-legend">Что тренируем</legend>
+      <!-- вся карточка — одна кнопка в настройки -->
+      <button class="home__filters-body" type="button" @click="emit('settings')">
+        <span class="home__filter">
+          <span class="home__filter-name">Времена</span>
+          <span class="home__filter-value">{{ summary.tenses }}</span>
+        </span>
+        <span class="home__filter">
+          <span class="home__filter-name">Лица</span>
+          <span class="home__filter-value">{{ summary.persons }}</span>
+        </span>
+        <span class="home__filter">
+          <span class="home__filter-name">Окончания</span>
+          <span class="home__filter-value">{{ summary.groups }}</span>
+        </span>
+        <span class="home__filter">
+          <span class="home__filter-name">Глаголы</span>
+          <span class="home__filter-value">{{ summary.verbs }}</span>
+        </span>
+        <span class="home__filter">
+          <span class="home__filter-name">Сессия</span>
+          <span class="home__filter-value">{{ summary.size }}</span>
+        </span>
         <span class="home__filters-edit">Изменить<Icon name="forward" /></span>
-      </span>
-      <span class="home__filter">
-        <span class="home__filter-name">Времена</span>
-        <span class="home__filter-value">{{ summary.tenses }}</span>
-      </span>
-      <span class="home__filter">
-        <span class="home__filter-name">Лица</span>
-        <span class="home__filter-value">{{ summary.persons }}</span>
-      </span>
-      <span class="home__filter">
-        <span class="home__filter-name">Окончания</span>
-        <span class="home__filter-value">{{ summary.groups }}</span>
-      </span>
-      <span class="home__filter">
-        <span class="home__filter-name">Глаголы</span>
-        <span class="home__filter-value">{{ summary.verbs }}</span>
-      </span>
-      <span class="home__filter">
-        <span class="home__filter-name">Сессия</span>
-        <span class="home__filter-value">{{ summary.size }}</span>
-      </span>
-    </button>
+      </button>
+    </fieldset>
 
     <p v-if="formsCount === 0" class="notice notice--muted home__no-forms">
       Под этот выбор нет форм — проверьте, что тренируем
