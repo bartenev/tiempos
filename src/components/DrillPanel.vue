@@ -68,6 +68,11 @@ const sentenceParts = computed(() => {
   }
 })
 
+/** Ответ открыт: устно после тапа или текстом после ошибки. */
+const answerShown = computed(
+  () => shown.value || feedback.value === 'wrong' || feedback.value === 'almost',
+)
+
 const filledBlank = computed(() => {
   if (feedback.value === null && !shown.value) return '___'
   return props.card.answer
@@ -224,6 +229,7 @@ onBeforeUnmount(() => {
         <span class="blank">{{ filledBlank }}</span>
         <span>{{ sentenceParts.after }}</span>
       </p>
+      <p v-if="answerShown" class="answer-big" lang="es">{{ card.answer }}</p>
       <p class="translation">{{ card.translation }}</p>
       <p class="hint-verb">
         глагол: <b>{{ card.verb.infinitive }}</b>

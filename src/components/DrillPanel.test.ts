@@ -34,6 +34,7 @@ describe('DrillPanel', () => {
     expect(wrapper.emitted('wrong')).toEqual([['hablas']])
     expect(wrapper.emitted('next')).toBeUndefined()
     expect(wrapper.find('.rule-hint').exists()).toBe(true)
+    expect(wrapper.find('.answer-big').text()).toBe('hablo')
 
     await wrapper.find('form').trigger('submit')
     expect(wrapper.emitted('next')).toHaveLength(1)
@@ -83,8 +84,10 @@ describe('DrillPanel — oral (self-check)', () => {
     expect(wrapper.find('.blank').text()).toBe('___')
     expect(wrapper.find('.grade-actions').exists()).toBe(false)
 
+    expect(wrapper.find('.answer-big').exists()).toBe(false)
     await wrapper.find('.prompt-card').trigger('click')
     expect(wrapper.find('.blank').text()).toBe('habló')
+    expect(wrapper.find('.answer-big').text()).toBe('habló')
     expect(wrapper.find('.rule-hint').exists()).toBe(true)
     expect(wrapper.find('.grade-actions').exists()).toBe(true)
   })
