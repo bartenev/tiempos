@@ -229,12 +229,13 @@ onBeforeUnmount(() => {
         <span class="drill__blank">{{ filledBlank }}</span>
         <span class="drill__sentence-after">{{ sentenceParts.after }}</span>
       </p>
-      <p v-if="answerShown" class="drill__answer" lang="es">{{ card.answer }}</p>
       <p class="drill__translation">{{ card.translation }}</p>
       <p class="drill__verb">
         глагол: <b class="drill__verb-name">{{ card.verb.infinitive }}</b>
       </p>
     </div>
+
+    <p v-if="answerShown" class="drill__answer" lang="es">{{ card.answer }}</p>
 
     <template v-if="oral">
       <RuleHint v-if="hint" class="drill__hint" :hint="hint" />

@@ -467,7 +467,12 @@ button {
 }
 
 .drill__answer {
-  margin: 0.15rem 0 0.6rem;
+  margin: -0.5rem 0 0.75rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  text-align: center;
   font-family: var(--mono);
   /* comprendisteis (14 знаков) — в одну строку на телефоне */
   font-size: clamp(1.6rem, 9vw, 2.6rem);
