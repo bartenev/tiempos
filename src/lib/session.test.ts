@@ -145,3 +145,27 @@ describe('smart / weak modes', () => {
     expect(() => buildSession({ ...regularOnly, mode: 'weak' }, {})).toThrow()
   })
 })
+
+describe('imperativo in sessions', () => {
+  for (const mode of ['random', 'smart'] as const) {
+    it(`${mode}: no yo and no verbs without imperative`, () => {
+      const cards = buildSession({ ...base, tenses: ['imperativo'], mode, size: 300 }, {})
+      for (const c of cards) {
+        expect(c.person).not.toBe('yo')
+        expect(c.verb.noImperative, c.verb.infinitive).toBeFalsy()
+        expect(c.sentence).toContain('___')
+      }
+    })
+  }
+
+  it('throws when only verbs without imperative are selected', () => {
+    expect(() =>
+      buildSession({
+        ...base,
+        tenses: ['imperativo'],
+        includeRegular: false,
+        selectedIrregular: ['haber', 'poder'],
+      }),
+    ).toThrow()
+  })
+})

@@ -1,4 +1,4 @@
-export type Tense = 'presente' | 'indefinido' | 'imperfecto'
+export type Tense = 'presente' | 'indefinido' | 'imperfecto' | 'imperativo'
 
 export type Person = 'yo' | 'tú' | 'él' | 'nosotros' | 'vosotros' | 'ellos'
 
@@ -20,8 +20,10 @@ export interface Verb {
    * (jeron if stem ends with j).
    */
   indefinidoStem?: string
-  /** Full paradigm override for a tense (all 6 persons). */
-  forms?: Partial<Record<Tense, Record<Person, string>>>
+  /** Override forms for a tense (full paradigm or single persons). */
+  forms?: Partial<Record<Tense, Partial<Record<Person, string>>>>
+  /** Императив неестественен (haber, poder…) — не тренируем. */
+  noImperative?: boolean
 }
 
 export interface DrillCard {
@@ -87,18 +89,40 @@ export const MODE_LABELS: Record<SessionMode, string> = {
 
 export const PERSONS: Person[] = ['yo', 'tú', 'él', 'nosotros', 'vosotros', 'ellos']
 
-export const TENSES: Tense[] = ['presente', 'indefinido', 'imperfecto']
+export const TENSES: Tense[] = ['presente', 'indefinido', 'imperfecto', 'imperativo']
+
+/**
+ * Imperativo afirmativo: tú, usted, nosotros, vosotros, ustedes.
+ * usted / ustedes хранятся в ячейках él / ellos (та же форма 3-го лица).
+ */
+export const IMPERATIVE_PERSONS: Person[] = ['tú', 'él', 'nosotros', 'vosotros', 'ellos']
+
+/** Лица, у которых есть форма в этом времени. */
+export function personsFor(tense: Tense): Person[] {
+  return tense === 'imperativo' ? IMPERATIVE_PERSONS : PERSONS
+}
+
+/** Подпись лица: в императиве él → usted, ellos → ustedes. */
+export function personLabel(tense: Tense, person: Person): string {
+  if (tense === 'imperativo') {
+    if (person === 'él') return 'usted'
+    if (person === 'ellos') return 'ustedes'
+  }
+  return person
+}
 
 export const TENSE_LABELS: Record<Tense, string> = {
   presente: 'Presente',
   indefinido: 'Pretérito indefinido',
   imperfecto: 'Pretérito imperfecto',
+  imperativo: 'Imperativo',
 }
 
 export const TENSE_SHORT: Record<Tense, string> = {
   presente: 'pres.',
   indefinido: 'indef.',
   imperfecto: 'imperf.',
+  imperativo: 'imperat.',
 }
 
 export const PERSON_LABELS: Record<Person, string> = {

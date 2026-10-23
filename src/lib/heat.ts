@@ -1,6 +1,6 @@
 import { REGULAR_INFINITIVES } from '../data/verbs'
 import type { Person, Tense } from '../types'
-import { PERSONS } from '../types'
+import { personsFor } from '../types'
 import type { StatsStore } from './stats'
 import { cellKey } from './stats'
 import { isDarkTheme } from './theme'
@@ -23,7 +23,8 @@ export function sumByTensePerson(
   return total
 }
 
-export type PersonHeat = Record<Person, { sum: number; color: string }>
+/** Только лица этого времени (в императиве нет yo). */
+export type PersonHeat = Partial<Record<Person, { sum: number; color: string }>>
 
 /**
  * Цвет ячеек строки по счёту:
@@ -31,16 +32,17 @@ export type PersonHeat = Record<Person, { sum: number; color: string }>
  * Нормализация внутри одного времени.
  */
 export function heatByPerson(stats: StatsStore, tense: Tense): PersonHeat {
+  const persons = personsFor(tense)
   const sums = Object.fromEntries(
-    PERSONS.map((p) => [p, sumByTensePerson(stats, tense, p)]),
+    persons.map((p) => [p, sumByTensePerson(stats, tense, p)]),
   ) as Record<Person, number>
 
-  const values = PERSONS.map((p) => sums[p])
+  const values = persons.map((p) => sums[p])
   const min = Math.min(...values)
   const max = Math.max(...values)
 
   const result = {} as PersonHeat
-  for (const person of PERSONS) {
+  for (const person of persons) {
     result[person] = {
       sum: sums[person],
       color: heatColor(sums[person], min, max),

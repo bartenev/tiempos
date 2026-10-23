@@ -221,7 +221,7 @@ function insertAccent(ch: string) {
         </p>
         <ul class="row">
           <li v-for="item in hint.row" :key="item.person" :class="{ current: item.current }">
-            <span class="p">{{ item.person }}</span>
+            <span class="p">{{ item.label }}</span>
             <span class="v">{{ item.value }}</span>
           </li>
         </ul>

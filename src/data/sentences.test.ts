@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { PERSONS, TENSES } from '../types'
+import { TENSES, personsFor } from '../types'
+import { hasTense } from '../lib/conjugate'
 import { VERB_COMPLEMENTS, buildVerbSentence } from './sentences'
 import { VERBS } from './verbs'
 
@@ -13,7 +14,8 @@ describe('verb sentences', () => {
   it('builds a sentence with one gap and a translation', () => {
     for (const verb of VERBS) {
       for (const tense of TENSES) {
-        for (const person of PERSONS) {
+        if (!hasTense(verb, tense)) continue
+        for (const person of personsFor(tense)) {
           const built = buildVerbSentence(verb.infinitive, tense, person)!
           expect(built.sentence.split('___').length - 1).toBe(1)
           expect(built.translation).toContain('…')
@@ -56,5 +58,28 @@ describe('tense-limited complements', () => {
     expect(buildVerbSentence('vivir', 'indefinido', 'yo')!.sentence).toMatch(/una gran aventura\.$/)
     expect(buildVerbSentence('vivir', 'indefinido', 'yo', all)!.sentence).toMatch(/una gran aventura\.$/)
     expect(buildVerbSentence('vivir', 'presente', 'yo')!.sentence).toMatch(/en Madrid\.$/)
+  })
+})
+
+describe('imperativo sentences', () => {
+  it('shows the addressee and keeps the gap at the verb', () => {
+    expect(buildVerbSentence('comer', 'imperativo', 'tú')).toEqual({
+      sentence: '(tú) ¡___ una pizza!',
+      translation: '(ты) … пиццу!',
+    })
+    expect(buildVerbSentence('hablar', 'imperativo', 'nosotros')!.translation).toBe(
+      'Давайте … с Аной!',
+    )
+    expect(buildVerbSentence('hablar', 'imperativo', 'ellos')!.sentence).toMatch(/^\(ustedes\)/)
+  })
+
+  it('uses imperative-specific complements where general ones sound wrong', () => {
+    expect(buildVerbSentence('tener', 'imperativo', 'tú')!.sentence).toBe('(tú) ¡___ paciencia!')
+    expect(buildVerbSentence('vivir', 'imperativo', 'vosotros')!.sentence).toBe(
+      '(vosotros) ¡___ el momento!',
+    )
+    expect(buildVerbSentence('estar', 'imperativo', 'ellos')!.sentence).toBe(
+      '(ustedes) ¡___ tranquilos!',
+    )
   })
 })

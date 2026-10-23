@@ -1,6 +1,7 @@
 import type { Person, StemChange, Tense, Verb } from '../types'
-import { PERSONS } from '../types'
+import { PERSONS, personLabel, personsFor } from '../types'
 import {
+  IMPERATIVE_ENDINGS,
   IMPERFECT_ENDINGS,
   INDEFINIDO_IRREGULAR,
   INDEFINIDO_REGULAR,
@@ -8,6 +9,7 @@ import {
   PRESENT_ENDINGS,
   STEM_CHANGED_PERSONS,
   applyStemChange,
+  conjugate,
   indefinidoShift,
   infinitiveStem,
   paradigmOf,
@@ -21,7 +23,7 @@ export interface FormHint {
   stem?: string
   ending?: string
   /** Ряд окончаний (или форм) по лицам; текущее лицо подсвечено. */
-  row: { person: Person; value: string; current: boolean }[]
+  row: { person: Person; label: string; value: string; current: boolean }[]
   /** Дополнительная заметка (орфография, ударение, исключение). */
   note?: string
 }
@@ -38,18 +40,27 @@ const TENSE_NAME: Record<Tense, string> = {
   presente: 'Presente',
   indefinido: 'Indefinido',
   imperfecto: 'Imperfecto',
+  imperativo: 'Imperativo',
 }
 
-function endingRow(endings: string[], person: Person): FormHint['row'] {
-  return PERSONS.map((p, i) => ({
+/** endings — по всем 6 лицам (PERSONS); в ряд попадают только лица времени. */
+function endingRow(endings: string[], person: Person, tense: Tense): FormHint['row'] {
+  return personsFor(tense).map((p) => ({
     person: p,
-    value: `-${endings[i]}`,
+    label: personLabel(tense, p),
+    value: `-${endings[PERSONS.indexOf(p)]}`,
     current: p === person,
   }))
 }
 
-function formRow(forms: string[], person: Person): FormHint['row'] {
-  return PERSONS.map((p, i) => ({ person: p, value: forms[i]!, current: p === person }))
+/** forms — по лицам времени (как возвращает paradigmOf). */
+function formRow(forms: string[], person: Person, tense: Tense): FormHint['row'] {
+  return personsFor(tense).map((p, i) => ({
+    person: p,
+    label: personLabel(tense, p),
+    value: forms[i]!,
+    current: p === person,
+  }))
 }
 
 function regularEndings(verb: Verb, tense: Tense): string[] {
@@ -60,6 +71,54 @@ function regularEndings(verb: Verb, tense: Tense): string[] {
       return IMPERFECT_ENDINGS[verb.group]
     case 'indefinido':
       return INDEFINIDO_REGULAR[verb.group]
+    case 'imperativo':
+      return IMPERATIVE_ENDINGS[verb.group]
+  }
+}
+
+const SHORT_TU = 'Короткие tú: di, haz, ve, pon, sal, sé, ten, ven.'
+
+function explainImperative(verb: Verb, person: Person): FormHint {
+  const actual = conjugate(verb, 'imperativo', person)
+  const endings = IMPERATIVE_ENDINGS[verb.group]
+  const ending = endings[PERSONS.indexOf(person)]!
+  const label = personLabel('imperativo', person)
+
+  if (verb.forms?.imperativo?.[person]) {
+    return {
+      rule: `Неправильная форма ${label}: ${actual} — запомните.`,
+      row: formRow(paradigmOf(verb, 'imperativo'), person, 'imperativo'),
+      note: person === 'tú' ? SHORT_TU : undefined,
+    }
+  }
+
+  let rule: string
+  let note: string | undefined
+  if (person === 'tú') {
+    rule = `tú = форма él / ella в presente: ${conjugate(verb, 'presente', 'él')}.`
+    if (verb.stemChange) note = 'Чередование сохраняется, как в presente (piensa, duerme).'
+  } else if (person === 'vosotros') {
+    rule = 'vosotros = инфинитив, только -r → -d.'
+  } else {
+    const yo = conjugate(verb, 'presente', 'yo')
+    const vowel = verb.group === 'ar' ? 'e' : 'a'
+    rule = `${label}: от формы yo (${yo}) без -o + «обратная» гласная -${vowel} (presente de subjuntivo).`
+    if (/[cgz]ar$/.test(verb.infinitive)) {
+      note = 'Перед e: c → qu, g → gu, z → c (busque, llegue, empiece).'
+    }
+    if (person === 'nosotros' && verb.stemChange && !verb.presentYo) {
+      note = indefinidoShift(verb)
+        ? 'В nosotros у -ir чередование e → i / o → u (pidamos, durmamos).'
+        : 'В nosotros без чередования (pensemos, volvamos).'
+    }
+  }
+
+  return {
+    rule,
+    stem: actual.endsWith(ending) ? actual.slice(0, -ending.length) : undefined,
+    ending,
+    row: endingRow(endings, person, 'imperativo'),
+    note,
   }
 }
 
@@ -88,20 +147,22 @@ function accentNote(tense: Tense, verb: Verb, person: Person): string | undefine
  * показываем всю парадигму — её нужно запомнить.
  */
 export function explainForm(verb: Verb, tense: Tense, person: Person): FormHint {
+  if (tense === 'imperativo') return explainImperative(verb, person)
+
   const idx = PERSONS.indexOf(person)
   const overridden = verb.forms?.[tense]?.[person]
 
   if (overridden) {
     return {
       rule: `${TENSE_NAME[tense]} у ${verb.infinitive} неправильный — запомните парадигму.`,
-      row: formRow(paradigmOf(verb, tense), person),
+      row: formRow(paradigmOf(verb, tense), person, tense),
     }
   }
 
   if (tense === 'presente' && person === 'yo' && verb.presentYo) {
     return {
       rule: `Неправильная форма yo: ${verb.presentYo}. Остальные лица — по правилу.`,
-      row: formRow(paradigmOf(verb, tense), person),
+      row: formRow(paradigmOf(verb, tense), person, tense),
     }
   }
 
@@ -114,7 +175,7 @@ export function explainForm(verb: Verb, tense: Tense, person: Person): FormHint 
       rule: `Неправильная основа ${stem}- + особые окончания (без ударений).`,
       stem,
       ending: endings[idx],
-      row: endingRow(endings, person),
+      row: endingRow(endings, person, tense),
       note: stem.endsWith('j') ? 'После j: -eron, а не -ieron (dijeron, trajeron).' : undefined,
     }
   }
@@ -155,7 +216,7 @@ export function explainForm(verb: Verb, tense: Tense, person: Person): FormHint 
     rule,
     stem: built === actual ? stem : actual.slice(0, -ending.length) || stem,
     ending,
-    row: endingRow(endings, person),
+    row: endingRow(endings, person, tense),
     note,
   }
 }

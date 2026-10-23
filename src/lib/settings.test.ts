@@ -29,7 +29,7 @@ describe('settings', () => {
     selectedIrregular.ser = false
     selectedIrregular.ir = false
     saveSettings({
-      selected: { presente: true, indefinido: false, imperfecto: true },
+      selected: { presente: true, indefinido: false, imperfecto: true, imperativo: false },
       includeRegular: true,
       includeIrregular: true,
       selectedIrregular,
@@ -38,6 +38,7 @@ describe('settings', () => {
     })
     const loaded = loadSettings()
     expect(loaded.selected.indefinido).toBe(false)
+    expect(loaded.selected.imperativo).toBe(false)
     expect(loaded.selectedIrregular.ser).toBe(false)
     expect(loaded.selectedIrregular.ir).toBe(false)
     expect(loaded.selectedIrregular.tener).toBe(true)
@@ -49,6 +50,19 @@ describe('settings', () => {
     expect(loadSettings().mode).toBe('smart')
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({ mode: 'bogus' }))
     expect(loadSettings().mode).toBe('smart')
+  })
+
+  it('turns on imperativo for settings saved before it existed', () => {
+    localStorage.setItem(
+      SETTINGS_KEY,
+      JSON.stringify({ selected: { presente: true, indefinido: false, imperfecto: true } }),
+    )
+    expect(loadSettings().selected).toEqual({
+      presente: true,
+      indefinido: false,
+      imperfecto: true,
+      imperativo: true,
+    })
   })
 
   it('falls back on corrupt payload', () => {

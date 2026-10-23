@@ -31,10 +31,16 @@ describe('heat / sums', () => {
       { 'hablar|presente|yo': stat(4, 0), 'comer|presente|tú': stat(1, 0) },
       'presente',
     )
-    expect(heat.yo.sum).toBe(4)
-    expect(heat.tú.sum).toBe(1)
-    expect(heat.él.sum).toBe(0)
-    expect(heat.yo.color).toMatch(/^hsl\(120/)
-    expect(heat.él.color).toMatch(/^hsl\(0/)
+    expect(heat.yo!.sum).toBe(4)
+    expect(heat.tú!.sum).toBe(1)
+    expect(heat.él!.sum).toBe(0)
+    expect(heat.yo!.color).toMatch(/^hsl\(120/)
+    expect(heat.él!.color).toMatch(/^hsl\(0/)
+  })
+
+  it('imperativo has no yo row', () => {
+    const heat = heatByPerson({}, 'imperativo')
+    expect(heat.yo).toBeUndefined()
+    expect(Object.keys(heat)).toHaveLength(5)
   })
 })

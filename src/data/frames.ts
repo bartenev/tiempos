@@ -56,6 +56,13 @@ export const FRAMES: SentenceFrame[] = [
   { tense: 'imperfecto', person: 'vosotros', template: 'De jóvenes vosotros ___.', translation: 'В молодости вы (vosotros) …' },
   { tense: 'imperfecto', person: 'ellos', template: 'Antes ellos ___ en el pueblo.', translation: 'Раньше они … в деревне.' },
   { tense: 'imperfecto', person: 'ellos', template: 'Mis abuelos ___ cada domingo.', translation: 'Мои бабушка и дедушка … каждое воскресенье.' },
+
+  // —— Imperativo (yo нет; él / ellos = usted / ustedes) ——
+  { tense: 'imperativo', person: 'tú', template: '(tú) ¡___ ahora!', translation: '(ты) … сейчас!' },
+  { tense: 'imperativo', person: 'él', template: '(usted) ¡___ ahora, por favor!', translation: '(вы — usted) … сейчас, пожалуйста!' },
+  { tense: 'imperativo', person: 'nosotros', template: '(nosotros) ¡___ juntos!', translation: 'Давайте … вместе!' },
+  { tense: 'imperativo', person: 'vosotros', template: '(vosotros) ¡___ ahora!', translation: '(вы — vosotros) … сейчас!' },
+  { tense: 'imperativo', person: 'ellos', template: '(ustedes) ¡___ ahora, por favor!', translation: '(вы — ustedes) … сейчас, пожалуйста!' },
 ]
 
 export function framesFor(tense: Tense, person: Person): SentenceFrame[] {

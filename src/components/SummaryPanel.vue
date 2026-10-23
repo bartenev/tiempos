@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { currentStreak, daysLabel, loadDaily } from '../lib/daily'
 import type { SessionResult } from '../types'
-import { TENSE_SHORT } from '../types'
+import { TENSE_SHORT, personLabel } from '../types'
 
 const props = defineProps<{
   result: SessionResult
@@ -73,7 +73,7 @@ const uniqueMistakes = computed(() => {
       <h2 class="section-title">Над чем поработать</h2>
       <ul class="mistakes">
         <li v-for="m in uniqueMistakes" :key="`${m.infinitive}|${m.tense}|${m.person}`">
-          <span class="m-meta">{{ m.infinitive }} · {{ TENSE_SHORT[m.tense] }} · {{ m.person }}</span>
+          <span class="m-meta">{{ m.infinitive }} · {{ TENSE_SHORT[m.tense] }} · {{ personLabel(m.tense, m.person) }}</span>
           <span class="m-forms">
             <s class="bad-text">{{ m.given }}</s>
             <b class="ok-text">{{ m.answer }}</b>

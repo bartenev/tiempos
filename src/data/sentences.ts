@@ -23,7 +23,7 @@ interface Phrase {
 }
 
 /** Маркеры времени: подсказывают, какое время нужно. */
-export const TIME_MARKERS: Record<Tense, Phrase[]> = {
+export const TIME_MARKERS: Record<Exclude<Tense, 'imperativo'>, Phrase[]> = {
   presente: [
     { es: 'Hoy', ru: 'Сегодня' },
     { es: 'Normalmente', ru: 'Обычно' },
@@ -337,6 +337,88 @@ export const SPECIAL_SENTENCES: Record<string, Partial<Record<Tense, Phrase[]>>>
   },
 }
 
+/** Подлежащее-подсказка в императиве (само подлежащее в ответ не входит). */
+const IMPERATIVE_SUBJECTS: Partial<Record<Person, Phrase>> = {
+  tú: { es: 'tú', ru: '(ты)' },
+  él: { es: 'usted', ru: '(вы — usted)' },
+  nosotros: { es: 'nosotros', ru: 'Давайте' },
+  vosotros: { es: 'vosotros', ru: '(вы — vosotros)' },
+  ellos: { es: 'ustedes', ru: '(вы — ustedes)' },
+}
+
+const IMPERATIVE_TAILS: Phrase[] = [
+  { es: '', ru: '' },
+  { es: ', por favor', ru: ', пожалуйста' },
+]
+
+/**
+ * Дополнения для императива, если общие звучат неестественно
+ * («¡Ten mucho trabajo!», «¡Vive en Madrid!»).
+ */
+export const IMPERATIVE_COMPLEMENTS: Record<string, Complement[]> = {
+  tener: [
+    { es: 'paciencia', ru: 'терпение' },
+    { es: 'cuidado', ru: 'осторожность' },
+  ],
+  estar: [
+    { es: 'tranquilo', esPl: 'tranquilos', ru: 'спокоен', ruPl: 'спокойны' },
+    { es: 'en casa a las ocho', ru: 'дома в восемь' },
+  ],
+  vivir: [
+    { es: 'el momento', ru: 'моментом' },
+    { es: 'cerca del trabajo', ru: 'рядом с работой' },
+  ],
+  recibir: [{ es: 'a los invitados', ru: 'гостей' }],
+  llegar: [
+    { es: 'a tiempo', ru: 'вовремя' },
+    { es: 'temprano', ru: 'рано' },
+  ],
+  conocer: [
+    { es: 'la ciudad', ru: 'город' },
+    { es: 'a mis padres', ru: 'с моими родителями' },
+  ],
+  // «¡Piensen mucho en ti!» — бессмыслица для ustedes.
+  pensar: [
+    { es: 'en el viaje', ru: 'о поездке' },
+    { es: 'en el futuro', ru: 'о будущем' },
+  ],
+  // «¡Ve a mis abuelos!» путается с ir («иди к…»).
+  ver: [
+    { es: 'una película', ru: 'фильм' },
+    { es: 'esta serie', ru: 'этот сериал' },
+  ],
+}
+
+export function imperativeComplements(infinitive: string): Complement[] {
+  return (
+    IMPERATIVE_COMPLEMENTS[infinitive] ??
+    (VERB_COMPLEMENTS[infinitive] ?? []).filter(
+      (c) => !c.tenses || c.tenses.includes('imperativo'),
+    )
+  )
+}
+
+function buildImperativeSentence(
+  infinitive: string,
+  person: Person,
+  pick: Pick,
+): BuiltSentence | null {
+  const subject = IMPERATIVE_SUBJECTS[person]
+  const complements = imperativeComplements(infinitive)
+  if (!subject || complements.length === 0) return null
+
+  const plural = PLURAL.has(person)
+  const comp = pick(complements)
+  const tail = pick(IMPERATIVE_TAILS)
+  const compEs = plural && comp.esPl ? comp.esPl : comp.es
+  const compRu = plural && comp.ruPl ? comp.ruPl : comp.ru
+
+  return {
+    sentence: `(${subject.es}) ¡___ ${compEs}${tail.es}!`,
+    translation: `${subject.ru} … ${compRu}${tail.ru}!`,
+  }
+}
+
 export interface BuiltSentence {
   sentence: string
   translation: string
@@ -363,6 +445,8 @@ export function buildVerbSentence(
   person: Person,
   pick: Pick = firstPick,
 ): BuiltSentence | null {
+  if (tense === 'imperativo') return buildImperativeSentence(infinitive, person, pick)
+
   const special = SPECIAL_SENTENCES[infinitive]?.[tense]
   if (special && special.length > 0) {
     const pattern = pick(special)

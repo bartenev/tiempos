@@ -24,6 +24,7 @@ export const DEFAULT_SETTINGS: SetupSettings = {
     presente: true,
     indefinido: true,
     imperfecto: true,
+    imperativo: true,
   },
   includeRegular: true,
   includeIrregular: true,

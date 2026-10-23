@@ -5,7 +5,7 @@ import { heatByPerson } from '../lib/heat'
 import { loadStats } from '../lib/stats'
 import { theme } from '../lib/theme'
 import type { Person, Tense, Verb } from '../types'
-import { PERSONS, TENSES, TENSE_LABELS } from '../types'
+import { TENSES, TENSE_LABELS, personLabel, personsFor } from '../types'
 
 const emit = defineEmits<{
   back: []
@@ -80,10 +80,10 @@ function cellStyle(tense: Tense, person: Person): { backgroundColor: string } {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="person in PERSONS" :key="person">
+            <tr v-for="person in personsFor(tense)" :key="person">
               <th scope="row" :style="cellStyle(tense, person)">
-                {{ PERSON_SHORT[person] }}
-                <span class="sum">{{ heat[tense][person].sum }}</span>
+                {{ tense === 'imperativo' ? personLabel(tense, person) : PERSON_SHORT[person] }}
+                <span class="sum">{{ heat[tense][person]!.sum }}</span>
               </th>
               <td
                 v-for="verb in EXAMPLES"

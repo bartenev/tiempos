@@ -16,7 +16,7 @@ export const VERBS: Verb[] = [
   { infinitive: 'llegar', group: 'ar' },
   { infinitive: 'buscar', group: 'ar' },
   { infinitive: 'tomar', group: 'ar' },
-  { infinitive: 'necesitar', group: 'ar' },
+  { infinitive: 'necesitar', group: 'ar', noImperative: true },
 
   // Regular -er
   { infinitive: 'comer', group: 'er' },
@@ -34,7 +34,7 @@ export const VERBS: Verb[] = [
   { infinitive: 'subir', group: 'ir' },
   { infinitive: 'decidir', group: 'ir' },
   { infinitive: 'recibir', group: 'ir' },
-  { infinitive: 'permitir', group: 'ir' },
+  { infinitive: 'permitir', group: 'ir', noImperative: true },
 
   // Stem-changing presente
   { infinitive: 'pensar', group: 'ar', stemChange: 'e>ie' },
@@ -45,8 +45,8 @@ export const VERBS: Verb[] = [
   { infinitive: 'pedir', group: 'ir', stemChange: 'e>i' },
   { infinitive: 'servir', group: 'ir', stemChange: 'e>i' },
   { infinitive: 'dormir', group: 'ir', stemChange: 'o>ue' },
-  { infinitive: 'preferir', group: 'ir', stemChange: 'e>ie' },
-  { infinitive: 'sentir', group: 'ir', stemChange: 'e>ie' },
+  { infinitive: 'preferir', group: 'ir', stemChange: 'e>ie', noImperative: true },
+  { infinitive: 'sentir', group: 'ir', stemChange: 'e>ie', noImperative: true },
 
   // Common irregulars
   {
@@ -77,6 +77,7 @@ export const VERBS: Verb[] = [
         vosotros: 'erais',
         ellos: 'eran',
       },
+      imperativo: { tú: 'sé', él: 'sea', nosotros: 'seamos', ellos: 'sean' },
     },
   },
   {
@@ -91,6 +92,7 @@ export const VERBS: Verb[] = [
         vosotros: 'estáis',
         ellos: 'están',
       },
+      imperativo: { él: 'esté', nosotros: 'estemos', ellos: 'estén' },
     },
     indefinidoStem: 'estuv',
   },
@@ -122,11 +124,13 @@ export const VERBS: Verb[] = [
         vosotros: 'ibais',
         ellos: 'iban',
       },
+      imperativo: { tú: 've', él: 'vaya', nosotros: 'vamos', ellos: 'vayan' },
     },
   },
   {
     infinitive: 'haber',
     group: 'er',
+    noImperative: true,
     forms: {
       presente: {
         yo: 'he',
@@ -145,6 +149,9 @@ export const VERBS: Verb[] = [
     stemChange: 'e>ie',
     presentYo: 'tengo',
     indefinidoStem: 'tuv',
+    forms: {
+      imperativo: { tú: 'ten' },
+    },
   },
   {
     infinitive: 'hacer',
@@ -160,11 +167,13 @@ export const VERBS: Verb[] = [
         vosotros: 'hicisteis',
         ellos: 'hicieron',
       },
+      imperativo: { tú: 'haz' },
     },
   },
   {
     infinitive: 'poder',
     group: 'er',
+    noImperative: true,
     stemChange: 'o>ue',
     indefinidoStem: 'pud',
   },
@@ -174,6 +183,9 @@ export const VERBS: Verb[] = [
     stemChange: 'e>i',
     presentYo: 'digo',
     indefinidoStem: 'dij',
+    forms: {
+      imperativo: { tú: 'di' },
+    },
   },
   {
     infinitive: 'venir',
@@ -181,16 +193,21 @@ export const VERBS: Verb[] = [
     stemChange: 'e>ie',
     presentYo: 'vengo',
     indefinidoStem: 'vin',
+    forms: {
+      imperativo: { tú: 'ven' },
+    },
   },
   {
     infinitive: 'querer',
     group: 'er',
+    noImperative: true,
     stemChange: 'e>ie',
     indefinidoStem: 'quis',
   },
   {
     infinitive: 'saber',
     group: 'er',
+    noImperative: true,
     presentYo: 'sé',
     indefinidoStem: 'sup',
   },
@@ -199,6 +216,9 @@ export const VERBS: Verb[] = [
     group: 'er',
     presentYo: 'pongo',
     indefinidoStem: 'pus',
+    forms: {
+      imperativo: { tú: 'pon' },
+    },
   },
   {
     infinitive: 'ver',
@@ -250,12 +270,16 @@ export const VERBS: Verb[] = [
         vosotros: 'disteis',
         ellos: 'dieron',
       },
+      imperativo: { él: 'dé', nosotros: 'demos', ellos: 'den' },
     },
   },
   {
     infinitive: 'salir',
     group: 'ir',
     presentYo: 'salgo',
+    forms: {
+      imperativo: { tú: 'sal' },
+    },
   },
   {
     infinitive: 'traer',
@@ -271,6 +295,7 @@ export const VERBS: Verb[] = [
   {
     infinitive: 'parecer',
     group: 'er',
+    noImperative: true,
     presentYo: 'parezco',
   },
   {
@@ -290,6 +315,7 @@ export const VERBS: Verb[] = [
   {
     infinitive: 'oír',
     group: 'ir',
+    noImperative: true,
     forms: {
       presente: {
         yo: 'oigo',
@@ -312,6 +338,7 @@ export const VERBS: Verb[] = [
   {
     infinitive: 'caer',
     group: 'er',
+    noImperative: true,
     presentYo: 'caigo',
     forms: {
       indefinido: {

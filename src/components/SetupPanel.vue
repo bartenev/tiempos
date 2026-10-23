@@ -79,7 +79,7 @@ function setAllIrregular(value: boolean) {
     <h1>Tiempos</h1>
     <p class="lead">
       Предложение с пропуском — впишите глагол в нужной форме
-      (presente, indefinido, imperfecto).
+      (presente, indefinido, imperfecto, imperativo).
     </p>
     <p v-if="days > 0" class="daily">
       🔥 {{ daysLabel(days) }} подряд

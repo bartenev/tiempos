@@ -2,7 +2,11 @@
 
 Минимальный тренажёр спряжения испанских глаголов.
 
-**Времена:** Presente · Pretérito indefinido · Pretérito imperfecto
+**Времена:** Presente · Pretérito indefinido · Pretérito imperfecto · Imperativo
+
+Imperativo — утвердительный: tú, usted, nosotros, vosotros, ustedes (формы yo нет).
+Глаголы с неестественным императивом (haber, poder, querer, saber, parecer, necesitar,
+preferir, sentir, oír, caer, permitir) в нём не тренируются.
 
 ## Онлайн
 

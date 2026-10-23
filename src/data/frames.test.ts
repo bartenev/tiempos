@@ -1,13 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { PERSONS, type Tense } from '../types'
+import { TENSES, personsFor } from '../types'
 import { FRAMES, framesFor } from './frames'
-
-const TENSES: Tense[] = ['presente', 'indefinido', 'imperfecto']
 
 describe('FRAMES', () => {
   it('covers every tense × person pair', () => {
     for (const tense of TENSES) {
-      for (const person of PERSONS) {
+      for (const person of personsFor(tense)) {
         const list = framesFor(tense, person)
         expect(list.length, `${tense}/${person}`).toBeGreaterThan(0)
       }

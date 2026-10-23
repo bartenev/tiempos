@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { VERBS, isRegularVerb } from '../data/verbs'
-import { conjugate } from '../lib/conjugate'
+import { conjugate, hasTense } from '../lib/conjugate'
 import type { CellStat, Mastery } from '../lib/stats'
 import { cellKey, errorRate, loadStats, masteryOf } from '../lib/stats'
 import type { Person, Tense, Verb } from '../types'
-import { PERSONS, TENSES, TENSE_SHORT } from '../types'
+import { TENSES, TENSE_SHORT, personLabel, personsFor } from '../types'
 
 const emit = defineEmits<{
   back: []
@@ -32,7 +32,8 @@ const MASTERY_LABELS: Record<Mastery, string> = {
 const cells: CellInfo[] = []
 for (const verb of VERBS) {
   for (const tense of TENSES) {
-    for (const person of PERSONS) {
+    if (!hasTense(verb, tense)) continue
+    for (const person of personsFor(tense)) {
       const stat = stats[cellKey(verb.infinitive, tense, person)]
       cells.push({ verb, tense, person, stat, mastery: masteryOf(stat) })
     }
@@ -77,6 +78,15 @@ const TAB_LABELS: Record<Tense, string> = {
   presente: 'Presente',
   indefinido: 'Indefinido',
   imperfecto: 'Imperfecto',
+  imperativo: 'Imperativo',
+}
+
+/** Короткие заголовки колонок сетки. */
+const COLUMN_LABELS: Record<string, string> = {
+  nosotros: 'nos.',
+  vosotros: 'vos.',
+  usted: 'ud.',
+  ustedes: 'uds.',
 }
 
 const tense = ref<Tense>('presente')
@@ -146,7 +156,7 @@ function statLine(c: CellInfo): string {
     </p>
     <ul v-else class="mistakes weak-list">
       <li v-for="c in topWeak" :key="cellKey(c.verb.infinitive, c.tense, c.person)">
-        <span class="m-meta">{{ c.verb.infinitive }} · {{ TENSE_SHORT[c.tense] }} · {{ c.person }}</span>
+        <span class="m-meta">{{ c.verb.infinitive }} · {{ TENSE_SHORT[c.tense] }} · {{ personLabel(c.tense, c.person) }}</span>
         <span class="m-forms">
           <b>{{ conjugate(c.verb, c.tense, c.person) }}</b>
           <small class="muted">{{ statLine(c) }}</small>
@@ -192,13 +202,13 @@ function statLine(c: CellInfo): string {
         <thead>
           <tr>
             <th class="verb-col" />
-            <th v-for="p in PERSONS" :key="p" scope="col">{{ p === 'nosotros' ? 'nos.' : p === 'vosotros' ? 'vos.' : p }}</th>
+            <th v-for="p in personsFor(tense)" :key="p" scope="col">{{ COLUMN_LABELS[personLabel(tense, p)] ?? p }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="verb in g.verbs" :key="verb.infinitive">
+          <tr v-for="verb in g.verbs.filter((v) => hasTense(v, tense))" :key="verb.infinitive">
             <th scope="row">{{ verb.infinitive }}</th>
-            <td v-for="p in PERSONS" :key="p">
+            <td v-for="p in personsFor(tense)" :key="p">
               <button
                 type="button"
                 class="cell"
@@ -214,7 +224,7 @@ function statLine(c: CellInfo): string {
 
     <div v-if="selected" class="cell-detail">
       <b>{{ conjugate(selected.verb, selected.tense, selected.person) }}</b>
-      <span>{{ selected.verb.infinitive }} · {{ selected.person }} · {{ MASTERY_LABELS[selected.mastery] }}</span>
+      <span>{{ selected.verb.infinitive }} · {{ personLabel(selected.tense, selected.person) }} · {{ MASTERY_LABELS[selected.mastery] }}</span>
       <small class="muted">{{ statLine(selected) }}</small>
     </div>
   </section>

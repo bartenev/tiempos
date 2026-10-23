@@ -1,5 +1,5 @@
 import type { Person, StemChange, Tense, Verb, VerbGroup } from '../types'
-import { PERSONS } from '../types'
+import { PERSONS, personsFor } from '../types'
 
 export const PRESENT_ENDINGS: Record<VerbGroup, string[]> = {
   ar: ['o', 'as', 'a', 'amos', 'áis', 'an'],
@@ -17,6 +17,17 @@ export const INDEFINIDO_REGULAR: Record<VerbGroup, string[]> = {
   ar: ['é', 'aste', 'ó', 'amos', 'asteis', 'aron'],
   er: ['í', 'iste', 'ió', 'imos', 'isteis', 'ieron'],
   ir: ['í', 'iste', 'ió', 'imos', 'isteis', 'ieron'],
+}
+
+/**
+ * Imperativo afirmativo (yo нет — пустая строка).
+ * tú = presente él; vosotros = инфинитив -r → -d;
+ * usted / nosotros / ustedes = presente de subjuntivo («обратная» гласная).
+ */
+export const IMPERATIVE_ENDINGS: Record<VerbGroup, string[]> = {
+  ar: ['', 'a', 'e', 'emos', 'ad', 'en'],
+  er: ['', 'e', 'a', 'amos', 'ed', 'an'],
+  ir: ['', 'e', 'a', 'amos', 'id', 'an'],
 }
 
 /** Endings for irregular pretérito stems (tuv-, pus-, …). */
@@ -81,8 +92,45 @@ function fixIndefinidoYo(stem: string, ending: string, group: VerbGroup): string
   return stem + ending
 }
 
+/** Перед e: c → qu, g → gu, z → c (busque, llegue, empiece). */
+export function fixBeforeE(stem: string): string {
+  if (stem.endsWith('c')) return `${stem.slice(0, -1)}qu`
+  if (stem.endsWith('g')) return `${stem.slice(0, -1)}gu`
+  if (stem.endsWith('z')) return `${stem.slice(0, -1)}c`
+  return stem
+}
+
+/**
+ * Основа presente de subjuntivo для usted / ustedes / nosotros.
+ * От формы yo (tengo → teng-, veo → ve-, pienso → piens-). У глаголов с чередованием
+ * nosotros без него, но -ir сохраняют e→i / o→u (pidamos, durmamos).
+ */
+export function subjunctiveStem(verb: Verb, person: Person): string {
+  let stem: string
+  if (person === 'nosotros' && verb.stemChange && !verb.presentYo) {
+    stem = infinitiveStem(verb)
+    const shift = indefinidoShift(verb)
+    if (shift) stem = applyStemChange(stem, shift)
+  } else {
+    stem = conjugatePresente(verb, 'yo').slice(0, -1)
+  }
+  return verb.group === 'ar' ? fixBeforeE(stem) : stem
+}
+
+function conjugateImperativo(verb: Verb, person: Person): string {
+  if (person === 'yo') throw new Error('В императиве нет формы yo')
+  const override = verb.forms?.imperativo?.[person]
+  if (override) return override
+
+  const ending = IMPERATIVE_ENDINGS[verb.group][personIndex(person)]!
+  if (person === 'tú') return conjugatePresente(verb, 'él')
+  if (person === 'vosotros') return verb.infinitive.slice(0, -1) + 'd'
+  return subjunctiveStem(verb, person) + ending
+}
+
 function conjugatePresente(verb: Verb, person: Person): string {
-  if (verb.forms?.presente?.[person]) return verb.forms.presente[person]
+  const override = verb.forms?.presente?.[person]
+  if (override) return override
   if (person === 'yo' && verb.presentYo) return verb.presentYo
 
   const idx = personIndex(person)
@@ -97,7 +145,8 @@ function conjugatePresente(verb: Verb, person: Person): string {
 }
 
 function conjugateImperfecto(verb: Verb, person: Person): string {
-  if (verb.forms?.imperfecto?.[person]) return verb.forms.imperfecto[person]
+  const override = verb.forms?.imperfecto?.[person]
+  if (override) return override
 
   const idx = personIndex(person)
   const stem = infinitiveStem(verb)
@@ -105,7 +154,8 @@ function conjugateImperfecto(verb: Verb, person: Person): string {
 }
 
 function conjugateIndefinido(verb: Verb, person: Person): string {
-  if (verb.forms?.indefinido?.[person]) return verb.forms.indefinido[person]
+  const override = verb.forms?.indefinido?.[person]
+  if (override) return override
 
   const idx = personIndex(person)
 
@@ -127,9 +177,14 @@ function conjugateIndefinido(verb: Verb, person: Person): string {
   return stem + ending
 }
 
-/** Все 6 форм времени. */
+/** Есть ли у глагола это время в тренажёре. */
+export function hasTense(verb: Verb, tense: Tense): boolean {
+  return tense !== 'imperativo' || !verb.noImperative
+}
+
+/** Все формы времени (в императиве — 5, без yo). */
 export function paradigmOf(verb: Verb, tense: Tense): string[] {
-  return PERSONS.map((p) => conjugate(verb, tense, p))
+  return personsFor(tense).map((p) => conjugate(verb, tense, p))
 }
 
 export function conjugate(verb: Verb, tense: Tense, person: Person): string {
@@ -140,5 +195,7 @@ export function conjugate(verb: Verb, tense: Tense, person: Person): string {
       return conjugateImperfecto(verb, person)
     case 'indefinido':
       return conjugateIndefinido(verb, person)
+    case 'imperativo':
+      return conjugateImperativo(verb, person)
   }
 }

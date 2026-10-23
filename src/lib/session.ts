@@ -2,8 +2,8 @@ import { framesFor } from '../data/frames'
 import { buildVerbSentence } from '../data/sentences'
 import { VERBS, isRegularVerb } from '../data/verbs'
 import type { DrillCard, Person, SessionConfig, Tense, Verb } from '../types'
-import { PERSONS } from '../types'
-import { conjugate } from './conjugate'
+import { personsFor } from '../types'
+import { conjugate, hasTense } from './conjugate'
 import type { StatsStore } from './stats'
 import { cellKey, cellWeight, isWeak, loadStats } from './stats'
 
@@ -70,7 +70,8 @@ export function cellsForConfig(
   const cells: Cell[] = []
   for (const verb of verbsForConfig(config)) {
     for (const tense of config.tenses) {
-      for (const person of PERSONS) {
+      if (!hasTense(verb, tense)) continue
+      for (const person of personsFor(tense)) {
         const stat = stats[cellKey(verb.infinitive, tense, person)]
         cells.push({
           verb,
@@ -150,18 +151,24 @@ export function buildSession(
     throw new Error('Нет глаголов для выбранного фильтра')
   }
 
+  let cells = cellsForConfig(config, stats)
+  if (cells.length === 0) {
+    throw new Error('Нет форм для выбранного фильтра')
+  }
+
   if (config.mode === 'random') {
+    // Равномерно по времени, затем по глаголу и лицу (у части глаголов нет императива).
+    const tenses = config.tenses.filter((t) => pool.some((v) => hasTense(v, t)))
     const cards: DrillCard[] = []
     for (let i = 0; i < config.size; i++) {
-      const verb = pickRandom(pool)
-      const tense = pickRandom(config.tenses)
-      const person = pickRandom(PERSONS)
+      const tense = pickRandom(tenses)
+      const verb = pickRandom(pool.filter((v) => hasTense(v, tense)))
+      const person = pickRandom(personsFor(tense))
       cards.push(makeCard(verb, tense, person))
     }
     return shuffle(cards)
   }
 
-  let cells = cellsForConfig(config, stats)
   let size = config.size
   if (config.mode === 'weak') {
     cells = cells.filter((c) => c.weak)
