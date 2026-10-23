@@ -62,6 +62,14 @@ describe('settings', () => {
     expect(configFromSettings(loadSettings()).groups).toEqual(['ar', 'er', 'ir'])
   })
 
+  it('irregular ticked but none picked means no irregular verbs', () => {
+    const settings = loadSettings()
+    for (const inf of IRREGULAR_INFINITIVES) settings.selectedIrregular[inf] = false
+    const cfg = configFromSettings(settings)
+    expect(cfg.includeIrregular).toBe(false)
+    expect(cfg.selectedIrregular).toEqual([])
+  })
+
   it('falls back to text for the removed voice mode', () => {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({ answer: 'voice' }))
     expect(loadSettings().answer).toBe('text')

@@ -168,6 +168,9 @@ export function configFromSettings(
   settings: SetupSettings,
   overrides: Partial<SessionConfig> = {},
 ): SessionConfig {
+  const irregular = settings.includeIrregular
+    ? selectedIrregularList(settings.selectedIrregular)
+    : []
   return {
     tenses: (Object.keys(settings.selected) as Tense[]).filter(
       (t) => settings.selected[t],
@@ -178,10 +181,9 @@ export function configFromSettings(
     mode: settings.mode,
     answer: settings.answer,
     includeRegular: settings.includeRegular,
-    includeIrregular: settings.includeIrregular,
-    selectedIrregular: settings.includeIrregular
-      ? selectedIrregularList(settings.selectedIrregular)
-      : [],
+    // «Неправильные» отмечены, но ни один не выбран — значит, их нет в сессии.
+    includeIrregular: settings.includeIrregular && irregular.length > 0,
+    selectedIrregular: irregular,
     ...overrides,
   }
 }

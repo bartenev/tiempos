@@ -87,7 +87,7 @@ export interface SessionResult {
   mistakes: SessionMistake[]
 }
 
-export type Screen = 'setup' | 'drill' | 'summary' | 'tables' | 'progress'
+export type Screen = 'setup' | 'settings' | 'drill' | 'summary' | 'tables' | 'progress'
 
 export const MODE_LABELS: Record<SessionMode, string> = {
   smart: 'Умная очередь',

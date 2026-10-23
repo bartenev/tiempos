@@ -6,6 +6,7 @@
  */
 export type IconName =
   | 'back'
+  | 'forward'
   | 'check'
   | 'cross'
   | 'sun'
@@ -13,6 +14,10 @@ export type IconName =
   | 'flame'
   | 'keyboard'
   | 'speech'
+  | 'settings'
+  | 'practice'
+  | 'progress'
+  | 'tables'
 
 defineProps<{
   name: IconName
@@ -33,6 +38,7 @@ defineProps<{
     focusable="false"
   >
     <path v-if="name === 'back'" d="M15 18l-6-6 6-6" />
+    <path v-else-if="name === 'forward'" d="M9 18l6-6-6-6" />
     <path v-else-if="name === 'check'" d="M20 6L9 17l-5-5" />
     <path v-else-if="name === 'cross'" d="M18 6L6 18M6 6l12 12" />
     <template v-else-if="name === 'sun'">
@@ -54,5 +60,20 @@ defineProps<{
       v-else-if="name === 'speech'"
       d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
     />
+    <path
+      v-else-if="name === 'settings'"
+      d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"
+    />
+    <path
+      v-else-if="name === 'practice'"
+      d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"
+    />
+    <path v-else-if="name === 'progress'" d="M18 20V10M12 20V4M6 20v-6" />
+    <template v-else-if="name === 'tables'">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+    </template>
   </svg>
 </template>

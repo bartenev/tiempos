@@ -6,11 +6,6 @@ import { endingsRow } from '../lib/tables'
 import { theme } from '../lib/theme'
 import type { Person, Tense, Verb } from '../types'
 import { TENSES, TENSE_LABELS, personLabel, personsFor } from '../types'
-import Icon from './Icon.vue'
-
-const emit = defineEmits<{
-  back: []
-}>()
 
 const EXAMPLES: Verb[] = [
   { infinitive: 'hablar', group: 'ar' },
@@ -46,15 +41,9 @@ function cellStyle(tense: Tense, person: Person): { backgroundColor: string } {
 
 <template>
   <section class="tables">
-    <header class="topbar tables__bar">
-      <button class="button button--ghost topbar__back tables__back" type="button" @click="emit('back')"><Icon name="back" />назад</button>
-      <span class="topbar__title tables__bar-title">Таблицы</span>
-      <span class="topbar__aside tables__bar-aside" />
-    </header>
-
-    <h1 class="screen__title tables__title">Окончания</h1>
+    <h1 class="screen__title tables__title">Таблицы</h1>
     <p class="screen__lead tables__lead">
-      Регулярные парадигмы на примерах
+      Окончания правильных глаголов на примерах
       <b class="tables__example">hablar</b>, <b class="tables__example">comer</b>, <b class="tables__example">vivir</b>.
     </p>
     <p class="tables__legend">

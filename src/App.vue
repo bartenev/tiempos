@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import DrillPanel from './components/DrillPanel.vue'
-import Icon from './components/Icon.vue'
+import HomePanel from './components/HomePanel.vue'
 import ProgressPanel from './components/ProgressPanel.vue'
-import SetupPanel from './components/SetupPanel.vue'
+import SettingsPanel from './components/SettingsPanel.vue'
 import SummaryPanel from './components/SummaryPanel.vue'
+import TabBar from './components/TabBar.vue'
 import TablesPanel from './components/TablesPanel.vue'
 import { markPracticed } from './lib/daily'
 import { IRREGULAR_INFINITIVES } from './data/verbs'
 import { buildSession, retryCard } from './lib/session'
-import { configFromSettings, loadSettings } from './lib/settings'
+import { configFromSettings } from './lib/settings'
+import { settings } from './lib/settingsState'
 import { recordAttempt } from './lib/stats'
-import { initTheme, theme, toggleTheme } from './lib/theme'
+import { initTheme } from './lib/theme'
 import type {
   DrillCard,
   Screen,
@@ -44,6 +46,11 @@ const startError = ref('')
 watch(screen, () => window.scrollTo(0, 0))
 
 const current = computed(() => cards.value[index.value]!)
+
+/** Панель вкладок — на экранах-разделах; в сессии и на итогах не отвлекает. */
+const showTabBar = computed(() =>
+  ['setup', 'settings', 'progress', 'tables'].includes(screen.value),
+)
 
 const result = computed<SessionResult>(() => ({
   correct: correct.value,
@@ -135,7 +142,7 @@ function again() {
 /** С экрана прогресса — все слабые формы, независимо от фильтров настройки. */
 function trainWeak() {
   start(
-    configFromSettings(loadSettings(), {
+    configFromSettings(settings, {
       mode: 'weak',
       tenses: [...TENSES],
       persons: [...PERSONS],
@@ -153,29 +160,16 @@ function toSetup() {
 </script>
 
 <template>
-  <div class="app">
-    <button
-      class="app__theme-toggle"
-      type="button"
-      :title="theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'"
-      :aria-label="theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'"
-      @click="toggleTheme()"
-    >
-      <Icon :name="theme === 'dark' ? 'sun' : 'moon'" />
-    </button>
-    <SetupPanel
+  <div class="app" :class="{ 'app--tabbar': showTabBar }">
+    <HomePanel
       v-if="screen === 'setup'"
       :error="startError"
       @start="start"
-      @tables="screen = 'tables'"
-      @progress="screen = 'progress'"
+      @settings="screen = 'settings'"
     />
-    <TablesPanel v-else-if="screen === 'tables'" @back="toSetup" />
-    <ProgressPanel
-      v-else-if="screen === 'progress'"
-      @back="toSetup"
-      @train-weak="trainWeak"
-    />
+    <SettingsPanel v-else-if="screen === 'settings'" @back="toSetup" />
+    <TablesPanel v-else-if="screen === 'tables'" />
+    <ProgressPanel v-else-if="screen === 'progress'" @train-weak="trainWeak" />
     <DrillPanel
       v-else-if="screen === 'drill' && current"
       :card="current"
@@ -198,5 +192,6 @@ function toSetup() {
       @setup="toSetup"
       @progress="screen = 'progress'"
     />
+    <TabBar v-if="showTabBar" :screen="screen" @go="screen = $event" />
   </div>
 </template>
