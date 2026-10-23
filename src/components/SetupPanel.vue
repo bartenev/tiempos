@@ -2,7 +2,6 @@
 import { computed, ref, watch } from 'vue'
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
 import { currentStreak, daysLabel, loadDaily } from '../lib/daily'
-import { isSpeechSupported } from '../lib/speech'
 import { weakCount } from '../lib/session'
 import { configFromSettings, loadSettings, saveSettings } from '../lib/settings'
 import type { AnswerMode, SessionConfig, SessionMode, Tense } from '../types'
@@ -26,9 +25,7 @@ const includeIrregular = ref(saved.includeIrregular)
 const selectedIrregular = ref({ ...saved.selectedIrregular })
 const size = ref(saved.size)
 const mode = ref<SessionMode>(saved.mode)
-const speechSupported = isSpeechSupported()
-// Голос сохранён, а браузер не умеет — откатываемся на текст.
-const answer = ref<AnswerMode>(speechSupported ? saved.answer : 'text')
+const answer = ref<AnswerMode>(saved.answer)
 
 const irregularList = IRREGULAR_INFINITIVES
 
@@ -105,20 +102,16 @@ function setAllIrregular(value: boolean) {
         <button
           type="button"
           role="radio"
-          :aria-checked="answer === 'voice'"
-          :class="{ active: answer === 'voice' }"
-          :disabled="!speechSupported"
-          @click="answer = 'voice'"
+          :aria-checked="answer === 'oral'"
+          :class="{ active: answer === 'oral' }"
+          @click="answer = 'oral'"
         >
-          🎤 Голос
+          🗣 Устно
         </button>
       </div>
-      <p v-if="!speechSupported" class="field-note">
-        Этот браузер не умеет распознавать речь — нужен Chrome или Safari.
-      </p>
-      <p v-else-if="answer === 'voice'" class="field-note">
-        Говорите форму вслух — микрофон слушает сам. Нужен интернет;
-        ударения на слух не проверяются.
+      <p v-if="answer === 'oral'" class="field-note">
+        Скажите форму вслух или про себя, тапните — появится ответ, отметьте
+        «верно» или «ошибся». Правописание здесь не проверяется.
       </p>
     </fieldset>
 

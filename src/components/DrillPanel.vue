@@ -2,11 +2,10 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { explainForm } from '../lib/explain'
 import type { AnswerCheck } from '../lib/normalize'
-import { checkAnswer, spokenMatches } from '../lib/normalize'
-import type { ListenState, Listener } from '../lib/speech'
-import { createListener } from '../lib/speech'
+import { checkAnswer } from '../lib/normalize'
 import type { DrillCard } from '../types'
 import { TENSE_LABELS } from '../types'
+import RuleHint from './RuleHint.vue'
 
 const props = defineProps<{
   card: DrillCard
@@ -15,8 +14,8 @@ const props = defineProps<{
   correct: number
   wrong: number
   streak: number
-  /** Голосовой режим: отвечать вслух, микрофон слушает без нажатий. */
-  voice?: boolean
+  /** Устный режим: сказать форму вслух / про себя, открыть ответ и оценить себя. */
+  oral?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -32,30 +31,12 @@ const ACCENTS = ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü']
 
 const input = ref('')
 const feedback = ref<AnswerCheck | null>(null)
+/** Устный режим: ответ открыт, ждём самооценку. */
+const shown = ref(false)
 const inputEl = ref<HTMLInputElement | null>(null)
 /** Короткая зелёная вспышка: прошлый ответ верный, уже следующая карточка. */
 const flashOk = ref(false)
 let flashTimer: ReturnType<typeof setTimeout> | undefined
-
-/** Что распознал микрофон в последний раз (для неверного ответа). */
-const heard = ref<string | null>(null)
-const listenState = ref<ListenState>('paused')
-let listener: Listener | null = null
-
-const VOICE_STATUS: Record<ListenState, string> = {
-  listening: 'Слушаю… скажите форму',
-  paused: 'Микрофон выключен',
-  denied: 'Нет доступа к микрофону — разрешите его в браузере',
-  network: 'Нет связи с распознаванием речи — нужен интернет',
-  unsupported: 'Браузер не умеет распознавать речь',
-}
-
-const voiceStatus = computed(() => {
-  if (listenState.value === 'listening' && feedback.value !== null) {
-    return 'Скажите правильную форму — и дальше'
-  }
-  return VOICE_STATUS[listenState.value]
-})
 
 const progress = computed(() => `${props.index + 1} / ${props.total}`)
 const revealed = computed(() => feedback.value !== null)
@@ -67,7 +48,8 @@ const accuracy = computed(() =>
 )
 
 const hint = computed(() => {
-  if (feedback.value !== 'wrong' && feedback.value !== 'almost') return null
+  const show = feedback.value === 'wrong' || feedback.value === 'almost' || shown.value
+  if (!show) return null
   return explainForm(props.card.verb, props.card.tense, props.card.person)
 })
 
@@ -81,7 +63,7 @@ const sentenceParts = computed(() => {
 })
 
 const filledBlank = computed(() => {
-  if (feedback.value === null) return '___'
+  if (feedback.value === null && !shown.value) return '___'
   return props.card.answer
 })
 
@@ -95,7 +77,7 @@ watch(
   async () => {
     input.value = ''
     feedback.value = null
-    heard.value = null
+    shown.value = false
     await nextTick()
     focusInput()
   },
@@ -131,49 +113,6 @@ function submit() {
   focusInput()
 }
 
-/**
- * Ответ голосом. Верно → следующая карточка. Неверно → ошибка и подсказка,
- * микрофон слушает дальше: произнесли правильную форму — идём дальше.
- */
-function onSpoken(alternatives: string[]) {
-  if (spokenMatches(alternatives, props.card.answer)) {
-    if (feedback.value === null) acceptCorrect()
-    else emit('next')
-    return
-  }
-  heard.value = alternatives[0] ?? null
-  if (feedback.value === null) {
-    feedback.value = 'wrong'
-    emit('wrong', heard.value ?? '')
-  }
-}
-
-function startListening() {
-  listener?.start()
-}
-
-function onVisibility() {
-  if (document.hidden) listener?.stop()
-  else listener?.start()
-}
-
-onMounted(() => {
-  if (!props.voice) return
-  listener = createListener({
-    onResult: onSpoken,
-    onState: (state) => (listenState.value = state),
-  })
-  listener.start()
-  document.addEventListener('visibilitychange', onVisibility)
-})
-
-onBeforeUnmount(() => {
-  clearTimeout(flashTimer)
-  listener?.stop()
-  listener = null
-  document.removeEventListener('visibilitychange', onVisibility)
-})
-
 function skip() {
   if (feedback.value === null) emit('skip')
   emit('next')
@@ -194,6 +133,45 @@ function insertAccent(ch: string) {
     focusInput()
   })
 }
+
+function reveal() {
+  if (props.oral) shown.value = true
+}
+
+/** Самооценка в устном режиме; обе кнопки ведут к следующей карточке. */
+function grade(ok: boolean) {
+  if (!shown.value) return
+  if (ok) {
+    acceptCorrect()
+    return
+  }
+  emit('wrong', '')
+  emit('next')
+}
+
+/** Клавиатура в устном режиме: пробел / Enter — ответ, → верно, ← ошибся. */
+function onKey(event: KeyboardEvent) {
+  if (event.metaKey || event.ctrlKey || event.altKey) return
+  if (!shown.value && (event.key === ' ' || event.key === 'Enter')) {
+    event.preventDefault()
+    reveal()
+  } else if (shown.value && event.key === 'ArrowRight') {
+    event.preventDefault()
+    grade(true)
+  } else if (shown.value && event.key === 'ArrowLeft') {
+    event.preventDefault()
+    grade(false)
+  }
+}
+
+onMounted(() => {
+  if (props.oral) window.addEventListener('keydown', onKey)
+})
+
+onBeforeUnmount(() => {
+  clearTimeout(flashTimer)
+  window.removeEventListener('keydown', onKey)
+})
 </script>
 
 <template>
@@ -216,7 +194,11 @@ function insertAccent(ch: string) {
       </span>
     </div>
 
-    <div class="prompt-card" :class="{ 'flash-ok': flashOk }">
+    <div
+      class="prompt-card"
+      :class="{ 'flash-ok': flashOk, tappable: oral && !shown }"
+      @click="reveal"
+    >
       <div class="meta">
         {{ TENSE_LABELS[card.tense] }}
         <span v-if="card.retry" class="retry-tag">повтор</span>
@@ -227,6 +209,7 @@ function insertAccent(ch: string) {
           ok: feedback === 'exact',
           almost: feedback === 'almost',
           bad: feedback === 'wrong',
+          shown,
         }"
       >
         <span>{{ sentenceParts.before }}</span>
@@ -239,59 +222,56 @@ function insertAccent(ch: string) {
       </p>
     </div>
 
-    <form class="answer-form" @submit.prevent="submit">
-      <div v-if="voice" class="voice-panel" :class="listenState" aria-live="polite">
-        <span class="mic-dot" aria-hidden="true" />
-        <span class="voice-status">{{ voiceStatus }}</span>
-        <button
-          v-if="listenState !== 'listening' && listenState !== 'unsupported'"
-          class="ghost small"
-          type="button"
-          @click="startListening"
-        >
-          🎤 Включить
-        </button>
-      </div>
-      <p v-if="voice && heard" class="heard">Услышал: «{{ heard }}»</p>
-
-      <template v-if="!voice">
-        <label class="sr-only" for="answer">Форма глагола</label>
-        <input
-          id="answer"
-          ref="inputEl"
-          v-model="input"
-          type="text"
-          inputmode="text"
-          enterkeyhint="go"
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          lang="es"
-          :readonly="revealed"
-          :class="{
-            ok: feedback === 'exact',
-            almost: feedback === 'almost',
-            bad: feedback === 'wrong',
-          }"
-          placeholder="форма глагола…"
-        />
-
-        <div class="accent-keys" role="group" aria-label="Буквы с ударением">
-          <button
-            v-for="ch in ACCENTS"
-            :key="ch"
-            type="button"
-            class="accent-key"
-            tabindex="-1"
-            :disabled="revealed"
-            @pointerdown.prevent
-            @click="insertAccent(ch)"
-          >
-            {{ ch }}
-          </button>
+    <div v-if="oral" class="oral">
+      <button v-if="!shown" class="reveal-btn" type="button" @click="reveal">
+        Скажите форму вслух или про себя —<br />тапните, чтобы проверить
+      </button>
+      <template v-else>
+        <RuleHint v-if="hint" :hint="hint" />
+        <div class="grade-actions">
+          <button class="grade bad" type="button" @click="grade(false)">✗ Ошибся</button>
+          <button class="grade ok" type="button" @click="grade(true)">✓ Сказал верно</button>
         </div>
       </template>
+    </div>
+
+    <form v-else class="answer-form" @submit.prevent="submit">
+      <label class="sr-only" for="answer">Форма глагола</label>
+      <input
+        id="answer"
+        ref="inputEl"
+        v-model="input"
+        type="text"
+        inputmode="text"
+        enterkeyhint="go"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        lang="es"
+        :readonly="revealed"
+        :class="{
+          ok: feedback === 'exact',
+          almost: feedback === 'almost',
+          bad: feedback === 'wrong',
+        }"
+        placeholder="форма глагола…"
+      />
+
+      <div class="accent-keys" role="group" aria-label="Буквы с ударением">
+        <button
+          v-for="ch in ACCENTS"
+          :key="ch"
+          type="button"
+          class="accent-key"
+          tabindex="-1"
+          :disabled="revealed"
+          @pointerdown.prevent
+          @click="insertAccent(ch)"
+        >
+          {{ ch }}
+        </button>
+      </div>
 
       <p v-if="feedback === 'almost'" class="hint almost-text">
         Почти — проверьте ударения. Правильно: <b>{{ card.answer }}</b>
@@ -300,24 +280,10 @@ function insertAccent(ch: string) {
         Неверно. Правильно: <b>{{ card.answer }}</b>
       </p>
 
-      <div v-if="hint" class="rule-hint">
-        <p class="rule">{{ hint.rule }}</p>
-        <p v-if="hint.stem && hint.ending !== undefined" class="formula">
-          <span class="stem">{{ hint.stem }}</span>
-          <span class="plus">+</span>
-          <span class="ending">-{{ hint.ending }}</span>
-        </p>
-        <ul class="row">
-          <li v-for="item in hint.row" :key="item.person" :class="{ current: item.current }">
-            <span class="p">{{ item.label }}</span>
-            <span class="v">{{ item.value }}</span>
-          </li>
-        </ul>
-        <p v-if="hint.note" class="note">{{ hint.note }}</p>
-      </div>
+      <RuleHint v-if="hint" :hint="hint" />
 
       <div class="actions drill-actions">
-        <button v-if="!voice || revealed" class="primary" type="submit" :disabled="!canSubmit">
+        <button class="primary" type="submit" :disabled="!canSubmit">
           {{ revealed ? 'Дальше' : 'Проверить' }}
         </button>
         <button v-if="!revealed" class="ghost" type="button" @click="skip">

@@ -39,7 +39,7 @@ const SIZES = new Set([10, 20, 30])
 
 const MODES = new Set<SessionMode>(['smart', 'weak', 'random'])
 
-const ANSWERS = new Set<AnswerMode>(['text', 'voice'])
+const ANSWERS = new Set<AnswerMode>(['text', 'oral'])
 
 function isBool(value: unknown): value is boolean {
   return typeof value === 'boolean'

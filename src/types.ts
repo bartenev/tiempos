@@ -47,8 +47,8 @@ export interface DrillCard {
  */
 export type SessionMode = 'smart' | 'weak' | 'random'
 
-/** Как отвечать: вписывать форму или произносить её. */
-export type AnswerMode = 'text' | 'voice'
+/** Как отвечать: вписывать форму или сказать её и оценить себя самому. */
+export type AnswerMode = 'text' | 'oral'
 
 export interface SessionConfig {
   tenses: Tense[]

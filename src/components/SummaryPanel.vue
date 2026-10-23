@@ -75,7 +75,7 @@ const uniqueMistakes = computed(() => {
         <li v-for="m in uniqueMistakes" :key="`${m.infinitive}|${m.tense}|${m.person}`">
           <span class="m-meta">{{ m.infinitive }} · {{ TENSE_SHORT[m.tense] }} · {{ personLabel(m.tense, m.person) }}</span>
           <span class="m-forms">
-            <s class="bad-text">{{ m.given }}</s>
+            <s v-if="m.given" class="bad-text">{{ m.given }}</s>
             <b class="ok-text">{{ m.answer }}</b>
           </span>
         </li>

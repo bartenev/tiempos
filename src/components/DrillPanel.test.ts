@@ -1,8 +1,7 @@
 import { mount } from '@vue/test-utils'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { findVerb } from '../data/verbs'
 import { buildCard } from '../lib/session'
-import { FakeRecognition, installFakeRecognition, removeFakeRecognition } from '../lib/speech.fake'
 import DrillPanel from './DrillPanel.vue'
 
 function mountDrill() {
@@ -50,19 +49,17 @@ describe('DrillPanel', () => {
   })
 })
 
-describe('DrillPanel — voice', () => {
-  beforeEach(() => {
-    vi.useFakeTimers()
-    installFakeRecognition()
-  })
+describe('DrillPanel — oral (self-check)', () => {
+  let wrapper: ReturnType<typeof mountOral> | undefined
 
   afterEach(() => {
-    vi.useRealTimers()
-    removeFakeRecognition()
+    wrapper?.unmount()
+    wrapper = undefined
   })
 
-  function mountVoice() {
+  function mountOral() {
     return mount(DrillPanel, {
+      attachTo: document.body,
       props: {
         card: buildCard(findVerb('hablar')!, 'indefinido', 'él'),
         index: 0,
@@ -70,53 +67,59 @@ describe('DrillPanel — voice', () => {
         correct: 0,
         wrong: 0,
         streak: 0,
-        voice: true,
+        oral: true,
       },
     })
   }
 
-  it('listens right away, without a text field', async () => {
-    const wrapper = mountVoice()
-    await wrapper.vm.$nextTick()
-    expect(FakeRecognition.last.started).toBe(true)
+  it('hides the answer until a tap, without a text field', async () => {
+    wrapper = mountOral()
     expect(wrapper.find('#answer').exists()).toBe(false)
-    expect(wrapper.text()).toContain('Слушаю')
-  })
+    expect(wrapper.find('.blank').text()).toBe('___')
+    expect(wrapper.find('.grade-actions').exists()).toBe(false)
 
-  it('right form in any alternative → next card', async () => {
-    const wrapper = mountVoice()
-    FakeRecognition.last.say('hable', 'habló')
-    await wrapper.vm.$nextTick()
-    expect(wrapper.emitted('correct')).toHaveLength(1)
-    expect(wrapper.emitted('next')).toHaveLength(1)
-  })
-
-  it('stress is not checked by ear: «hablo» counts for «habló»', async () => {
-    const wrapper = mountVoice()
-    FakeRecognition.last.say('hablo')
-    await wrapper.vm.$nextTick()
-    expect(wrapper.emitted('correct')).toHaveLength(1)
-  })
-
-  it('wrong form → hint, then saying the right form moves on', async () => {
-    const wrapper = mountVoice()
-    FakeRecognition.last.say('hablaba')
-    await wrapper.vm.$nextTick()
-    expect(wrapper.emitted('wrong')).toEqual([['hablaba']])
+    await wrapper.find('.prompt-card').trigger('click')
+    expect(wrapper.find('.blank').text()).toBe('habló')
     expect(wrapper.find('.rule-hint').exists()).toBe(true)
-    expect(wrapper.text()).toContain('Услышал: «hablaba»')
+    expect(wrapper.find('.grade-actions').exists()).toBe(true)
+  })
 
-    vi.advanceTimersByTime(200)
-    FakeRecognition.last.say('habló')
-    await wrapper.vm.$nextTick()
-    expect(wrapper.emitted('correct')).toBeUndefined()
+  it('«Сказал верно» counts as correct and moves on', async () => {
+    wrapper = mountOral()
+    await wrapper.find('.reveal-btn').trigger('click')
+    await wrapper.find('.grade.ok').trigger('click')
+    expect(wrapper.emitted('correct')).toHaveLength(1)
     expect(wrapper.emitted('next')).toHaveLength(1)
   })
 
-  it('stops the microphone when the card screen closes', () => {
-    const wrapper = mountVoice()
-    const rec = FakeRecognition.last
+  it('«Ошибся» counts as a mistake and moves on', async () => {
+    wrapper = mountOral()
+    await wrapper.find('.reveal-btn').trigger('click')
+    await wrapper.find('.grade.bad').trigger('click')
+    expect(wrapper.emitted('wrong')).toEqual([['']])
+    expect(wrapper.emitted('next')).toHaveLength(1)
+  })
+
+  it('keyboard: space reveals, → correct, ← mistake', async () => {
+    wrapper = mountOral()
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }))
+    expect(wrapper.emitted('correct')).toBeUndefined()
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' }))
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('.blank').text()).toBe('habló')
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }))
+    expect(wrapper.emitted('wrong')).toHaveLength(1)
+    expect(wrapper.emitted('next')).toHaveLength(1)
+  })
+
+  it('stops listening to the keyboard when the screen closes', () => {
+    const off = vi.spyOn(window, 'removeEventListener')
+    wrapper = mountOral()
     wrapper.unmount()
-    expect(rec.aborted).toBe(true)
+    wrapper = undefined
+    expect(off).toHaveBeenCalledWith('keydown', expect.any(Function))
+    off.mockRestore()
   })
 })

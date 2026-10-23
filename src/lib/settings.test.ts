@@ -35,7 +35,7 @@ describe('settings', () => {
       selectedIrregular,
       size: 30,
       mode: 'weak',
-      answer: 'voice',
+      answer: 'oral',
     })
     const loaded = loadSettings()
     expect(loaded.selected.indefinido).toBe(false)
@@ -45,7 +45,12 @@ describe('settings', () => {
     expect(loaded.selectedIrregular.tener).toBe(true)
     expect(loaded.size).toBe(30)
     expect(loaded.mode).toBe('weak')
-    expect(loaded.answer).toBe('voice')
+    expect(loaded.answer).toBe('oral')
+  })
+
+  it('falls back to text for the removed voice mode', () => {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ answer: 'voice' }))
+    expect(loadSettings().answer).toBe('text')
   })
 
   it('defaults to smart mode and ignores unknown modes', () => {

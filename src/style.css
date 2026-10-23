@@ -707,64 +707,61 @@ button {
   font-size: 0.82rem;
 }
 
-.voice-panel {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  min-height: 3.25rem;
-  padding: 0.6rem 0.9rem;
-  border: 1.5px solid var(--line);
-  border-radius: 10px;
-  background: var(--input-bg);
-  font-size: 0.95rem;
+.prompt-card.tappable {
+  cursor: pointer;
 }
 
-.voice-panel.listening {
+.prompt-card .sentence.shown .blank {
   border-color: var(--accent);
+  color: var(--accent);
 }
 
-.voice-panel .voice-status {
-  flex: 1;
-}
-
-.mic-dot {
-  flex: none;
-  width: 0.8rem;
-  height: 0.8rem;
-  border-radius: 50%;
-  background: var(--muted);
-}
-
-.voice-panel.listening .mic-dot {
-  background: var(--bad);
-  animation: mic-pulse 1.2s ease-in-out infinite;
-}
-
-.voice-panel.denied .mic-dot,
-.voice-panel.network .mic-dot {
-  background: var(--almost);
-}
-
-@keyframes mic-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--bad) 55%, transparent);
-  }
-  50% {
-    box-shadow: 0 0 0 0.45rem transparent;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .voice-panel.listening .mic-dot {
-    animation: none;
-  }
-}
-
-.heard {
-  margin: 0.5rem 0 0;
-  font-size: 0.9rem;
+.reveal-btn {
+  width: 100%;
+  min-height: 6rem;
+  padding: 1rem;
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
   color: var(--muted);
+  cursor: pointer;
+}
+
+.reveal-btn:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.grade-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.grade {
+  min-height: 4rem;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+}
+
+.grade.bad {
+  background: var(--bad-bg);
+  border-color: var(--bad);
+  color: var(--bad);
+}
+
+.grade.ok {
+  background: var(--ok-bg);
+  border-color: var(--ok);
+  color: var(--ok);
 }
 
 .drill-actions .primary {
