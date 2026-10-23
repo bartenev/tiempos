@@ -154,6 +154,58 @@ function validate(config: SessionConfig): void {
 /** Максимум показов одной слабой формы в режиме «только слабые». */
 export const WEAK_REPEATS = 3
 
+/** Доля умной сессии, гарантированная слабым формам (если они есть). */
+export const WEAK_SMART_SHARE = 1 / 3
+
+/** Сколько раз одна слабая форма может попасть в умную сессию. */
+export const WEAK_SMART_REPEATS = 2
+
+/**
+ * Гарантированные места для слабых форм: сначала те, где больше ошибок
+ * (равные — в случайном порядке), каждая по разу, потом — второй круг.
+ */
+function weakPicks(weak: Cell[], slots: number): Cell[] {
+  const ordered = shuffle(weak).sort((a, b) => b.weight - a.weight)
+  const picks: Cell[] = []
+  for (let round = 0; round < WEAK_SMART_REPEATS; round++) {
+    for (const cell of ordered) {
+      if (picks.length < slots) picks.push(cell)
+    }
+  }
+  return picks
+}
+
+/** Перемешать так, чтобы одна и та же форма не шла два раза подряд (если это возможно). */
+function spread(cells: Cell[]): Cell[] {
+  const out = shuffle(cells)
+  const clashes = (k: number) =>
+    (k > 0 && out[k] === out[k - 1]) || (k < out.length - 1 && out[k] === out[k + 1])
+  for (let i = 1; i < out.length; i++) {
+    if (out[i] !== out[i - 1]) continue
+    // повтор: меняем out[i] с любым местом, где после обмена у обоих нет одинаковых соседей
+    for (let j = 0; j < out.length; j++) {
+      if (j === i || out[j] === out[i]) continue
+      ;[out[i], out[j]] = [out[j]!, out[i]!]
+      if (!clashes(i) && !clashes(j)) break
+      ;[out[i], out[j]] = [out[j]!, out[i]!]
+    }
+  }
+  return out
+}
+
+/**
+ * Умная сессия: до трети мест — слабым формам (гарантированно), остальное —
+ * порции, повторение и новое без слабых, чтобы одна форма не выпадала много раз.
+ */
+function smartQueue(cells: Cell[], size: number): Cell[] {
+  const weak = cells.filter((c) => c.weak)
+  const rest = smartPool(cells).filter((c) => !c.weak)
+  if (rest.length === 0) return weightedQueue(weak, Math.min(size, weak.length * WEAK_REPEATS))
+
+  const slots = Math.min(Math.floor(size * WEAK_SMART_SHARE), weak.length * WEAK_SMART_REPEATS)
+  return spread([...weakPicks(weak, slots), ...weightedQueue(rest, size - slots)])
+}
+
 /** Новая форма в уже освоенной порции: правило знакомо — это скорее повторение. */
 export const KNOWN_PATTERN_NEW_WEIGHT = 1.25
 
@@ -226,8 +278,11 @@ export function buildSession(
     return shuffle(cards)
   }
 
+  if (config.mode === 'smart') {
+    return smartQueue(cells, config.size).map((c) => makeCard(c.verb, c.tense, c.person))
+  }
+
   let size = config.size
-  if (config.mode === 'smart') cells = smartPool(cells)
   if (config.mode === 'weak') {
     cells = cells.filter((c) => c.weak)
     if (cells.length === 0) {

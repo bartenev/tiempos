@@ -233,3 +233,61 @@ describe('verb group filter (-ar / -er / -ir)', () => {
     expect(() => buildSession({ ...base, groups: [] }, {})).toThrow()
   })
 })
+
+describe('smart mode: guaranteed slots for weak forms', () => {
+  const wide: SessionConfig = {
+    ...base,
+    tenses: ['presente', 'indefinido', 'imperfecto', 'imperativo'],
+    mode: 'smart',
+    size: 20,
+  }
+  const key = (c: { verb: { infinitive: string }; tense: string; person: string }) =>
+    `${c.verb.infinitive}|${c.tense}|${c.person}`
+
+  it('a single weak form is in every session, at most twice, never back to back', () => {
+    const stats = { 'decir|imperfecto|nosotros': { ok: 1, bad: 2, streak: 0, last: 0 } }
+    for (let run = 0; run < 200; run++) {
+      const cards = buildSession(wide, stats)
+      const hits = cards.map(key).filter((k) => k === 'decir|imperfecto|nosotros').length
+      expect(hits).toBeGreaterThanOrEqual(1)
+      expect(hits).toBeLessThanOrEqual(2)
+      for (let i = 1; i < cards.length; i++) expect(key(cards[i]!)).not.toBe(key(cards[i - 1]!))
+    }
+  })
+
+  it('many weak forms take at most a third of the session, the worst first', () => {
+    const stats: Record<string, { ok: number; bad: number; streak: number; last: number }> = {}
+    const verbs = ['hablar', 'comer', 'vivir', 'cantar', 'beber', 'abrir', 'tomar', 'vender', 'subir', 'mirar']
+    verbs.forEach((v, i) => {
+      stats[`${v}|presente|yo`] = { ok: 0, bad: i === 0 ? 5 : 1, streak: 0, last: 0 }
+    })
+    const weakKeys = new Set(Object.keys(stats))
+    for (let run = 0; run < 50; run++) {
+      const cards = buildSession(wide, stats)
+      expect(cards).toHaveLength(20)
+      const weakCards = cards.filter((c) => weakKeys.has(key(c)))
+      expect(weakCards.length).toBeLessThanOrEqual(6)
+      // форма с 5 ошибками — всегда среди гарантированных
+      expect(cards.some((c) => key(c) === 'hablar|presente|yo')).toBe(true)
+    }
+  })
+
+  it('no weak forms — the session is as before', () => {
+    const cards = buildSession(wide, {})
+    expect(cards).toHaveLength(20)
+  })
+
+  it('only weak forms in the filter — behaves like the weak mode', () => {
+    const narrow: SessionConfig = {
+      ...base,
+      mode: 'smart',
+      includeIrregular: true,
+      includeRegular: false,
+      selectedIrregular: ['ser'],
+      persons: ['yo'],
+    }
+    const cards = buildSession(narrow, { 'ser|presente|yo': { ok: 0, bad: 1, streak: 0, last: 0 } })
+    expect(cards.length).toBeGreaterThan(0)
+    expect(cards.every((c) => key(c) === 'ser|presente|yo')).toBe(true)
+  })
+})
