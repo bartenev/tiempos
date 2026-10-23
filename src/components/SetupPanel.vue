@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
-import {
-  loadSettings,
-  saveSettings,
-  selectedIrregularList,
-} from '../lib/settings'
-import type { SessionConfig, Tense } from '../types'
-import { TENSE_LABELS } from '../types'
+import { currentStreak, daysLabel, loadDaily } from '../lib/daily'
+import { weakCount } from '../lib/session'
+import { configFromSettings, loadSettings, saveSettings } from '../lib/settings'
+import type { SessionConfig, SessionMode, Tense } from '../types'
+import { MODE_LABELS, TENSE_LABELS } from '../types'
+
+defineProps<{
+  error?: string
+}>()
 
 const emit = defineEmits<{
   start: [config: SessionConfig]
   tables: []
+  progress: []
 }>()
 
 const saved = loadSettings()
@@ -21,47 +24,45 @@ const includeRegular = ref(saved.includeRegular)
 const includeIrregular = ref(saved.includeIrregular)
 const selectedIrregular = ref({ ...saved.selectedIrregular })
 const size = ref(saved.size)
+const mode = ref<SessionMode>(saved.mode)
 
 const irregularList = IRREGULAR_INFINITIVES
 
-watch(
-  [selected, includeRegular, includeIrregular, selectedIrregular, size],
-  () => {
-    saveSettings({
-      selected: { ...selected.value },
-      includeRegular: includeRegular.value,
-      includeIrregular: includeIrregular.value,
-      selectedIrregular: { ...selectedIrregular.value },
-      size: size.value,
-    })
-  },
-  { deep: true },
-)
+const MODE_HINTS: Record<SessionMode, string> = {
+  smart: 'чаще — формы с ошибками, реже — выученные',
+  weak: 'только формы, где были ошибки',
+  random: 'равномерно, без учёта прогресса',
+}
 
-const tenses = computed(() =>
-  (Object.keys(selected.value) as Tense[]).filter((t) => selected.value[t]),
-)
+const days = currentStreak(loadDaily())
 
-const irregularPicked = computed(() =>
-  selectedIrregularList(selectedIrregular.value),
-)
+const settings = computed(() => ({
+  selected: { ...selected.value },
+  includeRegular: includeRegular.value,
+  includeIrregular: includeIrregular.value,
+  selectedIrregular: { ...selectedIrregular.value },
+  size: size.value,
+  mode: mode.value,
+}))
+
+watch(settings, (value) => saveSettings(value), { deep: true })
+
+const config = computed(() => configFromSettings(settings.value))
+
+const weak = computed(() => weakCount(config.value))
 
 const canStart = computed(() => {
-  if (tenses.value.length === 0) return false
-  if (!includeRegular.value && !includeIrregular.value) return false
-  if (includeIrregular.value && irregularPicked.value.length === 0) return false
+  const cfg = config.value
+  if (cfg.tenses.length === 0) return false
+  if (!cfg.includeRegular && !cfg.includeIrregular) return false
+  if (cfg.includeIrregular && cfg.selectedIrregular.length === 0) return false
+  if (cfg.mode === 'weak' && weak.value === 0) return false
   return true
 })
 
 function start() {
   if (!canStart.value) return
-  emit('start', {
-    tenses: tenses.value,
-    size: size.value,
-    includeRegular: includeRegular.value,
-    includeIrregular: includeIrregular.value,
-    selectedIrregular: includeIrregular.value ? irregularPicked.value : [],
-  })
+  emit('start', config.value)
 }
 
 function setAllIrregular(value: boolean) {
@@ -80,6 +81,23 @@ function setAllIrregular(value: boolean) {
       Предложение с пропуском — впишите глагол в нужной форме
       (presente, indefinido, imperfecto).
     </p>
+    <p v-if="days > 0" class="daily">
+      🔥 {{ daysLabel(days) }} подряд
+    </p>
+
+    <fieldset class="block">
+      <legend>Режим</legend>
+      <label v-for="(label, m) in MODE_LABELS" :key="m" class="radio mode-option">
+        <input v-model="mode" type="radio" :value="m" />
+        <span>
+          {{ label }}
+          <template v-if="m === 'weak'">
+            <span class="badge" :class="{ hot: weak > 0 }">{{ weak }}</span>
+          </template>
+          <small>{{ MODE_HINTS[m as SessionMode] }}</small>
+        </span>
+      </label>
+    </fieldset>
 
     <fieldset class="block">
       <legend>Времена</legend>
@@ -135,9 +153,17 @@ function setAllIrregular(value: boolean) {
       </div>
     </fieldset>
 
-    <div class="actions">
+    <p v-if="mode === 'weak' && weak === 0" class="hint muted">
+      Слабых форм в выбранных временах нет — начните с умной очереди.
+    </p>
+    <p v-if="error" class="hint bad-text">{{ error }}</p>
+
+    <div class="actions setup-actions">
       <button class="primary" type="button" :disabled="!canStart" @click="start">
         Empezar
+      </button>
+      <button class="ghost" type="button" @click="emit('progress')">
+        Прогресс
       </button>
       <button class="ghost" type="button" @click="emit('tables')">
         Таблицы

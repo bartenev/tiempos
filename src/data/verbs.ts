@@ -203,8 +203,15 @@ export const VERBS: Verb[] = [
   {
     infinitive: 'ver',
     group: 'er',
-    presentYo: 'veo',
     forms: {
+      presente: {
+        yo: 'veo',
+        tú: 'ves',
+        él: 've',
+        nosotros: 'vemos',
+        vosotros: 'veis',
+        ellos: 'ven',
+      },
       indefinido: {
         yo: 'vi',
         tú: 'viste',

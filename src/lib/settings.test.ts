@@ -34,6 +34,7 @@ describe('settings', () => {
       includeIrregular: true,
       selectedIrregular,
       size: 30,
+      mode: 'weak',
     })
     const loaded = loadSettings()
     expect(loaded.selected.indefinido).toBe(false)
@@ -41,6 +42,13 @@ describe('settings', () => {
     expect(loaded.selectedIrregular.ir).toBe(false)
     expect(loaded.selectedIrregular.tener).toBe(true)
     expect(loaded.size).toBe(30)
+    expect(loaded.mode).toBe('weak')
+  })
+
+  it('defaults to smart mode and ignores unknown modes', () => {
+    expect(loadSettings().mode).toBe('smart')
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ mode: 'bogus' }))
+    expect(loadSettings().mode).toBe('smart')
   })
 
   it('falls back on corrupt payload', () => {

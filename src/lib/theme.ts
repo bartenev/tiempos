@@ -23,8 +23,17 @@ export function loadTheme(): Theme {
   return 'light'
 }
 
+const THEME_COLORS: Record<Theme, string> = {
+  light: '#f6f3ee',
+  dark: '#121816',
+}
+
 export function applyTheme(value: Theme): void {
   document.documentElement.dataset.theme = value
+  // Цвет статус-бара на телефоне — под выбранную тему, а не системную.
+  for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
+    meta.setAttribute('content', THEME_COLORS[value])
+  }
 }
 
 export function initTheme(): Theme {

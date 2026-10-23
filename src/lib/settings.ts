@@ -1,5 +1,5 @@
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
-import type { Tense } from '../types'
+import type { SessionConfig, SessionMode, Tense } from '../types'
 
 export const SETTINGS_KEY = 'tiempos.settings.v1'
 
@@ -10,6 +10,7 @@ export interface SetupSettings {
   /** Чекбоксы неправильных глаголов: infinitive → выбран. */
   selectedIrregular: Record<string, boolean>
   size: number
+  mode: SessionMode
 }
 
 export function defaultSelectedIrregular(
@@ -28,9 +29,12 @@ export const DEFAULT_SETTINGS: SetupSettings = {
   includeIrregular: true,
   selectedIrregular: defaultSelectedIrregular(),
   size: 20,
+  mode: 'smart',
 }
 
 const SIZES = new Set([10, 20, 30])
+
+const MODES = new Set<SessionMode>(['smart', 'weak', 'random'])
 
 function isBool(value: unknown): value is boolean {
   return typeof value === 'boolean'
@@ -89,6 +93,10 @@ export function loadSettings(): SetupSettings {
         typeof parsed.size === 'number' && SIZES.has(parsed.size)
           ? parsed.size
           : DEFAULT_SETTINGS.size,
+      mode:
+        typeof parsed.mode === 'string' && MODES.has(parsed.mode)
+          ? parsed.mode
+          : DEFAULT_SETTINGS.mode,
     }
   } catch {
     return cloneDefaults()
@@ -103,4 +111,23 @@ export function selectedIrregularList(
   map: Record<string, boolean>,
 ): string[] {
   return Object.keys(map).filter((inf) => map[inf])
+}
+
+export function configFromSettings(
+  settings: SetupSettings,
+  overrides: Partial<SessionConfig> = {},
+): SessionConfig {
+  return {
+    tenses: (Object.keys(settings.selected) as Tense[]).filter(
+      (t) => settings.selected[t],
+    ),
+    size: settings.size,
+    mode: settings.mode,
+    includeRegular: settings.includeRegular,
+    includeIrregular: settings.includeIrregular,
+    selectedIrregular: settings.includeIrregular
+      ? selectedIrregularList(settings.selectedIrregular)
+      : [],
+    ...overrides,
+  }
 }

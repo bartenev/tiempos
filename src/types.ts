@@ -5,7 +5,7 @@ export type Person = 'yo' | 'tú' | 'él' | 'nosotros' | 'vosotros' | 'ellos'
 export type VerbGroup = 'ar' | 'er' | 'ir'
 
 /** Stem change in presente (nosotros/vosotros keep the infinitive stem). */
-export type StemChange = 'e>ie' | 'o>ue' | 'e>i' | 'u>ue'
+export type StemChange = 'e>ie' | 'o>ue' | 'e>i' | 'u>ue' | 'o>u'
 
 export interface Verb {
   infinitive: string
@@ -34,11 +34,21 @@ export interface DrillCard {
   translation: string
   /** Ожидаемая форма глагола в пропуске. */
   answer: string
+  /** Повтор карточки после ошибки в этой же сессии. */
+  retry?: boolean
 }
+
+/**
+ * smart — чаще показывать слабые формы;
+ * weak — только слабые («красные зоны»);
+ * random — равномерно случайно.
+ */
+export type SessionMode = 'smart' | 'weak' | 'random'
 
 export interface SessionConfig {
   tenses: Tense[]
   size: number
+  mode: SessionMode
   /** Включать правильные (регулярные) глаголы. */
   includeRegular: boolean
   /** Включать неправильные глаголы. */
@@ -47,14 +57,33 @@ export interface SessionConfig {
   selectedIrregular: string[]
 }
 
+export interface SessionMistake {
+  infinitive: string
+  tense: Tense
+  person: Person
+  answer: string
+  given: string
+}
+
 export interface SessionResult {
   correct: number
   wrong: number
   skipped: number
   total: number
+  /** Лучшая серия верных подряд за сессию. */
+  bestStreak: number
+  /** Длительность в секундах. */
+  seconds: number
+  mistakes: SessionMistake[]
 }
 
-export type Screen = 'setup' | 'drill' | 'summary' | 'tables'
+export type Screen = 'setup' | 'drill' | 'summary' | 'tables' | 'progress'
+
+export const MODE_LABELS: Record<SessionMode, string> = {
+  smart: 'Умная очередь',
+  weak: 'Только слабые',
+  random: 'Случайно',
+}
 
 export const PERSONS: Person[] = ['yo', 'tú', 'él', 'nosotros', 'vosotros', 'ellos']
 
@@ -62,6 +91,12 @@ export const TENSE_LABELS: Record<Tense, string> = {
   presente: 'Presente',
   indefinido: 'Pretérito indefinido',
   imperfecto: 'Pretérito imperfecto',
+}
+
+export const TENSE_SHORT: Record<Tense, string> = {
+  presente: 'pres.',
+  indefinido: 'indef.',
+  imperfecto: 'imperf.',
 }
 
 export const PERSON_LABELS: Record<Person, string> = {

@@ -149,3 +149,25 @@ describe('irregulars', () => {
     expect(conjugate(mustFind('ver'), 'indefinido', 'él')).toBe('vio')
   })
 })
+
+describe('-ir stem shift in indefinido', () => {
+  it('pedir / dormir / sentir / preferir / servir', () => {
+    expect(conjugate(mustFind('pedir'), 'indefinido', 'él')).toBe('pidió')
+    expect(conjugate(mustFind('pedir'), 'indefinido', 'nosotros')).toBe('pedimos')
+    expect(conjugate(mustFind('dormir'), 'indefinido', 'ellos')).toBe('durmieron')
+    expect(conjugate(mustFind('dormir'), 'indefinido', 'yo')).toBe('dormí')
+    expect(conjugate(mustFind('sentir'), 'indefinido', 'él')).toBe('sintió')
+    expect(conjugate(mustFind('preferir'), 'indefinido', 'ellos')).toBe('prefirieron')
+    expect(conjugate(mustFind('servir'), 'indefinido', 'él')).toBe('sirvió')
+  })
+
+  it('-ar/-er stem-changers stay regular in indefinido', () => {
+    expect(conjugate(mustFind('pensar'), 'indefinido', 'él')).toBe('pensó')
+    expect(conjugate(mustFind('volver'), 'indefinido', 'ellos')).toBe('volvieron')
+  })
+
+  it('ver vosotros presente has no accent', () => {
+    expect(conjugate(mustFind('ver'), 'presente', 'vosotros')).toBe('veis')
+    expect(conjugate(mustFind('ver'), 'presente', 'yo')).toBe('veo')
+  })
+})
