@@ -82,6 +82,16 @@ npm run build
 Элемент обычно несёт и общий, и свой класс (`button button--primary setup__start`):
 общий задаёт вид, свой — точка для правок конкретного места. Все стили — в `src/style.css`.
 
+Дизайн-токены — в начале `src/style.css`, все стили берут значения только из них:
+
+- шрифт — системный (`--font`); размеры `--text-xs … --text-2xl` (12 / 14 / 16 / 20 / 24 / 32)
+  и `--text-display` для крупного ответа; насыщенность `--weight-regular / semibold / bold`;
+- отступы — сетка 4 px: `--space-1 … --space-7` (4 / 8 / 12 / 16 / 24 / 32 / 48);
+- скругления — `--radius-xs` (метки), `--radius-sm` (клавиши), `--radius-md` (карточки), `--radius-pill`;
+- цвета — светлая и тёмная тема (`[data-theme]`); янтарный (`--almost`) — только для «почти».
+
+Иконки — `src/components/Icon.vue` (SVG, цвет = цвет текста).
+
 ## Стек
 
 Vue 3 + Vite + TypeScript + Vitest. Без бэкенда и без IndexedDB, без PWA-плагинов.

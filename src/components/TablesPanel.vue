@@ -6,6 +6,7 @@ import { endingsRow } from '../lib/tables'
 import { theme } from '../lib/theme'
 import type { Person, Tense, Verb } from '../types'
 import { TENSES, TENSE_LABELS, personLabel, personsFor } from '../types'
+import Icon from './Icon.vue'
 
 const emit = defineEmits<{
   back: []
@@ -46,7 +47,7 @@ function cellStyle(tense: Tense, person: Person): { backgroundColor: string } {
 <template>
   <section class="tables">
     <header class="topbar tables__bar">
-      <button class="button button--ghost topbar__back tables__back" type="button" @click="emit('back')">‹ назад</button>
+      <button class="button button--ghost topbar__back tables__back" type="button" @click="emit('back')"><Icon name="back" />назад</button>
       <span class="topbar__title tables__bar-title">Таблицы</span>
       <span class="topbar__aside tables__bar-aside" />
     </header>

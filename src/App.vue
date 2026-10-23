@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import DrillPanel from './components/DrillPanel.vue'
+import Icon from './components/Icon.vue'
 import ProgressPanel from './components/ProgressPanel.vue'
 import SetupPanel from './components/SetupPanel.vue'
 import SummaryPanel from './components/SummaryPanel.vue'
@@ -160,7 +161,7 @@ function toSetup() {
       :aria-label="theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'"
       @click="toggleTheme()"
     >
-      {{ theme === 'dark' ? '☀' : '☾' }}
+      <Icon :name="theme === 'dark' ? 'sun' : 'moon'" />
     </button>
     <SetupPanel
       v-if="screen === 'setup'"

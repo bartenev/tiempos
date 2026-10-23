@@ -6,6 +6,7 @@ import type { CellStat, Mastery } from '../lib/stats'
 import { cellKey, errorRate, loadStats, masteryOf } from '../lib/stats'
 import type { Person, Tense, Verb } from '../types'
 import { TENSES, TENSE_SHORT, personLabel, personsFor } from '../types'
+import Icon from './Icon.vue'
 
 const emit = defineEmits<{
   back: []
@@ -127,7 +128,7 @@ function statLine(c: CellInfo): string {
 <template>
   <section class="progress">
     <header class="topbar progress__bar">
-      <button class="button button--ghost button--small topbar__back progress__back" type="button" @click="emit('back')">‹ назад</button>
+      <button class="button button--ghost button--small topbar__back progress__back" type="button" @click="emit('back')"><Icon name="back" />назад</button>
       <span class="topbar__title progress__bar-title">Прогресс</span>
       <span class="topbar__aside progress__bar-aside" />
     </header>

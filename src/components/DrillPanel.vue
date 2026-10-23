@@ -5,6 +5,7 @@ import type { AnswerCheck } from '../lib/normalize'
 import { checkAnswer } from '../lib/normalize'
 import type { DrillCard } from '../types'
 import { TENSE_LABELS } from '../types'
+import Icon from './Icon.vue'
 import RuleHint from './RuleHint.vue'
 
 const props = defineProps<{
@@ -194,10 +195,11 @@ onBeforeUnmount(() => {
 <template>
   <section class="drill" :class="{ 'drill--oral': oral }">
     <header class="topbar drill__bar">
-      <button class="button button--ghost button--small topbar__back drill__quit" type="button" @click="emit('quit')">‹ выход</button>
+      <button class="button button--ghost button--small topbar__back drill__quit" type="button" @click="emit('quit')"><Icon name="back" />выход</button>
       <span class="topbar__title drill__counter">{{ progress }}</span>
       <span class="topbar__aside drill__score">
-        ✓ {{ correct }} · ✗ {{ wrong }}
+        <Icon name="check" />{{ correct }}
+        <Icon name="cross" />{{ wrong }}
       </span>
     </header>
 
@@ -207,7 +209,7 @@ onBeforeUnmount(() => {
       </div>
       <span class="drill__meter-stats">
         <span v-if="accuracy !== null" class="drill__accuracy">{{ accuracy }}%</span>
-        <span v-if="streak >= 2" class="drill__streak">🔥 {{ streak }}</span>
+        <span v-if="streak >= 2" class="drill__streak"><Icon name="flame" />{{ streak }}</span>
       </span>
     </div>
 
@@ -246,8 +248,8 @@ onBeforeUnmount(() => {
           Скажите форму вслух или про себя —<br class="drill__reveal-break" />тапните, чтобы проверить
         </button>
         <div v-else class="drill__grades">
-          <button class="drill__grade drill__grade--bad" type="button" @click="grade(false)">✗ Ошибся</button>
-          <button class="drill__grade drill__grade--ok" type="button" @click="grade(true)">✓ Сказал верно</button>
+          <button class="drill__grade drill__grade--bad" type="button" @click="grade(false)"><Icon name="cross" />Ошибся</button>
+          <button class="drill__grade drill__grade--ok" type="button" @click="grade(true)"><Icon name="check" />Сказал верно</button>
         </div>
       </div>
     </template>

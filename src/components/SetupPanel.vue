@@ -6,6 +6,7 @@ import { cellsForConfig, weakCount } from '../lib/session'
 import { configFromSettings, loadSettings, saveSettings } from '../lib/settings'
 import type { AnswerMode, Person, SessionConfig, SessionMode, Tense } from '../types'
 import { MODE_LABELS, PERSONS, TENSE_LABELS, VERB_GROUPS } from '../types'
+import Icon from './Icon.vue'
 
 defineProps<{
   error?: string
@@ -114,7 +115,7 @@ function setAllIrregular(value: boolean) {
       (presente, indefinido, imperfecto, imperativo).
     </p>
     <p v-if="days > 0" class="setup__daily">
-      🔥 {{ daysLabel(days) }} подряд
+      <Icon name="flame" />{{ daysLabel(days) }} подряд
     </p>
 
     <fieldset class="group setup__answer">
@@ -128,7 +129,7 @@ function setAllIrregular(value: boolean) {
           :aria-checked="answer === 'text'"
           @click="answer = 'text'"
         >
-          ⌨ Текст
+          <Icon name="keyboard" />Текст
         </button>
         <button
           class="segmented__item setup__answer-oral"
@@ -138,7 +139,7 @@ function setAllIrregular(value: boolean) {
           :aria-checked="answer === 'oral'"
           @click="answer = 'oral'"
         >
-          🗣 Устно
+          <Icon name="speech" />Устно
         </button>
       </div>
       <p v-if="answer === 'oral'" class="group__note setup__answer-note">
