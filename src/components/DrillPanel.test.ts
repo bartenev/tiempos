@@ -34,6 +34,8 @@ describe('DrillPanel', () => {
     expect(wrapper.emitted('wrong')).toEqual([['hablas']])
     expect(wrapper.emitted('next')).toBeUndefined()
     expect(wrapper.find('.rule-hint').exists()).toBe(true)
+    // после проверки клавиши с ударениями не нужны
+    expect(wrapper.find('.drill__accents').exists()).toBe(false)
     expect(wrapper.find('.drill__answer').text()).toBe('hablo')
 
     await wrapper.find('form').trigger('submit')

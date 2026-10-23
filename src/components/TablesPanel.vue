@@ -47,10 +47,13 @@ function cellStyle(tense: Tense, person: Person): { backgroundColor: string } {
       <b class="tables__example">hablar</b>, <b class="tables__example">comer</b>, <b class="tables__example">vivir</b>.
     </p>
     <p class="tables__legend">
-      <span class="tables__swatch tables__swatch--cold" /> лучше знаю
+      <span class="tables__swatch tables__swatch--cold" /> знаю лучше
       <span class="tables__legend-sep">→</span>
-      <span class="tables__swatch tables__swatch--hot" /> хуже знаю
-      <span class="tables__legend-note">(правильные глаголы: верный +1, ошибка −1)</span>
+      <span class="tables__swatch tables__swatch--hot" /> знаю хуже
+      <span class="tables__legend-note">
+        Цвет строки — ваши ответы по этому лицу в правильных глаголах;
+        число под лицом — верные минус ошибки.
+      </span>
     </p>
     <p class="tables__shared-note">
       <b class="tables__shared-sample">ía</b> — окончание совпадает у разных спряжений

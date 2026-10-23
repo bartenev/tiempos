@@ -278,14 +278,13 @@ onBeforeUnmount(() => {
         placeholder="форма глагола…"
       />
 
-      <div class="drill__accents" role="group" aria-label="Буквы с ударением">
+      <div v-if="!revealed" class="drill__accents" role="group" aria-label="Буквы с ударением">
         <button
           v-for="ch in ACCENTS"
           :key="ch"
           class="drill__accent"
           type="button"
           tabindex="-1"
-          :disabled="revealed"
           @pointerdown.prevent
           @click="insertAccent(ch)"
         >
@@ -293,11 +292,12 @@ onBeforeUnmount(() => {
         </button>
       </div>
 
+      <!-- правильная форма уже крупно под карточкой — здесь только вердикт -->
       <p v-if="feedback === 'almost'" class="notice notice--almost drill__feedback">
-        Почти — проверьте ударения. Правильно: <b class="drill__correct-form">{{ card.answer }}</b>
+        Почти — проверьте ударения.
       </p>
       <p v-else-if="feedback === 'wrong'" class="notice notice--bad drill__feedback">
-        Неверно. Правильно: <b class="drill__correct-form">{{ card.answer }}</b>
+        Неверно.
       </p>
 
       <RuleHint v-if="hint" class="drill__hint" :hint="hint" />

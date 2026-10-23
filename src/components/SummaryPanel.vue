@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { currentStreak, daysLabel, loadDaily } from '../lib/daily'
+import { pluralRu } from '../lib/plural'
 import type { SessionResult } from '../types'
 import { TENSE_SHORT, personLabel } from '../types'
 import Icon from './Icon.vue'
@@ -63,20 +64,11 @@ const uniqueMistakes = computed(() => {
       </div>
     </div>
 
-    <ul class="stat-list summary__stats">
-      <li class="stat-list__item summary__total">
-        <span class="stat-list__label">Всего карточек</span><b class="stat-list__value">{{ result.total }}</b>
-      </li>
-      <li class="stat-list__item stat-list__item--ok summary__correct">
-        <span class="stat-list__label">Верно</span><b class="stat-list__value">{{ result.correct }}</b>
-      </li>
-      <li class="stat-list__item stat-list__item--bad summary__wrong">
-        <span class="stat-list__label">Ошибки</span><b class="stat-list__value">{{ result.wrong }}</b>
-      </li>
-      <li class="stat-list__item summary__skipped">
-        <span class="stat-list__label">Пропущено</span><b class="stat-list__value">{{ result.skipped }}</b>
-      </li>
-    </ul>
+    <p class="summary__counts">
+      <span class="summary__count summary__count--ok">{{ result.correct }} верно</span>
+      <span class="summary__count summary__count--bad">{{ result.wrong }} {{ pluralRu(result.wrong, 'ошибка', 'ошибки', 'ошибок') }}</span>
+      <span v-if="result.skipped > 0" class="summary__count summary__count--skipped">{{ result.skipped }} пропущено</span>
+    </p>
 
     <template v-if="uniqueMistakes.length > 0">
       <h2 class="screen__section-title summary__mistakes-title">Над чем поработать</h2>

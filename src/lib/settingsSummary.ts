@@ -1,6 +1,7 @@
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
 import type { Tense } from '../types'
 import { PERSONS, TENSES, VERB_GROUPS } from '../types'
+import { pluralRu } from './plural'
 import type { SetupSettings } from './settings'
 import { selectedIrregularList } from './settings'
 
@@ -31,8 +32,7 @@ function listOrAll(picked: string[], total: number): string {
 
 /** «1 неправильный», «2 / 5 / 11 неправильных». */
 export function irregularLabel(n: number): string {
-  const word = n % 10 === 1 && n % 100 !== 11 ? 'неправильный' : 'неправильных'
-  return `${n} ${word}`
+  return `${n} ${pluralRu(n, 'неправильный', 'неправильных', 'неправильных')}`
 }
 
 function describeVerbs(settings: SetupSettings): string {

@@ -80,7 +80,7 @@ npm run build
 
 - экраны: `home`, `settings`, `drill`, `summary`, `progress`, `tables` — элементы `drill__card`, `drill__answer`, `home__start`…; панель вкладок — `tabbar`;
 - общие блоки: `button`, `topbar`, `screen` (`screen__title`, `screen__lead`, `screen__actions`),
-  `group`, `choice`, `segmented`, `badge`, `notice`, `stat-tiles`, `stat-list`, `form-list`,
+  `group`, `choice`, `segmented`, `badge`, `notice`, `stat-tiles`, `form-list`,
   `tabs`, `rule-hint`, `link-button`;
 - состояния — модификаторы: `drill__sentence--bad`, `tabs__tab--active`, `progress__cell--weak`.
 
