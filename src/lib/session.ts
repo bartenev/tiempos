@@ -63,6 +63,11 @@ export interface Cell {
 }
 
 /** Все формы глагол × время × местоимение для фильтра, с весами. */
+/** Лица времени, отмеченные в настройках (в императиве нет yo). */
+function personsOf(config: SessionConfig, tense: Tense): Person[] {
+  return personsFor(tense).filter((p) => config.persons.includes(p))
+}
+
 export function cellsForConfig(
   config: SessionConfig,
   stats: StatsStore = loadStats(),
@@ -71,7 +76,7 @@ export function cellsForConfig(
   for (const verb of verbsForConfig(config)) {
     for (const tense of config.tenses) {
       if (!hasTense(verb, tense)) continue
-      for (const person of personsFor(tense)) {
+      for (const person of personsOf(config, tense)) {
         const stat = stats[cellKey(verb.infinitive, tense, person)]
         cells.push({
           verb,
@@ -125,6 +130,9 @@ function validate(config: SessionConfig): void {
   if (config.tenses.length === 0) {
     throw new Error('Выберите хотя бы одно время')
   }
+  if (config.persons.length === 0) {
+    throw new Error('Выберите хотя бы одно местоимение')
+  }
   if (!config.includeRegular && !config.includeIrregular) {
     throw new Error('Выберите правильные и/или неправильные глаголы')
   }
@@ -157,13 +165,16 @@ export function buildSession(
   }
 
   if (config.mode === 'random') {
-    // Равномерно по времени, затем по глаголу и лицу (у части глаголов нет императива).
-    const tenses = config.tenses.filter((t) => pool.some((v) => hasTense(v, t)))
+    // Равномерно по времени, затем по глаголу и лицу (у части глаголов нет императива,
+    // в императиве нет yo).
+    const tenses = config.tenses.filter(
+      (t) => personsOf(config, t).length > 0 && pool.some((v) => hasTense(v, t)),
+    )
     const cards: DrillCard[] = []
     for (let i = 0; i < config.size; i++) {
       const tense = pickRandom(tenses)
       const verb = pickRandom(pool.filter((v) => hasTense(v, tense)))
-      const person = pickRandom(personsFor(tense))
+      const person = pickRandom(personsOf(config, tense))
       cards.push(makeCard(verb, tense, person))
     }
     return shuffle(cards)

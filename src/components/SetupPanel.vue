@@ -2,10 +2,10 @@
 import { computed, ref, watch } from 'vue'
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
 import { currentStreak, daysLabel, loadDaily } from '../lib/daily'
-import { weakCount } from '../lib/session'
+import { cellsForConfig, weakCount } from '../lib/session'
 import { configFromSettings, loadSettings, saveSettings } from '../lib/settings'
-import type { AnswerMode, SessionConfig, SessionMode, Tense } from '../types'
-import { MODE_LABELS, TENSE_LABELS } from '../types'
+import type { AnswerMode, Person, SessionConfig, SessionMode, Tense } from '../types'
+import { MODE_LABELS, PERSONS, TENSE_LABELS } from '../types'
 
 defineProps<{
   error?: string
@@ -20,6 +20,7 @@ const emit = defineEmits<{
 const saved = loadSettings()
 
 const selected = ref({ ...saved.selected })
+const persons = ref({ ...saved.persons })
 const includeRegular = ref(saved.includeRegular)
 const includeIrregular = ref(saved.includeIrregular)
 const selectedIrregular = ref({ ...saved.selectedIrregular })
@@ -28,6 +29,16 @@ const mode = ref<SessionMode>(saved.mode)
 const answer = ref<AnswerMode>(saved.answer)
 
 const irregularList = IRREGULAR_INFINITIVES
+
+/** Подписи чекбоксов; usted / ustedes тренируются вместе с él / ellos. */
+const PERSON_CHOICES: Record<Person, string> = {
+  yo: 'yo',
+  tú: 'tú',
+  él: 'él / ella',
+  nosotros: 'nosotros',
+  vosotros: 'vosotros',
+  ellos: 'ellos / ellas',
+}
 
 const MODE_HINTS: Record<SessionMode, string> = {
   smart: 'чаще — формы с ошибками, реже — выученные',
@@ -39,6 +50,7 @@ const days = currentStreak(loadDaily())
 
 const settings = computed(() => ({
   selected: { ...selected.value },
+  persons: { ...persons.value },
   includeRegular: includeRegular.value,
   includeIrregular: includeIrregular.value,
   selectedIrregular: { ...selectedIrregular.value },
@@ -53,11 +65,20 @@ const config = computed(() => configFromSettings(settings.value))
 
 const weak = computed(() => weakCount(config.value))
 
+/** Сколько форм под фильтр (0, например, если только yo и только imperativo). */
+const formsCount = computed(() => {
+  const cfg = config.value
+  if (cfg.tenses.length === 0 || cfg.persons.length === 0) return 0
+  return cellsForConfig(cfg).length
+})
+
 const canStart = computed(() => {
   const cfg = config.value
   if (cfg.tenses.length === 0) return false
+  if (cfg.persons.length === 0) return false
   if (!cfg.includeRegular && !cfg.includeIrregular) return false
   if (cfg.includeIrregular && cfg.selectedIrregular.length === 0) return false
+  if (formsCount.value === 0) return false
   if (cfg.mode === 'weak' && weak.value === 0) return false
   return true
 })
@@ -139,6 +160,19 @@ function setAllIrregular(value: boolean) {
       </label>
     </fieldset>
 
+    <fieldset class="group setup__persons">
+      <legend class="group__legend setup__persons-legend">Местоимения</legend>
+      <div class="setup__persons-grid">
+        <label v-for="person in PERSONS" :key="person" class="choice setup__person">
+          <input v-model="persons[person]" class="choice__input setup__person-input" type="checkbox" />
+          <span class="choice__label setup__person-label">{{ PERSON_CHOICES[person] }}</span>
+        </label>
+      </div>
+      <p class="group__note setup__persons-note">
+        usted / ustedes — вместе с él / ellos; в imperativo формы yo нет.
+      </p>
+    </fieldset>
+
     <fieldset class="group setup__verbs">
       <legend class="group__legend setup__verbs-legend">Глаголы</legend>
       <label class="choice setup__verb-kind setup__verb-kind--regular">
@@ -185,6 +219,12 @@ function setAllIrregular(value: boolean) {
       </div>
     </fieldset>
 
+    <p
+      v-if="config.tenses.length > 0 && config.persons.length > 0 && formsCount === 0"
+      class="notice notice--muted setup__no-forms"
+    >
+      Под этот выбор нет форм — например, в imperativo нет yo.
+    </p>
     <p v-if="mode === 'weak' && weak === 0" class="notice notice--muted setup__weak-empty">
       Слабых форм в выбранных временах нет — начните с умной очереди.
     </p>

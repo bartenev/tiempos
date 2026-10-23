@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { IRREGULAR_INFINITIVES, findVerb, isRegularVerb } from '../data/verbs'
-import { buildCard, buildSession } from './session'
+import { buildCard, buildSession, cellsForConfig } from './session'
 import type { SessionConfig } from '../types'
+import { PERSONS } from '../types'
 
 const base: SessionConfig = {
   tenses: ['presente'],
+  persons: [...PERSONS],
   size: 12,
   mode: 'random',
   answer: 'text',
@@ -168,5 +170,39 @@ describe('imperativo in sessions', () => {
         selectedIrregular: ['haber', 'poder'],
       }),
     ).toThrow()
+  })
+})
+
+describe('person filter', () => {
+  for (const mode of ['random', 'smart'] as const) {
+    it(`${mode}: only the chosen persons`, () => {
+      const cards = buildSession(
+        { ...base, tenses: ['presente', 'imperativo'], persons: ['tú', 'nosotros'], mode, size: 200 },
+        {},
+      )
+      for (const c of cards) expect(['tú', 'nosotros']).toContain(c.person)
+    })
+  }
+
+  it('imperativo with only yo has no forms', () => {
+    const cfg = { ...base, tenses: ['imperativo' as const], persons: ['yo' as const] }
+    expect(cellsForConfig(cfg, {})).toHaveLength(0)
+    expect(() => buildSession(cfg, {})).toThrow()
+    expect(() => buildSession({ ...cfg, mode: 'random' }, {})).toThrow()
+  })
+
+  it('random mode skips imperativo when only yo is chosen with other tenses', () => {
+    const cards = buildSession(
+      { ...base, tenses: ['presente', 'imperativo'], persons: ['yo'], size: 50 },
+      {},
+    )
+    for (const c of cards) {
+      expect(c.tense).toBe('presente')
+      expect(c.person).toBe('yo')
+    }
+  })
+
+  it('throws without persons', () => {
+    expect(() => buildSession({ ...base, persons: [] }, {})).toThrow()
   })
 })

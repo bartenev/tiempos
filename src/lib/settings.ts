@@ -1,10 +1,13 @@
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
-import type { AnswerMode, SessionConfig, SessionMode, Tense } from '../types'
+import type { AnswerMode, Person, SessionConfig, SessionMode, Tense } from '../types'
+import { PERSONS } from '../types'
 
 export const SETTINGS_KEY = 'tiempos.settings.v1'
 
 export interface SetupSettings {
   selected: Record<Tense, boolean>
+  /** Чекбоксы местоимений. */
+  persons: Record<Person, boolean>
   includeRegular: boolean
   includeIrregular: boolean
   /** Чекбоксы неправильных глаголов: infinitive → выбран. */
@@ -26,6 +29,14 @@ export const DEFAULT_SETTINGS: SetupSettings = {
     indefinido: true,
     imperfecto: true,
     imperativo: true,
+  },
+  persons: {
+    yo: true,
+    tú: true,
+    él: true,
+    nosotros: true,
+    vosotros: true,
+    ellos: true,
   },
   includeRegular: true,
   includeIrregular: true,
@@ -55,6 +66,16 @@ function parseSelected(raw: unknown): Record<Tense, boolean> {
   return base
 }
 
+function parsePersons(raw: unknown): Record<Person, boolean> {
+  const base = { ...DEFAULT_SETTINGS.persons }
+  if (!raw || typeof raw !== 'object') return base
+  const obj = raw as Record<string, unknown>
+  for (const person of PERSONS) {
+    if (isBool(obj[person])) base[person] = obj[person]
+  }
+  return base
+}
+
 /**
  * Актуальный список неправильных из банка.
  * Новые глаголы → true; сохранённые снятые галки сохраняются.
@@ -76,6 +97,7 @@ function cloneDefaults(): SetupSettings {
   return {
     ...DEFAULT_SETTINGS,
     selected: { ...DEFAULT_SETTINGS.selected },
+    persons: { ...DEFAULT_SETTINGS.persons },
     selectedIrregular: defaultSelectedIrregular(),
   }
 }
@@ -87,6 +109,7 @@ export function loadSettings(): SetupSettings {
     const parsed = JSON.parse(raw) as Partial<SetupSettings>
     return {
       selected: parseSelected(parsed.selected),
+      persons: parsePersons(parsed.persons),
       includeRegular: isBool(parsed.includeRegular)
         ? parsed.includeRegular
         : DEFAULT_SETTINGS.includeRegular,
@@ -130,6 +153,7 @@ export function configFromSettings(
     tenses: (Object.keys(settings.selected) as Tense[]).filter(
       (t) => settings.selected[t],
     ),
+    persons: PERSONS.filter((p) => settings.persons[p]),
     size: settings.size,
     mode: settings.mode,
     answer: settings.answer,

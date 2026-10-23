@@ -52,6 +52,8 @@ export type AnswerMode = 'text' | 'oral'
 
 export interface SessionConfig {
   tenses: Tense[]
+  /** Какие местоимения тренировать (usted / ustedes — вместе с él / ellos). */
+  persons: Person[]
   size: number
   mode: SessionMode
   answer: AnswerMode

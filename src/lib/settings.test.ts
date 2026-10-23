@@ -3,6 +3,7 @@ import { IRREGULAR_INFINITIVES } from '../data/verbs'
 import {
   DEFAULT_SETTINGS,
   SETTINGS_KEY,
+  configFromSettings,
   defaultSelectedIrregular,
   loadSettings,
   mergeSelectedIrregular,
@@ -30,6 +31,7 @@ describe('settings', () => {
     selectedIrregular.ir = false
     saveSettings({
       selected: { presente: true, indefinido: false, imperfecto: true, imperativo: false },
+      persons: { yo: true, tú: false, él: true, nosotros: true, vosotros: false, ellos: true },
       includeRegular: true,
       includeIrregular: true,
       selectedIrregular,
@@ -46,6 +48,15 @@ describe('settings', () => {
     expect(loaded.size).toBe(30)
     expect(loaded.mode).toBe('weak')
     expect(loaded.answer).toBe('oral')
+    expect(loaded.persons.tú).toBe(false)
+    expect(loaded.persons.vosotros).toBe(false)
+    expect(configFromSettings(loaded).persons).toEqual(['yo', 'él', 'nosotros', 'ellos'])
+  })
+
+  it('all persons are on by default and for settings saved before the filter', () => {
+    expect(Object.values(loadSettings().persons).every(Boolean)).toBe(true)
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ size: 10 }))
+    expect(configFromSettings(loadSettings()).persons).toHaveLength(6)
   })
 
   it('falls back to text for the removed voice mode', () => {
