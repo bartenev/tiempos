@@ -38,6 +38,9 @@
 
   /* высота нажимаемой строки на телефоне */
   --tap: 2.75rem;
+
+  /* высота нижней панели вкладок (без безопасной зоны iPhone) */
+  --tabbar-height: 4rem;
 }
 
 :root,
@@ -646,7 +649,7 @@ input[type='radio'] {
 /* ===== app: отступ под нижнюю панель вкладок ===== */
 
 .app--tabbar {
-  padding-bottom: calc(4rem + var(--space-6) + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--tabbar-height) + var(--space-6) + env(safe-area-inset-bottom));
 }
 
 /* ===== tabbar: нижняя панель разделов ===== */
@@ -789,7 +792,7 @@ input[type='radio'] {
 /* «Начать» всегда видна — закреплена над панелью вкладок */
 .home__actions {
   position: sticky;
-  bottom: calc(4rem + env(safe-area-inset-bottom));
+  bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
   z-index: 2;
   margin: var(--space-2) calc(-1 * var(--space-4)) 0;
   padding: var(--space-3) var(--space-4);
@@ -1288,9 +1291,10 @@ input[type='radio'] {
 }
 
 .progress__detail {
+  /* прилипает над нижней панелью вкладок, а не под ней */
   position: sticky;
-  bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
-  z-index: 1;
+  bottom: calc(var(--tabbar-height) + var(--space-3) + env(safe-area-inset-bottom));
+  z-index: 3;
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
