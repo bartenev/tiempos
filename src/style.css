@@ -471,7 +471,7 @@ button {
 
 .drill__blank {
   display: inline-block;
-  min-width: 3.5ch;
+  min-width: 4ch;
   padding: 0 0.15em;
   margin: 0 0.05em;
   border-bottom: 2px solid var(--accent);

@@ -73,8 +73,12 @@ const answerShown = computed(
   () => shown.value || feedback.value === 'wrong' || feedback.value === 'almost',
 )
 
+/**
+ * Пустой пропуск — неразрывный пробел: линию рисует border-bottom,
+ * символы «___» дали бы вторую линию.
+ */
 const filledBlank = computed(() => {
-  if (feedback.value === null && !shown.value) return '___'
+  if (feedback.value === null && !shown.value) return '\u00a0'
   return props.card.answer
 })
 

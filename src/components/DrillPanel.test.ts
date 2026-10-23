@@ -81,7 +81,8 @@ describe('DrillPanel — oral (self-check)', () => {
   it('hides the answer until a tap, without a text field', async () => {
     wrapper = mountOral()
     expect(wrapper.find('#answer').exists()).toBe(false)
-    expect(wrapper.find('.drill__blank').text()).toBe('___')
+    // пустой пропуск — только линия (border), без символов «___»
+    expect(wrapper.find('.drill__blank').text()).toBe('')
     expect(wrapper.find('.drill__grades').exists()).toBe(false)
 
     expect(wrapper.find('.drill__answer').exists()).toBe(false)
