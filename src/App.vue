@@ -47,9 +47,9 @@ watch(screen, () => window.scrollTo(0, 0))
 
 const current = computed(() => cards.value[index.value]!)
 
-/** Панель вкладок — на экранах-разделах; в сессии и на итогах не отвлекает. */
+/** Панель вкладок — на экранах-разделах и на итогах; в сессии не отвлекает. */
 const showTabBar = computed(() =>
-  ['setup', 'settings', 'progress', 'tables'].includes(screen.value),
+  ['setup', 'settings', 'progress', 'tables', 'summary'].includes(screen.value),
 )
 
 const result = computed<SessionResult>(() => ({

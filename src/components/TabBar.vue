@@ -19,9 +19,11 @@ const TABS: { screen: Tab; label: string; icon: IconName }[] = [
   { screen: 'tables', label: 'Таблицы', icon: 'tables' },
 ]
 
-/** Настройки открываются с главной — подсвечиваем «Тренировку». */
+/** Настройки открываются с главной, итоги завершают тренировку — подсвечиваем «Тренировку». */
+const TRAINING_SCREENS: Screen[] = ['setup', 'settings', 'summary']
+
 function isActive(tab: Tab): boolean {
-  return tab === 'setup' ? props.screen === 'setup' || props.screen === 'settings' : props.screen === tab
+  return tab === 'setup' ? TRAINING_SCREENS.includes(props.screen) : props.screen === tab
 }
 </script>
 
