@@ -55,10 +55,49 @@ describe('portionStatuses', () => {
     expect(statuses[0]).toMatchObject({ state: 'current', personsDone: 5 })
   })
 
-  it('portions you already practised stay open', () => {
+  it('a started portion becomes current before untouched ones', () => {
     const stats = { 'vivir|indefinido|yo': ok(1) }
     const statuses = portionStatuses(cellsForConfig(learning, stats))
-    expect(statuses.map((s) => s.state)).toEqual(['current', 'locked', 'open'])
+    expect(statuses.map((s) => s.state)).toEqual(['locked', 'locked', 'current'])
+  })
+
+  it('of started portions, the one with more persons done is current; the rest stay open', () => {
+    const stats = {
+      'hablar|indefinido|yo': ok(5),
+      'vivir|indefinido|yo': ok(2),
+      'vivir|indefinido|tú': ok(2),
+    }
+    const statuses = portionStatuses(cellsForConfig(learning, stats))
+    expect(statuses.map((s) => s.state)).toEqual(['open', 'locked', 'current'])
+  })
+
+  it('equal persons done: more correct answers wins', () => {
+    const stats = { 'hablar|indefinido|yo': ok(1), 'comer|indefinido|yo': ok(1), 'comer|indefinido|tú': ok(1) }
+    const statuses = portionStatuses(cellsForConfig(learning, stats))
+    expect(statuses.map((s) => s.state)).toEqual(['open', 'current', 'locked'])
+  })
+
+  it('a full tie goes to the first portion in order', () => {
+    const stats = { 'comer|indefinido|yo': ok(1), 'vivir|indefinido|yo': ok(1) }
+    const statuses = portionStatuses(cellsForConfig(learning, stats))
+    expect(statuses.map((s) => s.state)).toEqual(['locked', 'current', 'open'])
+  })
+
+  it('progress is a share of persons: imperativo has no yo', () => {
+    const both: SessionConfig = { ...learning, tenses: ['indefinido', 'imperativo'], groups: ['ar'] }
+    // 4 из 6 лиц в indefinido против 4 из 5 в imperativo
+    const persons = ['tú', 'él', 'nosotros', 'vosotros'] as const
+    const stats = Object.fromEntries(
+      persons.flatMap((p) => [
+        [`hablar|indefinido|${p}`, ok(2)],
+        [`hablar|imperativo|${p}`, ok(2)],
+      ]),
+    )
+    const statuses = portionStatuses(cellsForConfig(both, stats))
+    expect(statuses.map((s) => `${s.tense}:${s.state}`)).toEqual([
+      'indefinido:open',
+      'imperativo:current',
+    ])
   })
 })
 
@@ -79,6 +118,15 @@ describe('smart mode with portions', () => {
     expect(share('er')).toBeGreaterThan(0.5)
     expect(share('er')).toBeLessThan(0.7)
     expect(share('ar')).toBeGreaterThan(0.3)
+  })
+
+  it('started -ir out of order: the session focuses on -ir, untouched -ar waits', () => {
+    const stats = { 'vivir|indefinido|yo': ok(1) }
+    const groups: string[] = []
+    for (let run = 0; run < 20; run++) {
+      groups.push(...buildSession({ ...learning, size: 20 }, stats).map((c) => c.verb.group))
+    }
+    expect(new Set(groups)).toEqual(new Set(['ir']))
   })
 
   it('when every portion is mastered, nothing is locked or boosted', () => {
