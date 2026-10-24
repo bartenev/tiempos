@@ -649,7 +649,7 @@ input[type='radio'] {
   bottom: 0;
   z-index: 4;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   width: 100%;
   max-width: 460px;
   padding: var(--space-1) var(--space-2) calc(var(--space-1) + env(safe-area-inset-bottom));
@@ -703,25 +703,6 @@ input[type='radio'] {
 
 .home__title {
   margin: 0;
-}
-
-.home__settings {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  background: var(--card);
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.home__settings:hover {
-  border-color: var(--muted);
-  color: var(--ink);
 }
 
 .home__daily {

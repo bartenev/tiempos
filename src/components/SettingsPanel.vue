@@ -6,10 +6,6 @@ import type { Person } from '../types'
 import { PERSONS, TENSES, TENSE_LABELS, TENSE_RU, VERB_GROUPS } from '../types'
 import Icon from './Icon.vue'
 
-const emit = defineEmits<{
-  back: []
-}>()
-
 const irregularList = IRREGULAR_INFINITIVES
 
 const SIZES = [10, 20, 30]
@@ -39,13 +35,7 @@ function setAllIrregular(value: boolean) {
 
 <template>
   <section class="settings">
-    <header class="topbar settings__bar">
-      <button class="button button--ghost button--small topbar__back settings__back" type="button" @click="emit('back')">
-        <Icon name="back" />Главная
-      </button>
-      <span class="topbar__title settings__bar-title">Настройки</span>
-      <span class="topbar__aside settings__bar-aside" />
-    </header>
+    <h1 class="screen__title settings__title">Настройки</h1>
 
     <fieldset class="group settings__tenses">
       <legend class="group__legend settings__tenses-legend">Времена</legend>

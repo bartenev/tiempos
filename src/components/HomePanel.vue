@@ -60,15 +60,6 @@ function start() {
   <section class="home">
     <header class="home__header">
       <h1 class="screen__title home__title">Tiempos</h1>
-      <button
-        class="home__settings"
-        type="button"
-        aria-label="Настройки"
-        title="Настройки"
-        @click="emit('settings')"
-      >
-        <Icon name="settings" />
-      </button>
     </header>
     <p class="screen__lead home__lead">
       Тренажёр спряжения испанских глаголов.

@@ -153,10 +153,6 @@ function trainWeak() {
     }),
   )
 }
-
-function toSetup() {
-  screen.value = 'setup'
-}
 </script>
 
 <template>
@@ -167,7 +163,7 @@ function toSetup() {
       @start="start"
       @settings="screen = 'settings'"
     />
-    <SettingsPanel v-else-if="screen === 'settings'" @back="toSetup" />
+    <SettingsPanel v-else-if="screen === 'settings'" />
     <TablesPanel v-else-if="screen === 'tables'" />
     <ProgressPanel v-else-if="screen === 'progress'" @train-weak="trainWeak" />
     <DrillPanel
