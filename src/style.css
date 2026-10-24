@@ -734,17 +734,6 @@ input[type='radio'] {
   color: var(--ink);
 }
 
-.home__portion {
-  margin: 0 0 var(--space-2);
-  font-size: var(--text-sm);
-}
-
-.home__portion-progress {
-  margin-left: var(--space-1);
-  color: var(--muted);
-  white-space: nowrap;
-}
-
 .home__filters-body {
   display: block;
   width: 100%;
