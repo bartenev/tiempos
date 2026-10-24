@@ -1,6 +1,6 @@
 import type { Verb } from '../types'
 
-/** Банк глаголов для тренажёра (~50). */
+/** Банк глаголов для тренажёра (~80). */
 export const VERBS: Verb[] = [
   // Regular -ar
   { infinitive: 'hablar', group: 'ar' },
@@ -47,6 +47,22 @@ export const VERBS: Verb[] = [
   { infinitive: 'dormir', group: 'ir', stemChange: 'o>ue' },
   { infinitive: 'preferir', group: 'ir', stemChange: 'e>ie', noImperative: true },
   { infinitive: 'sentir', group: 'ir', stemChange: 'e>ie', noImperative: true },
+  { infinitive: 'cerrar', group: 'ar', stemChange: 'e>ie' },
+  { infinitive: 'comenzar', group: 'ar', stemChange: 'e>ie' },
+  { infinitive: 'recomendar', group: 'ar', stemChange: 'e>ie' },
+  { infinitive: 'regar', group: 'ar', stemChange: 'e>ie' },
+  { infinitive: 'perder', group: 'er', stemChange: 'e>ie', noImperative: true },
+  { infinitive: 'entender', group: 'er', stemChange: 'e>ie', noImperative: true },
+  { infinitive: 'contar', group: 'ar', stemChange: 'o>ue' },
+  { infinitive: 'mostrar', group: 'ar', stemChange: 'o>ue' },
+  { infinitive: 'probar', group: 'ar', stemChange: 'o>ue' },
+  { infinitive: 'colgar', group: 'ar', stemChange: 'o>ue' },
+  { infinitive: 'almorzar', group: 'ar', stemChange: 'o>ue' },
+  { infinitive: 'mover', group: 'er', stemChange: 'o>ue' },
+  { infinitive: 'devolver', group: 'er', stemChange: 'o>ue' },
+  { infinitive: 'resolver', group: 'er', stemChange: 'o>ue' },
+  { infinitive: 'repetir', group: 'ir', stemChange: 'e>i' },
+  { infinitive: 'conseguir', group: 'ir', stemChange: 'e>i' },
 
   // Common irregulars
   {
@@ -348,6 +364,47 @@ export const VERBS: Verb[] = [
         nosotros: 'caímos',
         vosotros: 'caísteis',
         ellos: 'cayeron',
+      },
+    },
+  },
+  {
+    infinitive: 'proponer',
+    group: 'er',
+    presentYo: 'propongo',
+    indefinidoStem: 'propus',
+    forms: {
+      imperativo: { tú: 'propón' },
+    },
+  },
+  {
+    infinitive: 'conducir',
+    group: 'ir',
+    presentYo: 'conduzco',
+    indefinidoStem: 'conduj',
+  },
+  {
+    infinitive: 'traducir',
+    group: 'ir',
+    presentYo: 'traduzco',
+    indefinidoStem: 'traduj',
+  },
+  {
+    infinitive: 'agradecer',
+    group: 'er',
+    presentYo: 'agradezco',
+  },
+  {
+    infinitive: 'creer',
+    group: 'er',
+    noImperative: true,
+    forms: {
+      indefinido: {
+        yo: 'creí',
+        tú: 'creíste',
+        él: 'creyó',
+        nosotros: 'creímos',
+        vosotros: 'creísteis',
+        ellos: 'creyeron',
       },
     },
   },

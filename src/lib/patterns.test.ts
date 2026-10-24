@@ -27,6 +27,8 @@ describe('patternOf', () => {
     expect(pattern('tener', 'presente', 'tú')).toBe('e>ie') // tienes
     expect(pattern('decir', 'presente', 'él')).toBe('e>i') // dice
     expect(pattern('jugar', 'presente', 'yo')).toBe('o>ue') // juego
+    expect(pattern('conseguir', 'presente', 'yo')).toBe('e>i') // consigo — орфография, не -go
+    expect(pattern('conducir', 'presente', 'yo')).toBe('yo-zco') // conduzco
     expect(pattern('conocer', 'presente', 'yo')).toBe('yo-zco')
     expect(pattern('oír', 'presente', 'yo')).toBe('yo-go') // oigo
     expect(pattern('oír', 'presente', 'tú')).toBe('minor') // oyes

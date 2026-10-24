@@ -88,6 +88,17 @@ describe('orthographic indefinido yo', () => {
   })
 })
 
+describe('orthographic -guir', () => {
+  it('u drops before o / a, stays before e / i', () => {
+    const conseguir = mustFind('conseguir')
+    expect(conjugate(conseguir, 'presente', 'yo')).toBe('consigo')
+    expect(conjugate(conseguir, 'presente', 'tú')).toBe('consigues')
+    expect(conjugate(conseguir, 'imperativo', 'él')).toBe('consiga')
+    expect(conjugate(conseguir, 'imperativo', 'nosotros')).toBe('consigamos')
+    expect(conjugate(conseguir, 'indefinido', 'ellos')).toBe('consiguieron')
+  })
+})
+
 describe('stem-changing presente', () => {
   it('e>ie pensar', () => {
     expect(paradigm('pensar', 'presente')).toEqual({

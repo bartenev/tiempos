@@ -100,6 +100,11 @@ export function fixBeforeE(stem: string): string {
   return stem
 }
 
+/** -guir: перед o / a u не пишется (consigo, consiga, consigamos). */
+export function fixGuBeforeAO(stem: string, group: VerbGroup): string {
+  return group === 'ir' && stem.endsWith('gu') ? stem.slice(0, -1) : stem
+}
+
 /**
  * Основа presente de subjuntivo для usted / ustedes / nosotros.
  * От формы yo (tengo → teng-, veo → ve-, pienso → piens-). У глаголов с чередованием
@@ -111,6 +116,7 @@ export function subjunctiveStem(verb: Verb, person: Person): string {
     stem = infinitiveStem(verb)
     const shift = indefinidoShift(verb)
     if (shift) stem = applyStemChange(stem, shift)
+    stem = fixGuBeforeAO(stem, verb.group)
   } else {
     stem = conjugatePresente(verb, 'yo').slice(0, -1)
   }
@@ -140,6 +146,7 @@ function conjugatePresente(verb: Verb, person: Person): string {
   if (verb.stemChange && STEM_CHANGED_PERSONS.includes(person)) {
     stem = applyStemChange(stem, verb.stemChange)
   }
+  if (person === 'yo') stem = fixGuBeforeAO(stem, verb.group)
 
   return stem + endings[idx]
 }

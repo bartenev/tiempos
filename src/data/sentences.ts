@@ -229,6 +229,70 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
     { es: 'frío', ru: 'холод' },
     { es: 'mucho dolor', ru: 'сильную боль' },
   ],
+  cerrar: [
+    { es: 'la puerta', ru: 'дверь' },
+    { es: 'la ventana', ru: 'окно' },
+  ],
+  comenzar: [
+    { es: 'el curso', ru: 'курс' },
+    { es: 'a trabajar a las nueve', ru: 'работать в девять' },
+  ],
+  recomendar: [
+    { es: 'un libro', ru: 'книгу' },
+    { es: 'este restaurante', ru: 'этот ресторан' },
+  ],
+  regar: [
+    { es: 'las plantas', ru: 'растения' },
+    { es: 'el jardín', ru: 'сад' },
+  ],
+  perder: [
+    { es: 'las llaves', ru: 'ключи' },
+    { es: 'el autobús', ru: 'автобус' },
+  ],
+  entender: [
+    { es: 'la pregunta', ru: 'вопрос' },
+    { es: 'el problema', ru: 'проблему' },
+  ],
+  contar: [
+    { es: 'un cuento', ru: 'сказку' },
+    { es: 'chistes', ru: 'анекдоты' },
+  ],
+  mostrar: [
+    { es: 'las fotos', ru: 'фотографии' },
+    { es: 'el camino', ru: 'дорогу' },
+  ],
+  probar: [
+    { es: 'la sopa', ru: 'суп' },
+    { es: 'un plato nuevo', ru: 'новое блюдо' },
+  ],
+  colgar: [
+    { es: 'el abrigo', ru: 'пальто' },
+    { es: 'la ropa', ru: 'одежду' },
+  ],
+  almorzar: [
+    { es: 'en casa', ru: 'дома' },
+    { es: 'con los compañeros', ru: 'с коллегами' },
+  ],
+  mover: [
+    { es: 'la mesa', ru: 'стол' },
+    { es: 'el coche', ru: 'машину' },
+  ],
+  devolver: [
+    { es: 'el libro', ru: 'книгу' },
+    { es: 'el dinero', ru: 'деньги' },
+  ],
+  resolver: [
+    { es: 'el problema', ru: 'проблему' },
+    { es: 'el ejercicio', ru: 'упражнение' },
+  ],
+  repetir: [
+    { es: 'la pregunta', ru: 'вопрос' },
+    { es: 'la palabra', ru: 'слово' },
+  ],
+  conseguir: [
+    { es: 'entradas', ru: 'билеты' },
+    { es: 'un trabajo nuevo', ru: 'новую работу' },
+  ],
 
   // —— Irregular ——
   ser: [
@@ -314,6 +378,26 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
   caer: [
     { es: 'al suelo', ru: 'на пол' },
     { es: 'en la calle', ru: 'на улице' },
+  ],
+  proponer: [
+    { es: 'un plan', ru: 'план' },
+    { es: 'una idea', ru: 'идею' },
+  ],
+  conducir: [
+    { es: 'despacio', ru: 'медленно' },
+    { es: 'al trabajo', ru: 'на работу' },
+  ],
+  traducir: [
+    { es: 'el texto', ru: 'текст' },
+    { es: 'una carta', ru: 'письмо' },
+  ],
+  agradecer: [
+    { es: 'la ayuda', ru: 'за помощь' },
+    { es: 'el regalo', ru: 'за подарок' },
+  ],
+  creer: [
+    { es: 'en los milagros', ru: 'в чудеса', tenses: ['presente', 'imperfecto'] },
+    { es: 'su historia', ru: 'его истории' },
   ],
 }
 
