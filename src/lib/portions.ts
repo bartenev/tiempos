@@ -3,7 +3,7 @@ import { TENSES, VERB_GROUPS } from '../types'
 import type { PortionId } from './patterns'
 import { PATTERNS_BY_TENSE, portionOf } from './patterns'
 import type { CellStat } from './stats'
-import { isWeak } from './stats'
+import { isWeak, recoveryStreak } from './stats'
 
 /**
  * Порции новых форм для умного режима.
@@ -11,7 +11,7 @@ import { isWeak } from './stats'
  * indefinido «основа на -u-». Порция у каждой формы своя: tenemos — в presente -er,
  * tengo — в «yo на -go», tienes — в e→ie. Внутри — все лица и глаголы, вперемешку.
  * Текущая порция — самая продвинутая из начатых; если ничего не начато — первая по порядку.
- * Следующая становится текущей, когда текущая освоена.
+ * Следующая (next) — та, что станет текущей, когда текущая будет освоена.
  */
 
 /** Форма с историей ответов — всё, что нужно для статуса порции. */
@@ -28,10 +28,11 @@ export const PERSON_OK = 2
 /**
  * mastered — освоена (её новые формы — уже повторение);
  * current — сейчас изучается (самая продвинутая из начатых, иначе первая неосвоенная);
+ * next — станет текущей после неё (выбирается по тому же правилу);
  * open — не освоена, но вы уже её тренировали — остаётся в очереди;
  * locked — ещё не начата, ждёт своей очереди.
  */
-export type PortionState = 'mastered' | 'current' | 'open' | 'locked'
+export type PortionState = 'mastered' | 'current' | 'next' | 'open' | 'locked'
 
 export interface PortionStatus {
   tense: Tense
@@ -39,6 +40,8 @@ export interface PortionStatus {
   state: PortionState
   personsDone: number
   personsTotal: number
+  /** Сколько верных ответов (как минимум) осталось до освоения порции. */
+  need: number
 }
 
 export function portionKey(tense: Tense, portion: PortionId): string {
@@ -51,8 +54,17 @@ export function cellPortionKey(cell: PortionCell): string {
 }
 
 function personDone(cells: PortionCell[]): boolean {
+  return personNeed(cells) === 0
+}
+
+/** Верных ответов до освоения лица: добрать PERSON_OK и вытащить слабые формы. */
+function personNeed(cells: PortionCell[]): number {
   const ok = cells.reduce((sum, c) => sum + (c.stat?.ok ?? 0), 0)
-  return ok >= PERSON_OK && !cells.some((c) => isWeak(c.stat))
+  const recover = cells.reduce(
+    (sum, c) => sum + (c.stat && isWeak(c.stat) ? recoveryStreak(c.stat.bad) - c.stat.streak : 0),
+    0,
+  )
+  return Math.max(0, PERSON_OK - ok) + recover
 }
 
 interface PortionProgress {
@@ -60,9 +72,18 @@ interface PortionProgress {
   portion: PortionId
   personsDone: number
   personsTotal: number
+  need: number
   /** Верных ответов по всем формам порции. */
   ok: number
   started: boolean
+}
+
+/** Какая порция изучается: из начатых — самая продвинутая (при равенстве — первая по порядку). */
+function pickCurrent(unfinished: PortionProgress[]): PortionProgress | undefined {
+  const started = unfinished.filter((p) => p.started)
+  return started.length > 0
+    ? started.reduce((best, p) => (isAhead(p, best) ? p : best))
+    : unfinished[0]
 }
 
 /** Продвинутость: доля освоенных лиц, при равенстве — число верных ответов. */
@@ -92,31 +113,30 @@ export function portionStatuses(cells: PortionCell[]): PortionStatus[] {
       if (!inPortion) continue
 
       const persons = [...new Set(inPortion.map((c) => c.person))]
+      const byPerson = persons.map((p) => inPortion.filter((c) => c.person === p))
       portions.push({
         tense,
         portion,
-        personsDone: persons.filter((p) => personDone(inPortion.filter((c) => c.person === p)))
-          .length,
+        personsDone: byPerson.filter(personDone).length,
         personsTotal: persons.length,
+        need: byPerson.reduce((sum, list) => sum + personNeed(list), 0),
         ok: inPortion.reduce((sum, c) => sum + (c.stat?.ok ?? 0), 0),
         started: inPortion.some((c) => c.stat),
       })
     }
   }
 
-  // Начатое доводим до конца: из начатых — самая продвинутая (при равенстве — первая по порядку).
+  // Начатое доводим до конца; следующая — по тому же правилу среди остальных.
   const unfinished = portions.filter((p) => p.personsDone < p.personsTotal)
-  const started = unfinished.filter((p) => p.started)
-  const current =
-    started.length > 0
-      ? started.reduce((best, p) => (isAhead(p, best) ? p : best))
-      : unfinished[0]
+  const current = pickCurrent(unfinished)
+  const next = pickCurrent(unfinished.filter((p) => p !== current))
 
-  return portions.map(({ tense, portion, personsDone, personsTotal, started }, i) => {
+  return portions.map(({ tense, portion, personsDone, personsTotal, need, started }, i) => {
     let state: PortionState
     if (personsDone === personsTotal) state = 'mastered'
     else if (portions[i] === current) state = 'current'
+    else if (portions[i] === next) state = 'next'
     else state = started ? 'open' : 'locked'
-    return { tense, portion, state, personsDone, personsTotal }
+    return { tense, portion, state, personsDone, personsTotal, need }
   })
 }

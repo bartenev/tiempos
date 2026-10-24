@@ -199,10 +199,10 @@ function spread(cells: Cell[]): Cell[] {
  */
 function smartQueue(cells: Cell[], size: number): Cell[] {
   const weak = cells.filter((c) => c.weak)
-  const rest = smartPool(cells).filter((c) => !c.weak)
+  const slots = Math.min(Math.floor(size * WEAK_SMART_SHARE), weak.length * WEAK_SMART_REPEATS)
+  const rest = smartPool(cells, size - slots).filter((c) => !c.weak)
   if (rest.length === 0) return weightedQueue(weak, Math.min(size, weak.length * WEAK_REPEATS))
 
-  const slots = Math.min(Math.floor(size * WEAK_SMART_SHARE), weak.length * WEAK_SMART_REPEATS)
   return spread([...weakPicks(weak, slots), ...weightedQueue(rest, size - slots)])
 }
 
@@ -212,6 +212,11 @@ export const KNOWN_PATTERN_NEW_WEIGHT = 1.25
 /** Доля сессии на текущую порцию; остальное — повторение уже открытого. */
 export const CURRENT_PORTION_SHARE = 0.6
 
+/** Карточек на каждый недостающий до освоения верный ответ — с запасом на ошибки. */
+export const NEAR_DONE_MARGIN = 2
+
+type Bucket = 'current' | 'next' | 'rest'
+
 /**
  * Умный режим вводит новое порциями (время × окончание или модель неправильности):
  * - не начатые порции ждут своей очереди;
@@ -219,32 +224,53 @@ export const CURRENT_PORTION_SHARE = 0.6
  *   в повторение — чтобы новое шло одной порцией и не забывалось натренированное;
  * - новые формы освоенных порций идут с весом повторения;
  * - текущей порции — CURRENT_PORTION_SHARE всей сессии, сколько бы в ней ни было
- *   глаголов (в -ar их вдвое больше, чем в -er, — иначе старое перевешивало бы новое).
+ *   глаголов (в -ar их вдвое больше, чем в -er, — иначе старое перевешивало бы новое);
+ * - если текущей до освоения осталось меньше карточек, чем ей положено, она получает
+ *   сколько нужно (с запасом NEAR_DONE_MARGIN), а остаток доли — следующая порция.
+ * `cards` — сколько карточек сессии разыгрывается из этого пула.
  */
-function smartPool(cells: Cell[]): Cell[] {
-  const state = new Map(
-    portionStatuses(cells).map((s) => [portionKey(s.tense, s.portion), s.state]),
-  )
+function smartPool(cells: Cell[], cards: number): Cell[] {
+  const statuses = portionStatuses(cells)
+  const state = new Map(statuses.map((s) => [portionKey(s.tense, s.portion), s.state]))
   const stateOf = (c: Cell) => state.get(cellPortionKey(c))
 
+  const currentCards = (statuses.find((s) => s.state === 'current')?.need ?? 0) * NEAR_DONE_MARGIN
+  const nearDone =
+    statuses.some((s) => s.state === 'next') && currentCards < CURRENT_PORTION_SHARE * cards
+  const currentShare = nearDone ? currentCards / cards : CURRENT_PORTION_SHARE
+  const share: Record<Bucket, number> = {
+    current: currentShare,
+    next: CURRENT_PORTION_SHARE - currentShare,
+    rest: 1 - CURRENT_PORTION_SHARE,
+  }
+  const bucketOf = (c: Cell): Bucket => {
+    const s = stateOf(c)
+    if (s === 'current') return 'current'
+    return s === 'next' && nearDone ? 'next' : 'rest'
+  }
+
   const pool = cells
-    .filter((c) => stateOf(c) !== 'locked' && !(stateOf(c) === 'open' && !c.stat))
+    .filter((c) => {
+      const s = stateOf(c)
+      if (s === 'locked') return false
+      // не начатое новое ждёт: у открытых (и у следующей, пока её не пустили) — только отвеченное
+      if (s === 'open' || (s === 'next' && !nearDone)) return Boolean(c.stat)
+      return true
+    })
     .map((c) =>
       !c.stat && stateOf(c) === 'mastered' ? { ...c, weight: KNOWN_PATTERN_NEW_WEIGHT } : c,
     )
 
-  const total = (list: Cell[]) => list.reduce((sum, c) => sum + c.weight, 0)
-  const current = total(pool.filter((c) => stateOf(c) === 'current'))
-  const rest = total(pool.filter((c) => stateOf(c) !== 'current'))
-  if (current === 0 || rest === 0) return pool
+  const totals: Record<Bucket, number> = { current: 0, next: 0, rest: 0 }
+  for (const c of pool) totals[bucketOf(c)] += c.weight
+  const used = (Object.keys(totals) as Bucket[]).filter((b) => totals[b] > 0)
+  if (used.length < 2) return pool
+  const shareSum = used.reduce((sum, b) => sum + share[b], 0)
 
-  return pool.map((c) => ({
-    ...c,
-    weight:
-      stateOf(c) === 'current'
-        ? (c.weight / current) * CURRENT_PORTION_SHARE
-        : (c.weight / rest) * (1 - CURRENT_PORTION_SHARE),
-  }))
+  return pool.map((c) => {
+    const b = bucketOf(c)
+    return { ...c, weight: (c.weight / totals[b]) * (share[b] / shareSum) }
+  })
 }
 
 /** Build a drill queue of the requested size. */

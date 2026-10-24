@@ -29,14 +29,14 @@ const arMastered: StatsStore = Object.fromEntries(
 )
 
 describe('portionStatuses', () => {
-  it('from scratch: -ar is current, -er and -ir wait', () => {
+  it('from scratch: -ar is current, -er is next, -ir waits', () => {
     const statuses = portionStatuses(cellsForConfig(learning, {}))
     expect(statuses.map((s) => `${s.portion}:${s.state}`)).toEqual([
       'ar:current',
-      'er:locked',
+      'er:next',
       'ir:locked',
     ])
-    expect(statuses[0]).toMatchObject({ personsDone: 0, personsTotal: 6 })
+    expect(statuses[0]).toMatchObject({ personsDone: 0, personsTotal: 6, need: 12 })
   })
 
   it('a person is done after 2 correct answers across verbs of the group', () => {
@@ -46,7 +46,7 @@ describe('portionStatuses', () => {
 
   it('mastering -ar opens -er', () => {
     const statuses = portionStatuses(cellsForConfig(learning, arMastered))
-    expect(statuses.map((s) => s.state)).toEqual(['mastered', 'current', 'locked'])
+    expect(statuses.map((s) => s.state)).toEqual(['mastered', 'current', 'next'])
   })
 
   it('a weak form keeps its portion current', () => {
@@ -55,32 +55,43 @@ describe('portionStatuses', () => {
     expect(statuses[0]).toMatchObject({ state: 'current', personsDone: 5 })
   })
 
+  it('need counts missing correct answers and weak forms to recover', () => {
+    const stats = {
+      'hablar|indefinido|yo': ok(2), // лицо готово
+      'hablar|indefinido|tú': ok(1), // ещё 1
+      'cantar|indefinido|él': { ok: 3, bad: 1, streak: 0, last: 0 }, // слабая: вытащить 2 подряд
+    }
+    const ar = portionStatuses(cellsForConfig(learning, stats))[0]!
+    // yo 0 + tú 1 + él 2 + nosotros, vosotros, ellos по 2
+    expect(ar).toMatchObject({ personsDone: 1, need: 9 })
+  })
+
   it('a started portion becomes current before untouched ones', () => {
     const stats = { 'vivir|indefinido|yo': ok(1) }
     const statuses = portionStatuses(cellsForConfig(learning, stats))
-    expect(statuses.map((s) => s.state)).toEqual(['locked', 'locked', 'current'])
+    expect(statuses.map((s) => s.state)).toEqual(['next', 'locked', 'current'])
   })
 
-  it('of started portions, the one with more persons done is current; the rest stay open', () => {
+  it('of started portions, the one with more persons done is current, the other is next', () => {
     const stats = {
       'hablar|indefinido|yo': ok(5),
       'vivir|indefinido|yo': ok(2),
       'vivir|indefinido|tú': ok(2),
     }
     const statuses = portionStatuses(cellsForConfig(learning, stats))
-    expect(statuses.map((s) => s.state)).toEqual(['open', 'locked', 'current'])
+    expect(statuses.map((s) => s.state)).toEqual(['next', 'locked', 'current'])
   })
 
   it('equal persons done: more correct answers wins', () => {
     const stats = { 'hablar|indefinido|yo': ok(1), 'comer|indefinido|yo': ok(1), 'comer|indefinido|tú': ok(1) }
     const statuses = portionStatuses(cellsForConfig(learning, stats))
-    expect(statuses.map((s) => s.state)).toEqual(['open', 'current', 'locked'])
+    expect(statuses.map((s) => s.state)).toEqual(['next', 'current', 'locked'])
   })
 
   it('a full tie goes to the first portion in order', () => {
     const stats = { 'comer|indefinido|yo': ok(1), 'vivir|indefinido|yo': ok(1) }
     const statuses = portionStatuses(cellsForConfig(learning, stats))
-    expect(statuses.map((s) => s.state)).toEqual(['locked', 'current', 'open'])
+    expect(statuses.map((s) => s.state)).toEqual(['locked', 'current', 'next'])
   })
 
   it('progress is a share of persons: imperativo has no yo', () => {
@@ -95,7 +106,7 @@ describe('portionStatuses', () => {
     )
     const statuses = portionStatuses(cellsForConfig(both, stats))
     expect(statuses.map((s) => `${s.tense}:${s.state}`)).toEqual([
-      'indefinido:open',
+      'indefinido:next',
       'imperativo:current',
     ])
   })
@@ -103,7 +114,7 @@ describe('portionStatuses', () => {
 
 describe('smart mode with portions', () => {
   it('first session of a new tense: only -ar forms, all persons mixed', () => {
-    const cards = buildSession(learning, {})
+    const cards = buildSession({ ...learning, size: 20 }, {})
     expect(new Set(cards.map((c) => c.verb.group))).toEqual(new Set(['ar']))
     expect(new Set(cards.map((c) => c.person)).size).toBe(6)
   })
@@ -153,6 +164,41 @@ describe('smart mode with portions', () => {
     expect(cards.filter((c) => c.verb.group === 'ar').every((c) => c.verb.infinitive === 'hablar')).toBe(true)
   })
 
+  it('a nearly mastered current portion hands most of its share to the next one', () => {
+    // -ar: 5 лиц из 6, до освоения 2 верных; повторять ещё нечего
+    const stats = Object.fromEntries(
+      (['yo', 'tú', 'él', 'nosotros', 'vosotros'] as const).map((p) => [`hablar|indefinido|${p}`, ok(2)]),
+    )
+    const groups: string[] = []
+    for (let run = 0; run < 100; run++) {
+      groups.push(...buildSession({ ...learning, size: 20 }, stats).map((c) => c.verb.group))
+    }
+    const share = (g: string) => groups.filter((x) => x === g).length / groups.length
+    expect(share('er')).toBeGreaterThan(0.6)
+    expect(share('ar')).toBeGreaterThan(0.1)
+    expect(share('ir')).toBe(0)
+  })
+
+  it('near done with something to review: review keeps its share', () => {
+    // -ar освоена; у -er — 5 лиц из 6; следующая — -ir
+    const stats = {
+      ...arMastered,
+      ...Object.fromEntries(
+        (['yo', 'tú', 'él', 'nosotros', 'vosotros'] as const).map((p) => [`comer|indefinido|${p}`, ok(2)]),
+      ),
+    }
+    const groups: string[] = []
+    for (let run = 0; run < 100; run++) {
+      groups.push(...buildSession({ ...learning, size: 20 }, stats).map((c) => c.verb.group))
+    }
+    const share = (g: string) => groups.filter((x) => x === g).length / groups.length
+    expect(share('ar')).toBeGreaterThan(0.3) // повторение
+    expect(share('ar')).toBeLessThan(0.5)
+    expect(share('ir')).toBeGreaterThan(0.3) // следующая
+    expect(share('er')).toBeGreaterThan(0.05) // текущая — сколько нужно
+    expect(share('er')).toBeLessThan(0.3)
+  })
+
   it('when every portion is mastered, nothing is locked or boosted', () => {
     const all: StatsStore = Object.fromEntries(
       ['hablar', 'comer', 'vivir'].flatMap((v) => PERSONS.map((p) => [`${v}|indefinido|${p}`, ok(2)])),
@@ -169,7 +215,9 @@ describe('smart mode with portions', () => {
       includeIrregular: true,
       selectedIrregular: [...IRREGULAR_INFINITIVES],
     }
-    const cards = Array.from({ length: 20 }, () => buildSession(withIrregular, {})).flat()
+    const cards = Array.from({ length: 20 }, () =>
+      buildSession({ ...withIrregular, size: 20 }, {}),
+    ).flat()
     expect(cards.every((c) => c.verb.group === 'ar')).toBe(true)
     // pensé, jugué, empecé — правильные формы неправильных -ar
     expect(cards.some((c) => ['pensar', 'jugar', 'empezar', 'encontrar'].includes(c.verb.infinitive))).toBe(true)
