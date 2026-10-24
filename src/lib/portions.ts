@@ -11,7 +11,8 @@ import { isWeak, recoveryStreak } from './stats'
  * indefinido «основа на -u-». Порция у каждой формы своя: tenemos — в presente -er,
  * tengo — в «yo на -go», tienes — в e→ie. Внутри — все лица и глаголы, вперемешку.
  * Текущая порция — самая продвинутая из начатых; если ничего не начато — первая по порядку.
- * Следующая (next) — та, что станет текущей, когда текущая будет освоена.
+ * Следующая (next) — та, что станет текущей, когда текущая будет освоена; дальше — по
+ * тому же правилу (rank — место в этой очереди).
  */
 
 /** Форма с историей ответов — всё, что нужно для статуса порции. */
@@ -42,6 +43,8 @@ export interface PortionStatus {
   personsTotal: number
   /** Сколько верных ответов (как минимум) осталось до освоения порции. */
   need: number
+  /** Место в очереди изучения: 0 — текущая, 1 — следующая…; у освоенных — null. */
+  rank: number | null
 }
 
 export function portionKey(tense: Tense, portion: PortionId): string {
@@ -126,17 +129,24 @@ export function portionStatuses(cells: PortionCell[]): PortionStatus[] {
     }
   }
 
-  // Начатое доводим до конца; следующая — по тому же правилу среди остальных.
-  const unfinished = portions.filter((p) => p.personsDone < p.personsTotal)
-  const current = pickCurrent(unfinished)
-  const next = pickCurrent(unfinished.filter((p) => p !== current))
+  // Очередь изучения: начатое доводим до конца, каждый раз по тому же правилу среди оставшихся.
+  const queue: PortionProgress[] = []
+  let left = portions.filter((p) => p.personsDone < p.personsTotal)
+  while (left.length > 0) {
+    const p = pickCurrent(left)!
+    queue.push(p)
+    left = left.filter((x) => x !== p)
+  }
 
-  return portions.map(({ tense, portion, personsDone, personsTotal, need, started }, i) => {
+  return portions.map((p) => {
+    const { tense, portion, personsDone, personsTotal, need, started } = p
+    const at = queue.indexOf(p)
+    const rank = at === -1 ? null : at
     let state: PortionState
-    if (personsDone === personsTotal) state = 'mastered'
-    else if (portions[i] === current) state = 'current'
-    else if (portions[i] === next) state = 'next'
+    if (rank === null) state = 'mastered'
+    else if (rank === 0) state = 'current'
+    else if (rank === 1) state = 'next'
     else state = started ? 'open' : 'locked'
-    return { tense, portion, state, personsDone, personsTotal, need }
+    return { tense, portion, state, personsDone, personsTotal, need, rank }
   })
 }

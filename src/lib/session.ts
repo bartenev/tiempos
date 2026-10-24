@@ -4,6 +4,7 @@ import { VERBS, isRegularVerb } from '../data/verbs'
 import type { DrillCard, Person, SessionConfig, Tense, Verb } from '../types'
 import { personsFor } from '../types'
 import { conjugate, hasTense } from './conjugate'
+import type { PortionStatus } from './portions'
 import { cellPortionKey, portionKey, portionStatuses } from './portions'
 import type { CellStat, StatsStore } from './stats'
 import { cellKey, cellWeight, isWeak, loadStats } from './stats'
@@ -215,61 +216,80 @@ export const CURRENT_PORTION_SHARE = 0.6
 /** Карточек на каждый недостающий до освоения верный ответ — с запасом на ошибки. */
 export const NEAR_DONE_MARGIN = 2
 
-type Bucket = 'current' | 'next' | 'rest'
+/** Корзина пула: порция из очереди (её ключ) или всё повторение. */
+const REVIEW = 'review'
+
+/**
+ * Раздать долю нового по очереди изучения: каждой порции — сколько ей нужно до освоения
+ * (с запасом NEAR_DONE_MARGIN), последней — остаток. Возвращает карточки по ключам порций.
+ */
+function allotNew(statuses: PortionStatus[], budget: number): Map<string, number> {
+  const allot = new Map<string, number>()
+  const queue = statuses
+    .filter((s) => s.rank !== null)
+    .sort((a, b) => a.rank! - b.rank!)
+  let last = ''
+  for (const s of queue) {
+    if (budget <= 0) break
+    const give = Math.min(s.need * NEAR_DONE_MARGIN, budget)
+    last = portionKey(s.tense, s.portion)
+    allot.set(last, give)
+    budget -= give
+  }
+  // все порции очереди уже получили сколько нужно — остаток последней
+  if (budget > 0 && last) allot.set(last, allot.get(last)! + budget)
+  return allot
+}
 
 /**
  * Умный режим вводит новое порциями (время × окончание или модель неправильности):
- * - не начатые порции ждут своей очереди;
- * - у начатых, но не текущих порций новые формы тоже ждут, а уже отвеченные идут
- *   в повторение — чтобы новое шло одной порцией и не забывалось натренированное;
+ * - доля нового (CURRENT_PORTION_SHARE сессии) раздаётся по очереди изучения: текущей —
+ *   сколько ей нужно до освоения, остаток — следующей, и так далее; последней — остаток.
+ *   Порция с нуля обычно забирает всю долю; почти освоенная — пару карточек, и в ту же
+ *   сессию входит следующая. Доля не зависит от числа глаголов в порции (в -ar их вдвое
+ *   больше, чем в -er, — иначе старое перевешивало бы новое);
+ * - порции, до которых доля не дошла, ждут: у начатых в повторение идут только уже
+ *   отвеченные формы, не начатые не берутся совсем;
  * - новые формы освоенных порций идут с весом повторения;
- * - текущей порции — CURRENT_PORTION_SHARE всей сессии, сколько бы в ней ни было
- *   глаголов (в -ar их вдвое больше, чем в -er, — иначе старое перевешивало бы новое);
- * - если текущей до освоения осталось меньше карточек, чем ей положено, она получает
- *   сколько нужно (с запасом NEAR_DONE_MARGIN), а остаток доли — следующая порция.
+ * - повторять нечего — вся сессия раздаётся по очереди.
  * `cards` — сколько карточек сессии разыгрывается из этого пула.
  */
 function smartPool(cells: Cell[], cards: number): Cell[] {
   const statuses = portionStatuses(cells)
   const state = new Map(statuses.map((s) => [portionKey(s.tense, s.portion), s.state]))
-  const stateOf = (c: Cell) => state.get(cellPortionKey(c))
 
-  const currentCards = (statuses.find((s) => s.state === 'current')?.need ?? 0) * NEAR_DONE_MARGIN
-  const nearDone =
-    statuses.some((s) => s.state === 'next') && currentCards < CURRENT_PORTION_SHARE * cards
-  const currentShare = nearDone ? currentCards / cards : CURRENT_PORTION_SHARE
-  const share: Record<Bucket, number> = {
-    current: currentShare,
-    next: CURRENT_PORTION_SHARE - currentShare,
-    rest: 1 - CURRENT_PORTION_SHARE,
+  const build = (budget: number) => {
+    const allot = allotNew(statuses, budget)
+    const bucketOf = (c: Cell) => {
+      const key = cellPortionKey(c)
+      return allot.has(key) ? key : REVIEW
+    }
+    const pool = cells
+      .filter((c) => {
+        const key = cellPortionKey(c)
+        return allot.has(key) || state.get(key) === 'mastered' || Boolean(c.stat)
+      })
+      .map((c) =>
+        !c.stat && state.get(cellPortionKey(c)) === 'mastered'
+          ? { ...c, weight: KNOWN_PATTERN_NEW_WEIGHT }
+          : c,
+      )
+    return { allot, bucketOf, pool }
   }
-  const bucketOf = (c: Cell): Bucket => {
-    const s = stateOf(c)
-    if (s === 'current') return 'current'
-    return s === 'next' && nearDone ? 'next' : 'rest'
-  }
 
-  const pool = cells
-    .filter((c) => {
-      const s = stateOf(c)
-      if (s === 'locked') return false
-      // не начатое новое ждёт: у открытых (и у следующей, пока её не пустили) — только отвеченное
-      if (s === 'open' || (s === 'next' && !nearDone)) return Boolean(c.stat)
-      return true
-    })
-    .map((c) =>
-      !c.stat && stateOf(c) === 'mastered' ? { ...c, weight: KNOWN_PATTERN_NEW_WEIGHT } : c,
-    )
+  let { allot, bucketOf, pool } = build(CURRENT_PORTION_SHARE * cards)
+  if (!pool.some((c) => bucketOf(c) === REVIEW)) ({ allot, bucketOf, pool } = build(cards))
 
-  const totals: Record<Bucket, number> = { current: 0, next: 0, rest: 0 }
-  for (const c of pool) totals[bucketOf(c)] += c.weight
-  const used = (Object.keys(totals) as Bucket[]).filter((b) => totals[b] > 0)
-  if (used.length < 2) return pool
-  const shareSum = used.reduce((sum, b) => sum + share[b], 0)
+  const share = (bucket: string) =>
+    bucket === REVIEW ? 1 - CURRENT_PORTION_SHARE : allot.get(bucket)! / cards
+  const totals = new Map<string, number>()
+  for (const c of pool) totals.set(bucketOf(c), (totals.get(bucketOf(c)) ?? 0) + c.weight)
+  if (totals.size < 2) return pool
+  const shareSum = [...totals.keys()].reduce((sum, b) => sum + share(b), 0)
 
   return pool.map((c) => {
     const b = bucketOf(c)
-    return { ...c, weight: (c.weight / totals[b]) * (share[b] / shareSum) }
+    return { ...c, weight: (c.weight / totals.get(b)!) * (share(b) / shareSum) }
   })
 }
 

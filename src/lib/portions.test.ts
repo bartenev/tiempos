@@ -66,6 +66,13 @@ describe('portionStatuses', () => {
     expect(ar).toMatchObject({ personsDone: 1, need: 9 })
   })
 
+  it('rank orders the study queue: started first, then untouched in order', () => {
+    const stats = { 'vivir|indefinido|yo': ok(1) }
+    const statuses = portionStatuses(cellsForConfig(learning, stats))
+    expect(statuses.map((s) => `${s.portion}:${s.rank}`)).toEqual(['ar:1', 'er:2', 'ir:0'])
+    expect(portionStatuses(cellsForConfig(learning, arMastered))[0]!.rank).toBeNull()
+  })
+
   it('a started portion becomes current before untouched ones', () => {
     const stats = { 'vivir|indefinido|yo': ok(1) }
     const statuses = portionStatuses(cellsForConfig(learning, stats))
@@ -177,6 +184,22 @@ describe('smart mode with portions', () => {
     expect(share('er')).toBeGreaterThan(0.6)
     expect(share('ar')).toBeGreaterThan(0.1)
     expect(share('ir')).toBe(0)
+  })
+
+  it('the new-material share runs down the queue: room left lets a third portion in', () => {
+    // -ar: нужно 2 верных (≈4 карточки), -er с нуля: 12 (≈24) — на 30 карточек остаётся и -ir
+    const stats = Object.fromEntries(
+      (['yo', 'tú', 'él', 'nosotros', 'vosotros'] as const).map((p) => [`hablar|indefinido|${p}`, ok(2)]),
+    )
+    const groups: string[] = []
+    for (let run = 0; run < 100; run++) {
+      groups.push(...buildSession({ ...learning, size: 30 }, stats).map((c) => c.verb.group))
+    }
+    const share = (g: string) => groups.filter((x) => x === g).length / groups.length
+    expect(share('er')).toBeGreaterThan(0.6)
+    expect(share('ar')).toBeGreaterThan(0.05)
+    expect(share('ir')).toBeGreaterThan(0.02)
+    expect(share('ir')).toBeLessThan(0.2)
   })
 
   it('near done with something to review: review keeps its share', () => {
