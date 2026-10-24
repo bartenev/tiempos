@@ -214,7 +214,9 @@ export const CURRENT_PORTION_SHARE = 0.6
 
 /**
  * Умный режим вводит новое порциями (время × окончание):
- * - не начатые порции после текущей ждут своей очереди;
+ * - не начатые порции ждут своей очереди;
+ * - у начатых, но не текущих порций новые формы тоже ждут, а уже отвеченные идут
+ *   в повторение — чтобы новое шло одной порцией и не забывалось натренированное;
  * - новые формы освоенных порций идут с весом повторения;
  * - текущей порции — CURRENT_PORTION_SHARE всей сессии, сколько бы в ней ни было
  *   глаголов (в -ar их вдвое больше, чем в -er, — иначе старое перевешивало бы новое).
@@ -226,7 +228,7 @@ function smartPool(cells: Cell[]): Cell[] {
   const stateOf = (c: Cell) => state.get(portionKey(c.tense, c.verb.group))
 
   const pool = cells
-    .filter((c) => stateOf(c) !== 'locked')
+    .filter((c) => stateOf(c) !== 'locked' && !(stateOf(c) === 'open' && !c.stat))
     .map((c) =>
       !c.stat && stateOf(c) === 'mastered' ? { ...c, weight: KNOWN_PATTERN_NEW_WEIGHT } : c,
     )

@@ -129,6 +129,30 @@ describe('smart mode with portions', () => {
     expect(new Set(groups)).toEqual(new Set(['ir']))
   })
 
+  it('an open portion gives only its answered forms, as review', () => {
+    // -ir продвинутее (текущая), в -ar отвечен только hablar · yo (открыта)
+    const stats = {
+      'vivir|indefinido|yo': ok(2),
+      'vivir|indefinido|tú': ok(2),
+      'hablar|indefinido|yo': ok(1),
+    }
+    const cards = Array.from({ length: 50 }, () => buildSession({ ...learning, size: 20 }, stats)).flat()
+    const ar = cards.filter((c) => c.verb.group === 'ar')
+    expect(ar.length).toBeGreaterThan(0)
+    expect(ar.every((c) => c.verb.infinitive === 'hablar' && c.person === 'yo')).toBe(true)
+    expect(cards.some((c) => c.verb.group === 'er')).toBe(false)
+  })
+
+  it('a weak form of an open portion still gets into the session', () => {
+    const stats = {
+      'vivir|indefinido|yo': ok(2),
+      'hablar|indefinido|tú': { ok: 0, bad: 1, streak: 0, last: 0 },
+    }
+    const cards = buildSession({ ...learning, size: 20 }, stats)
+    expect(cards.some((c) => c.verb.infinitive === 'hablar' && c.person === 'tú')).toBe(true)
+    expect(cards.filter((c) => c.verb.group === 'ar').every((c) => c.verb.infinitive === 'hablar')).toBe(true)
+  })
+
   it('when every portion is mastered, nothing is locked or boosted', () => {
     const all: StatsStore = Object.fromEntries(
       ['hablar', 'comer', 'vivir'].flatMap((v) => PERSONS.map((p) => [`${v}|indefinido|${p}`, ok(2)])),
