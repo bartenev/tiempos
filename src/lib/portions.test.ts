@@ -31,7 +31,7 @@ const arMastered: StatsStore = Object.fromEntries(
 describe('portionStatuses', () => {
   it('from scratch: -ar is current, -er and -ir wait', () => {
     const statuses = portionStatuses(cellsForConfig(learning, {}))
-    expect(statuses.map((s) => `${s.group}:${s.state}`)).toEqual([
+    expect(statuses.map((s) => `${s.portion}:${s.state}`)).toEqual([
       'ar:current',
       'er:locked',
       'ir:locked',
@@ -163,13 +163,53 @@ describe('smart mode with portions', () => {
     expect(new Set(cards.map((c) => c.verb.group)).size).toBe(3)
   })
 
-  it('irregular verbs belong to the portion of their group', () => {
-    const cards = buildSession(
-      { ...learning, includeIrregular: true, selectedIrregular: [...IRREGULAR_INFINITIVES] },
-      {},
-    )
+  it('regular forms of irregular verbs join the ending portion, irregular ones wait', () => {
+    const withIrregular = {
+      ...learning,
+      includeIrregular: true,
+      selectedIrregular: [...IRREGULAR_INFINITIVES],
+    }
+    const cards = Array.from({ length: 20 }, () => buildSession(withIrregular, {})).flat()
     expect(cards.every((c) => c.verb.group === 'ar')).toBe(true)
-    expect(cards.some((c) => c.verb.infinitive === 'estar' || c.verb.infinitive === 'dar')).toBe(true)
+    // pensé, jugué, empecé — правильные формы неправильных -ar
+    expect(cards.some((c) => ['pensar', 'jugar', 'empezar', 'encontrar'].includes(c.verb.infinitive))).toBe(true)
+    // estuve, di — свои модели, ждут очереди
+    expect(cards.some((c) => c.verb.infinitive === 'estar' || c.verb.infinitive === 'dar')).toBe(false)
+  })
+
+  it('pattern portions come after the regular endings of their tense', () => {
+    const withIrregular = {
+      ...learning,
+      includeIrregular: true,
+      selectedIrregular: [...IRREGULAR_INFINITIVES],
+    }
+    const statuses = portionStatuses(cellsForConfig(withIrregular, {}))
+    expect(statuses.map((s) => s.portion)).toEqual([
+      'ar',
+      'er',
+      'ir',
+      'stem-u',
+      'stem-i',
+      'stem-j',
+      'shift-3',
+      'y',
+      'fui',
+      'di-vi',
+    ])
+  })
+
+  it('an irregular form counts towards its pattern, not its ending', () => {
+    const withIrregular = {
+      ...learning,
+      includeIrregular: true,
+      selectedIrregular: [...IRREGULAR_INFINITIVES],
+    }
+    // tuve, pude — основа на -u-: эта порция продвинулась, -er — нет
+    const stats = { 'tener|indefinido|yo': ok(1), 'poder|indefinido|yo': ok(1) }
+    const statuses = portionStatuses(cellsForConfig(withIrregular, stats))
+    const byPortion = Object.fromEntries(statuses.map((s) => [s.portion, s]))
+    expect(byPortion['stem-u']).toMatchObject({ state: 'current', personsDone: 1 })
+    expect(byPortion['er']!.state).toBe('locked')
   })
 
   it('weak and random modes ignore portions', () => {

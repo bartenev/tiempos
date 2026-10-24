@@ -1,18 +1,22 @@
-import type { Person, Tense, VerbGroup } from '../types'
+import type { Person, Tense, Verb } from '../types'
 import { TENSES, VERB_GROUPS } from '../types'
+import type { PortionId } from './patterns'
+import { PATTERNS_BY_TENSE, portionOf } from './patterns'
 import type { CellStat } from './stats'
 import { isWeak } from './stats'
 
 /**
  * Порции новых форм для умного режима.
- * Порция — время × окончание (indefinido -ar); внутри — все лица и глаголы, вперемешку.
+ * Порция — время × (окончание или модель неправильности): indefinido -ar, presente e→ie,
+ * indefinido «основа на -u-». Порция у каждой формы своя: tenemos — в presente -er,
+ * tengo — в «yo на -go», tienes — в e→ie. Внутри — все лица и глаголы, вперемешку.
  * Текущая порция — самая продвинутая из начатых; если ничего не начато — первая по порядку.
  * Следующая становится текущей, когда текущая освоена.
  */
 
 /** Форма с историей ответов — всё, что нужно для статуса порции. */
 export interface PortionCell {
-  verb: { group: VerbGroup }
+  verb: Verb
   tense: Tense
   person: Person
   stat: CellStat | undefined
@@ -31,14 +35,19 @@ export type PortionState = 'mastered' | 'current' | 'open' | 'locked'
 
 export interface PortionStatus {
   tense: Tense
-  group: VerbGroup
+  portion: PortionId
   state: PortionState
   personsDone: number
   personsTotal: number
 }
 
-export function portionKey(tense: Tense, group: VerbGroup): string {
-  return `${tense}|${group}`
+export function portionKey(tense: Tense, portion: PortionId): string {
+  return `${tense}|${portion}`
+}
+
+/** Ключ порции, в которую входит форма. */
+export function cellPortionKey(cell: PortionCell): string {
+  return portionKey(cell.tense, portionOf(cell.verb, cell.tense, cell.person))
 }
 
 function personDone(cells: PortionCell[]): boolean {
@@ -48,7 +57,7 @@ function personDone(cells: PortionCell[]): boolean {
 
 interface PortionProgress {
   tense: Tense
-  group: VerbGroup
+  portion: PortionId
   personsDone: number
   personsTotal: number
   /** Верных ответов по всем формам порции. */
@@ -63,18 +72,29 @@ function isAhead(a: PortionProgress, b: PortionProgress): boolean {
   return ra !== rb ? ra > rb : a.ok > b.ok
 }
 
-/** Статусы порций в порядке изучения: времена как в TENSES, окончания -ar → -er → -ir. */
+/**
+ * Статусы порций в порядке изучения: времена как в TENSES, внутри времени —
+ * окончания -ar → -er → -ir, затем модели неправильности (PATTERNS_BY_TENSE).
+ */
 export function portionStatuses(cells: PortionCell[]): PortionStatus[] {
+  const byPortion = new Map<string, PortionCell[]>()
+  for (const cell of cells) {
+    const key = cellPortionKey(cell)
+    const list = byPortion.get(key)
+    if (list) list.push(cell)
+    else byPortion.set(key, [cell])
+  }
+
   const portions: PortionProgress[] = []
   for (const tense of TENSES) {
-    for (const group of VERB_GROUPS) {
-      const inPortion = cells.filter((c) => c.tense === tense && c.verb.group === group)
-      if (inPortion.length === 0) continue
+    for (const portion of [...VERB_GROUPS, ...PATTERNS_BY_TENSE[tense]]) {
+      const inPortion = byPortion.get(portionKey(tense, portion))
+      if (!inPortion) continue
 
       const persons = [...new Set(inPortion.map((c) => c.person))]
       portions.push({
         tense,
-        group,
+        portion,
         personsDone: persons.filter((p) => personDone(inPortion.filter((c) => c.person === p)))
           .length,
         personsTotal: persons.length,
@@ -92,11 +112,11 @@ export function portionStatuses(cells: PortionCell[]): PortionStatus[] {
       ? started.reduce((best, p) => (isAhead(p, best) ? p : best))
       : unfinished[0]
 
-  return portions.map(({ tense, group, personsDone, personsTotal, started }, i) => {
+  return portions.map(({ tense, portion, personsDone, personsTotal, started }, i) => {
     let state: PortionState
     if (personsDone === personsTotal) state = 'mastered'
     else if (portions[i] === current) state = 'current'
     else state = started ? 'open' : 'locked'
-    return { tense, group, state, personsDone, personsTotal }
+    return { tense, portion, state, personsDone, personsTotal }
   })
 }

@@ -4,7 +4,7 @@ import { VERBS, isRegularVerb } from '../data/verbs'
 import type { DrillCard, Person, SessionConfig, Tense, Verb } from '../types'
 import { personsFor } from '../types'
 import { conjugate, hasTense } from './conjugate'
-import { portionKey, portionStatuses } from './portions'
+import { cellPortionKey, portionKey, portionStatuses } from './portions'
 import type { CellStat, StatsStore } from './stats'
 import { cellKey, cellWeight, isWeak, loadStats } from './stats'
 
@@ -213,7 +213,7 @@ export const KNOWN_PATTERN_NEW_WEIGHT = 1.25
 export const CURRENT_PORTION_SHARE = 0.6
 
 /**
- * Умный режим вводит новое порциями (время × окончание):
+ * Умный режим вводит новое порциями (время × окончание или модель неправильности):
  * - не начатые порции ждут своей очереди;
  * - у начатых, но не текущих порций новые формы тоже ждут, а уже отвеченные идут
  *   в повторение — чтобы новое шло одной порцией и не забывалось натренированное;
@@ -223,9 +223,9 @@ export const CURRENT_PORTION_SHARE = 0.6
  */
 function smartPool(cells: Cell[]): Cell[] {
   const state = new Map(
-    portionStatuses(cells).map((s) => [portionKey(s.tense, s.group), s.state]),
+    portionStatuses(cells).map((s) => [portionKey(s.tense, s.portion), s.state]),
   )
-  const stateOf = (c: Cell) => state.get(portionKey(c.tense, c.verb.group))
+  const stateOf = (c: Cell) => state.get(cellPortionKey(c))
 
   const pool = cells
     .filter((c) => stateOf(c) !== 'locked' && !(stateOf(c) === 'open' && !c.stat))
