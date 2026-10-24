@@ -12,8 +12,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   again: []
-  setup: []
-  progress: []
 }>()
 
 const answered = computed(() => props.result.correct + props.result.wrong)
@@ -89,8 +87,6 @@ const uniqueMistakes = computed(() => {
 
     <div class="screen__actions summary__actions">
       <button class="button button--primary summary__again" type="button" @click="emit('again')">Ещё раз</button>
-      <button class="button button--ghost summary__to-progress" type="button" @click="emit('progress')">Прогресс</button>
-      <button class="button button--ghost summary__to-setup" type="button" @click="emit('setup')">Главный экран</button>
     </div>
   </section>
 </template>

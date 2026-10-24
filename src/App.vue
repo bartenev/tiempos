@@ -189,8 +189,6 @@ function toSetup() {
       v-else-if="screen === 'summary'"
       :result="result"
       @again="again"
-      @setup="toSetup"
-      @progress="screen = 'progress'"
     />
     <TabBar v-if="showTabBar" :screen="screen" @go="screen = $event" />
   </div>
