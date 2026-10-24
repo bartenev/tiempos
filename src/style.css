@@ -564,17 +564,6 @@ input[type='radio'] {
   line-height: 1.45;
 }
 
-.rule-hint__formula {
-  margin: var(--space-2) 0 0;
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
-}
-
-.rule-hint__ending {
-  color: var(--accent);
-  font-weight: var(--weight-bold);
-}
-
 .rule-hint__row {
   /* таблица спряжения: слева ед. число, справа мн. */
   display: grid;

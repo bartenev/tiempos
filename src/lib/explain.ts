@@ -32,8 +32,6 @@ export interface HintRowItem {
 export interface FormHint {
   /** Короткое правило одной строкой. */
   rule: string
-  /** Текущая форма (та же, что подсвечена в row) — для крупной строки-формулы. */
-  form: HintRowItem
   /** Полные формы по лицам; текущее лицо подсвечено. */
   row: HintRowItem[]
   /** Дополнительная заметка (орфография, ударение, исключение). */
@@ -79,16 +77,15 @@ function formsRow(verb: Verb, tense: Tense, person: Person, endings: string[]): 
   })
 }
 
-/** Подсказка с рядом форм; form — клетка текущего лица. */
+/** Подсказка с рядом форм по лицам; текущее лицо подсвечено. */
 function withRow(
-  hint: Omit<FormHint, 'form' | 'row'>,
+  hint: Omit<FormHint, 'row'>,
   verb: Verb,
   tense: Tense,
   person: Person,
   endings: string[],
 ): FormHint {
-  const row = formsRow(verb, tense, person, endings)
-  return { ...hint, form: row.find((item) => item.current)!, row }
+  return { ...hint, row: formsRow(verb, tense, person, endings) }
 }
 
 function regularEndings(verb: Verb, tense: Tense): string[] {
