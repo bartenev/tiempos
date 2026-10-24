@@ -1,9 +1,10 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import { removeObsoleteKeys } from './lib/storage'
+import { removeObsoleteKeys, requestPersistentStorage } from './lib/storage'
 import './style.css'
 
 removeObsoleteKeys()
+void requestPersistentStorage()
 createApp(App).mount('#app')
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
