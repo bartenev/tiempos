@@ -96,6 +96,18 @@ const groups = [
   { title: 'Неправильные и с чередованием', verbs: VERBS.filter((v) => !isRegularVerb(v)) },
 ]
 
+/** В сетке — только глаголы, начатые в этом времени: есть ответ хотя бы по одному лицу. */
+const visibleGroups = computed(() =>
+  groups
+    .map((g) => ({
+      ...g,
+      verbs: g.verbs.filter(
+        (v) => hasTense(v, tense.value) && personsFor(tense.value).some((p) => cellOf(v, p).stat),
+      ),
+    }))
+    .filter((g) => g.verbs.length > 0),
+)
+
 const selected = computed(() =>
   selectedKey.value ? byKey.get(selectedKey.value) ?? null : null,
 )
@@ -200,7 +212,10 @@ function statLine(c: CellInfo): string {
       </span>
     </p>
 
-    <div v-for="g in groups" :key="g.title" class="progress__group">
+    <p v-if="visibleGroups.length === 0" class="progress__grid-empty">
+      В этом времени вы ещё ничего не отвечали.
+    </p>
+    <div v-for="g in visibleGroups" :key="g.title" class="progress__group">
       <p class="progress__group-title">{{ g.title }}</p>
       <table class="progress__grid">
         <thead class="progress__grid-head">
@@ -210,7 +225,7 @@ function statLine(c: CellInfo): string {
           </tr>
         </thead>
         <tbody class="progress__grid-body">
-          <tr v-for="verb in g.verbs.filter((v) => hasTense(v, tense))" :key="verb.infinitive" class="progress__row">
+          <tr v-for="verb in g.verbs" :key="verb.infinitive" class="progress__row">
             <th class="progress__verb" scope="row">{{ verb.infinitive }}</th>
             <td v-for="p in personsFor(tense)" :key="p" class="progress__td">
               <button

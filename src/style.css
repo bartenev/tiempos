@@ -1207,6 +1207,12 @@ input[type='radio'] {
   margin-bottom: var(--space-4);
 }
 
+.progress__grid-empty {
+  margin: var(--space-3) 0;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
 .progress__group-title {
   margin: var(--space-3) 0 var(--space-1);
   font-size: var(--text-xs);
