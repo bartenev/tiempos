@@ -121,7 +121,8 @@ describe('portionStatuses', () => {
 
 describe('smart mode with portions', () => {
   it('first session of a new tense: only -ar forms, all persons mixed', () => {
-    const cards = buildSession({ ...learning, size: 20 }, {})
+    // по нескольким сессиям: в одной на 20 карточек какое-то лицо может случайно не выпасть
+    const cards = Array.from({ length: 10 }, () => buildSession({ ...learning, size: 20 }, {})).flat()
     expect(new Set(cards.map((c) => c.verb.group))).toEqual(new Set(['ar']))
     expect(new Set(cards.map((c) => c.person)).size).toBe(6)
   })
