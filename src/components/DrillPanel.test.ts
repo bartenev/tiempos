@@ -65,7 +65,7 @@ describe('DrillPanel — oral (self-check)', () => {
     vi.useRealTimers()
   })
 
-  function mountOral() {
+  function mountOral(extra: { canUndo?: boolean; reopened?: boolean } = {}) {
     return mount(DrillPanel, {
       attachTo: document.body,
       props: {
@@ -76,6 +76,7 @@ describe('DrillPanel — oral (self-check)', () => {
         wrong: 0,
         streak: 0,
         oral: true,
+        ...extra,
       },
     })
   }
@@ -139,6 +140,30 @@ describe('DrillPanel — oral (self-check)', () => {
     vi.advanceTimersByTime(300)
     await wrapper.find('.drill__grade--ok').trigger('click')
     expect(wrapper.emitted('correct')).toHaveLength(1)
+  })
+
+  it('offers to undo the previous grade only when there is one', async () => {
+    wrapper = mountOral()
+    expect(wrapper.find('.drill__undo').exists()).toBe(false)
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }))
+    expect(wrapper.emitted('undo')).toBeUndefined()
+
+    await wrapper.setProps({ canUndo: true })
+    await wrapper.find('.drill__undo').trigger('click')
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }))
+    expect(wrapper.emitted('undo')).toHaveLength(2)
+  })
+
+  it('a card reopened by undo shows the answer and waits for a new grade', async () => {
+    wrapper = mountOral({ reopened: true })
+    expect(wrapper.find('.drill__reveal').exists()).toBe(false)
+    expect(wrapper.find('.drill__blank').text()).toBe('habló')
+    // тот же быстрый тап, что вызвал отмену, не ставит оценку снова
+    await wrapper.find('.drill__grade--ok').trigger('click')
+    expect(wrapper.emitted('correct')).toBeUndefined()
+    vi.advanceTimersByTime(400)
+    await wrapper.find('.drill__grade--bad').trigger('click')
+    expect(wrapper.emitted('wrong')).toHaveLength(1)
   })
 
   it('stops listening to the keyboard when the screen closes', () => {

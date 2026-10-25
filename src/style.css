@@ -1074,6 +1074,25 @@ input[type='radio'] {
   margin-top: var(--space-4);
 }
 
+.drill__undo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.drill__undo:hover {
+  color: var(--ink);
+}
+
 .drill__reveal {
   width: 100%;
   min-height: 6rem;

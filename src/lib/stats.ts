@@ -104,6 +104,20 @@ export function recordAttempt(
   return stat
 }
 
+/** Вернуть форме прежнюю историю (отмена ответа); undefined — истории не было. */
+export function restoreStat(
+  infinitive: string,
+  tense: Tense,
+  person: Person,
+  previous: CellStat | undefined,
+): void {
+  const store = loadStats()
+  const key = cellKey(infinitive, tense, person)
+  if (previous) store[key] = previous
+  else delete store[key]
+  saveStats(store)
+}
+
 /** Слабая форма: были ошибки и с тех пор меньше recoveryStreak(bad) верных подряд. */
 export function isWeak(stat: CellStat | undefined): boolean {
   if (!stat) return false

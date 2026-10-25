@@ -17,6 +17,10 @@ const props = defineProps<{
   streak: number
   /** Устный режим: сказать форму вслух / про себя, открыть ответ и оценить себя. */
   oral?: boolean
+  /** Устный режим: прошлую самооценку можно отменить. */
+  canUndo?: boolean
+  /** К карточке вернулись отменой — ответ сразу открыт, ждём новую оценку. */
+  reopened?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -25,6 +29,7 @@ const emit = defineEmits<{
   skip: []
   quit: []
   next: []
+  undo: []
 }>()
 
 /** Буквы, которых нет на русской/английской раскладке. */
@@ -93,7 +98,8 @@ watch(
   async () => {
     input.value = ''
     feedback.value = null
-    shown.value = false
+    shown.value = Boolean(props.oral && props.reopened)
+    shownAt = Date.now()
     await nextTick()
     focusInput()
   },
@@ -167,10 +173,13 @@ function grade(ok: boolean) {
   emit('next')
 }
 
-/** Клавиатура в устном режиме: пробел / Enter — ответ, → верно, ← ошибся. */
+/** Клавиатура в устном режиме: пробел / Enter — ответ, → верно, ← ошибся, Backspace — отмена. */
 function onKey(event: KeyboardEvent) {
   if (event.metaKey || event.ctrlKey || event.altKey) return
-  if (!shown.value && (event.key === ' ' || event.key === 'Enter')) {
+  if (event.key === 'Backspace' && props.canUndo) {
+    event.preventDefault()
+    emit('undo')
+  } else if (!shown.value && (event.key === ' ' || event.key === 'Enter')) {
     event.preventDefault()
     reveal()
   } else if (shown.value && event.key === 'ArrowRight') {
@@ -244,6 +253,9 @@ onBeforeUnmount(() => {
       <RuleHint v-if="hint" class="drill__hint" :hint="hint" />
       <!-- На телефоне закреплено внизу экрана — под большой палец. -->
       <div class="drill__dock">
+        <button v-if="canUndo" class="drill__undo" type="button" @click="emit('undo')">
+          <Icon name="back" />Вернуть прошлую карточку
+        </button>
         <button v-if="!shown" class="drill__reveal" type="button" @click="reveal">
           Скажите форму вслух или про себя —<br class="drill__reveal-break" />тапните, чтобы проверить
         </button>

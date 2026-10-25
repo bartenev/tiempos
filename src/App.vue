@@ -12,7 +12,8 @@ import { IRREGULAR_INFINITIVES } from './data/verbs'
 import { buildSession, retryCard } from './lib/session'
 import { configFromSettings } from './lib/settings'
 import { settings } from './lib/settingsState'
-import { recordAttempt } from './lib/stats'
+import type { CellStat } from './lib/stats'
+import { cellKey, loadStats, recordAttempt, restoreStat } from './lib/stats'
 import { initTheme } from './lib/theme'
 import type {
   DrillCard,
@@ -41,6 +42,22 @@ const mistakes = ref<SessionMistake[]>([])
 const startedAt = ref(0)
 const finishedAt = ref(0)
 const startError = ref('')
+
+/** Состояние до последней самооценки в устном режиме — чтобы отменить случайный тап. */
+interface GradeSnapshot {
+  index: number
+  correct: number
+  wrong: number
+  streak: number
+  bestStreak: number
+  mistakes: SessionMistake[]
+  cards: DrillCard[]
+  card: DrillCard
+  stat: CellStat | undefined
+}
+const lastGrade = ref<GradeSnapshot | null>(null)
+/** Карточка, к которой вернулись отменой: ответ на ней сразу открыт. */
+const reopenedIndex = ref<number | null>(null)
 
 // Новый экран — с начала страницы (на телефоне иначе остаётся прокрутка настроек).
 watch(screen, () => window.scrollTo(0, 0))
@@ -79,6 +96,8 @@ function start(cfg: SessionConfig) {
   streak.value = 0
   bestStreak.value = 0
   mistakes.value = []
+  lastGrade.value = null
+  reopenedIndex.value = null
   startedAt.value = Date.now()
   screen.value = 'drill'
 }
@@ -90,6 +109,7 @@ function finish() {
 }
 
 function goNext() {
+  reopenedIndex.value = null
   if (index.value + 1 >= cards.value.length) {
     finish()
     return
@@ -97,7 +117,39 @@ function goNext() {
   index.value += 1
 }
 
+function rememberGrade(card: DrillCard) {
+  if (config.value?.answer !== 'oral') return
+  lastGrade.value = {
+    index: index.value,
+    correct: correct.value,
+    wrong: wrong.value,
+    streak: streak.value,
+    bestStreak: bestStreak.value,
+    mistakes: [...mistakes.value],
+    cards: [...cards.value],
+    card,
+    stat: loadStats()[cellKey(card.verb.infinitive, card.tense, card.person)],
+  }
+}
+
+/** Отменить последнюю самооценку и вернуться к той карточке с открытым ответом. */
+function undoGrade() {
+  const snap = lastGrade.value
+  if (!snap) return
+  index.value = snap.index
+  correct.value = snap.correct
+  wrong.value = snap.wrong
+  streak.value = snap.streak
+  bestStreak.value = snap.bestStreak
+  mistakes.value = snap.mistakes
+  cards.value = snap.cards
+  restoreStat(snap.card.verb.infinitive, snap.card.tense, snap.card.person, snap.stat)
+  lastGrade.value = null
+  reopenedIndex.value = snap.index
+}
+
 function onCorrect() {
+  if (current.value) rememberGrade(current.value)
   correct.value += 1
   streak.value += 1
   bestStreak.value = Math.max(bestStreak.value, streak.value)
@@ -107,6 +159,7 @@ function onCorrect() {
 }
 
 function onWrong(given: string) {
+  if (current.value) rememberGrade(current.value)
   wrong.value += 1
   streak.value = 0
   const card = current.value
@@ -175,11 +228,14 @@ function trainWeak() {
       :wrong="wrong"
       :streak="streak"
       :oral="config?.answer === 'oral'"
+      :can-undo="lastGrade !== null"
+      :reopened="reopenedIndex === index"
       @correct="onCorrect"
       @wrong="onWrong"
       @skip="onSkip"
       @next="goNext"
       @quit="quit"
+      @undo="undoGrade"
     />
     <SummaryPanel
       v-else-if="screen === 'summary'"

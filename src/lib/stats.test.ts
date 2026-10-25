@@ -8,6 +8,7 @@ import {
   masteryOf,
   recordAttempt,
   recoveryStreak,
+  restoreStat,
 } from './stats'
 
 beforeEach(() => {
@@ -15,6 +16,18 @@ beforeEach(() => {
 })
 
 describe('stats', () => {
+  it('restoreStat puts back the previous history or removes a new form', () => {
+    recordAttempt('ser', 'presente', 'yo', true, 1)
+    const before = loadStats()[cellKey('ser', 'presente', 'yo')]
+    recordAttempt('ser', 'presente', 'yo', false, 2)
+    restoreStat('ser', 'presente', 'yo', before)
+    expect(loadStats()[cellKey('ser', 'presente', 'yo')]).toEqual({ ok: 1, bad: 0, streak: 1, last: 1 })
+
+    recordAttempt('ir', 'presente', 'yo', true, 3)
+    restoreStat('ir', 'presente', 'yo', undefined)
+    expect(loadStats()[cellKey('ir', 'presente', 'yo')]).toBeUndefined()
+  })
+
   it('records ok / bad and resets streak on error', () => {
     recordAttempt('ser', 'presente', 'yo', true, 1)
     recordAttempt('ser', 'presente', 'yo', true, 2)
