@@ -90,3 +90,36 @@ const uniqueMistakes = computed(() => {
     </div>
   </section>
 </template>
+
+<style scoped lang="scss">
+/* ===== summary ===== */
+
+.summary__counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  margin: 0 0 var(--space-4);
+  color: var(--muted);
+}
+
+.summary__count {
+  font-weight: var(--weight-semibold);
+  color: var(--ink);
+}
+
+/* разделитель «·» — перед следующим числом, чтобы при переносе не висел в конце строки */
+.summary__count + .summary__count::before {
+  content: '·';
+  margin-right: var(--space-2);
+  font-weight: var(--weight-regular);
+  color: var(--muted);
+}
+
+.summary__count--ok {
+  color: var(--ok);
+}
+
+.summary__count--bad {
+  color: var(--bad);
+}
+</style>

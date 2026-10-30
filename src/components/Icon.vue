@@ -77,3 +77,18 @@ defineProps<{
     </template>
   </svg>
 </template>
+
+<style scoped lang="scss">
+/* ===== icon ===== */
+
+.icon {
+  flex: none;
+  width: 1.25em;
+  height: 1.25em;
+  vertical-align: -0.25em;
+}
+
+.icon--flame {
+  color: var(--flame);
+}
+</style>

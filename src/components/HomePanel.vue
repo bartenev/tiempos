@@ -167,3 +167,87 @@ function start() {
     </div>
   </section>
 </template>
+
+<style scoped lang="scss">
+/* ===== home: главная ===== */
+
+.home__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.home__title {
+  margin: 0;
+}
+
+.home__daily {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--ink);
+}
+
+.home__filters-body {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.home__filter {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.home__filter-name {
+  flex: none;
+  color: var(--muted);
+}
+
+.home__filter-value {
+  font-weight: var(--weight-semibold);
+  text-align: right;
+}
+
+/* строка-действие внизу карточки, как в списках настроек iOS */
+.home__filters-edit {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--space-2) 0 var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--accent);
+}
+
+.home__filters-body:hover .home__filters-edit {
+  color: var(--accent-hover);
+}
+
+/* «Начать» всегда видна — закреплена над панелью вкладок */
+.home__actions {
+  position: sticky;
+  bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
+  z-index: 2;
+  margin: var(--space-2) calc(-1 * var(--space-4)) 0;
+  padding: var(--space-3) var(--space-4);
+  background: linear-gradient(to top, var(--bg) 70%, transparent);
+}
+
+.home__start {
+  flex: 1 1 100%;
+}
+</style>

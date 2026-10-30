@@ -325,3 +325,353 @@ onBeforeUnmount(() => {
     </form>
   </section>
 </template>
+
+<style scoped lang="scss">
+/* ===== drill: верх экрана ===== */
+
+.drill__score {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.drill__meter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: calc(-1 * var(--space-2)) 0 var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.drill__meter-track {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+  overflow: hidden;
+}
+
+.drill__meter-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.25s ease;
+}
+
+.drill__meter-stats {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  min-width: 5.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.drill__streak {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: var(--weight-semibold);
+  color: var(--ink);
+}
+
+/* ===== drill: карточка задания (два размера: предложение и служебное) ===== */
+
+.drill__card {
+  margin-bottom: var(--space-4);
+  padding: var(--space-5) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.drill__card--tappable {
+  cursor: pointer;
+}
+
+.drill__card--flash {
+  animation: flash-ok 0.6s ease-out;
+}
+
+@keyframes flash-ok {
+  0% {
+    border-color: var(--ok);
+    box-shadow: 0 0 0 3px var(--ok-bg);
+  }
+  100% {
+    border-color: var(--line);
+    box-shadow: 0 0 0 3px transparent;
+  }
+}
+
+.drill__tense {
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.drill__retry {
+  margin-left: var(--space-2);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+
+.drill__sentence {
+  margin: var(--space-3) 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  line-height: 1.45;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.drill__blank {
+  display: inline-block;
+  min-width: 4ch;
+  padding: 0 var(--space-1);
+  border-bottom: 2px solid var(--accent);
+  font-weight: var(--weight-bold);
+  color: var(--accent);
+}
+
+.drill__sentence--ok .drill__blank {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+.drill__sentence--almost .drill__blank {
+  border-color: var(--almost);
+  color: var(--almost);
+}
+
+.drill__sentence--bad .drill__blank {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+
+.drill__sentence--shown .drill__blank {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.drill__infinitive {
+  font-weight: var(--weight-regular);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.drill__translation {
+  margin: 0;
+}
+
+/* ===== drill: крупный ответ под карточкой ===== */
+
+.drill__answer {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  text-align: center;
+  font-size: var(--text-display);
+  font-weight: var(--weight-bold);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  overflow-wrap: anywhere;
+  animation: answer-in 0.18s ease-out;
+}
+
+@keyframes answer-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+/* ===== drill: ввод текстом ===== */
+
+.drill__input {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: var(--space-3) var(--space-4);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  outline: none;
+  background: var(--input-bg);
+  font: inherit;
+  font-size: var(--text-lg);
+  color: var(--ink);
+}
+
+.drill__input:focus {
+  border-color: var(--accent);
+}
+
+.drill__input--ok {
+  border-color: var(--ok);
+  background: var(--ok-bg);
+}
+
+.drill__input--almost {
+  border-color: var(--almost);
+  background: var(--almost-bg);
+}
+
+.drill__input--bad {
+  border-color: var(--bad);
+  background: var(--bad-bg);
+}
+
+.drill__accents {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.drill__accent {
+  min-height: var(--tap);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  font: inherit;
+  font-size: var(--text-lg);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.drill__accent:active:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.drill__submit {
+  flex: 1;
+}
+
+/* ===== drill: устный режим ===== */
+
+.drill__dock {
+  margin-top: var(--space-4);
+}
+
+.drill__undo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.drill__undo:hover {
+  color: var(--ink);
+}
+
+.drill__reveal {
+  width: 100%;
+  min-height: 6rem;
+  padding: var(--space-4);
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  font: inherit;
+  line-height: 1.45;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.drill__reveal:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.drill__grades {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.drill__grade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 6rem;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+
+.drill__grade--bad {
+  border-color: var(--bad);
+  background: var(--bad-bg);
+  color: var(--bad);
+}
+
+.drill__grade--ok {
+  border-color: var(--ok);
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+/* ===== адаптив ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .drill__card--flash,
+  .drill__answer {
+    animation: none;
+  }
+}
+
+/* телефон: зона тапа и оценки — внизу экрана, контент прокручивается над ней */
+@media (max-width: 640px) {
+  /* «Проверить / Дальше» — тоже у нижнего края, когда подсказка длинная */
+  .drill__actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin: var(--space-2) calc(-1 * var(--space-4)) 0;
+    padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--bg) 70%, transparent);
+  }
+
+  .drill--oral {
+    padding-bottom: calc(8rem + env(safe-area-inset-bottom));
+  }
+
+  .drill__dock {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    z-index: 3;
+    width: 100%;
+    max-width: 460px;
+    margin: 0;
+    padding: var(--space-5) calc(var(--space-4) + env(safe-area-inset-right))
+      calc(var(--space-4) + env(safe-area-inset-bottom)) calc(var(--space-4) + env(safe-area-inset-left));
+    background: linear-gradient(to top, var(--bg) 75%, transparent);
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 420px) {
+  .drill__sentence {
+    font-size: var(--text-lg);
+  }
+}
+</style>

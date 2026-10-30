@@ -91,7 +91,11 @@ npm run build
 - состояния — модификаторы: `drill__sentence--bad`, `tabs__tab--active`, `progress__cell--weak`.
 
 Элемент обычно несёт и общий, и свой класс (`button button--primary home__start`):
-общий задаёт вид, свой — точка для правок конкретного места. Все стили — в `src/style.css`.
+общий задаёт вид, свой — точка для правок конкретного места.
+
+Стили:
+- `src/style.css` — дизайн-токены, база (`html`/`body`) и общие блоки (`button`, `group`, `screen`…);
+- `<style scoped lang="scss">` в компонентах — стили своего БЭМ-блока (`home__*`, `drill__*`, `tabbar`…).
 
 Дизайн-токены — в начале `src/style.css`, все стили берут значения только из них:
 

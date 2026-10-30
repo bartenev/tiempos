@@ -153,3 +153,72 @@ function setAllIrregular(value: boolean) {
     </fieldset>
   </section>
 </template>
+
+<style scoped lang="scss">
+/* ===== settings: экран настроек ===== */
+
+.settings__tense {
+  padding: var(--space-1) 0;
+}
+
+.settings__tense-ru {
+  display: block;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.settings__persons-grid {
+  /* как таблица спряжения: слева ед. число, справа мн. */
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(3, auto);
+  grid-auto-flow: column;
+  column-gap: var(--space-3);
+}
+
+.settings__groups-row {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.settings__irregular {
+  margin-top: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.settings__irregular-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+}
+
+.settings__irregular-title {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--muted);
+}
+
+.settings__irregular-actions {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.settings__irregular-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--space-3);
+  max-height: 17.5rem;
+  overflow-y: auto;
+  padding-right: var(--space-1);
+}
+
+/* отсеян фильтром окончаний — в сессию не попадёт */
+.settings__irregular-item--off {
+  opacity: 0.4;
+}
+</style>

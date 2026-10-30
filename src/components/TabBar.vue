@@ -42,3 +42,55 @@ function isActive(tab: Tab): boolean {
     </button>
   </nav>
 </template>
+
+<style scoped lang="scss">
+/* ===== tabbar: нижняя панель разделов ===== */
+
+.tabbar {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  max-width: 460px;
+  padding: var(--space-1) var(--space-2) calc(var(--space-1) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--card);
+  transform: translateX(-50%);
+}
+
+/* шире телефона панель не во всю ширину — оформляем её как отдельную плашку */
+@media (min-width: 461px) {
+  .tabbar {
+    border: 1px solid var(--line);
+    border-bottom: none;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+  }
+}
+
+.tabbar__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 3.5rem;
+  border: none;
+  background: transparent;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tabbar__item--active {
+  color: var(--accent);
+}
+
+.tabbar__icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+</style>

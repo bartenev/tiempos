@@ -245,3 +245,22 @@ function trainWeak() {
     <TabBar v-if="showTabBar" :screen="screen" @go="screen = $event" />
   </div>
 </template>
+
+<style scoped lang="scss">
+/* ===== app ===== */
+
+.app {
+  position: relative;
+  max-width: 460px;
+  margin: 0 auto;
+  padding:
+    calc(var(--space-6) + env(safe-area-inset-top)) calc(var(--space-4) + env(safe-area-inset-right))
+    calc(var(--space-7) + env(safe-area-inset-bottom)) calc(var(--space-4) + env(safe-area-inset-left));
+}
+
+/* ===== app: отступ под нижнюю панель вкладок ===== */
+
+.app--tabbar {
+  padding-bottom: calc(var(--tabbar-height) + var(--space-6) + env(safe-area-inset-bottom));
+}
+</style>

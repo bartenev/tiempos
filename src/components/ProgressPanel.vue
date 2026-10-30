@@ -251,3 +251,151 @@ function statLine(c: CellInfo): string {
     </div>
   </section>
 </template>
+
+<style scoped lang="scss">
+/* ===== progress ===== */
+
+.progress__weak-empty {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.progress__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin: var(--space-3) 0;
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.progress__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.progress__dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: var(--radius-xs);
+}
+
+.progress__dot--solid,
+.progress__cell--solid {
+  background: var(--m-solid);
+}
+
+.progress__dot--learning,
+.progress__cell--learning {
+  background: var(--m-learning);
+}
+
+.progress__dot--weak,
+.progress__cell--weak {
+  background: var(--m-weak);
+}
+
+.progress__dot--new,
+.progress__cell--new {
+  background: var(--m-new);
+}
+
+.progress__group {
+  margin-bottom: var(--space-4);
+}
+
+.progress__grid-empty {
+  margin: var(--space-3) 0;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.progress__group-title {
+  margin: var(--space-3) 0 var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--muted);
+}
+
+.progress__grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 3px;
+  table-layout: fixed;
+}
+
+.progress__col {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--muted);
+}
+
+.progress__col--verb {
+  width: 6.5rem;
+}
+
+.progress__verb {
+  padding-right: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progress__td {
+  padding: 0;
+}
+
+.progress__cell {
+  display: block;
+  width: 100%;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+}
+
+.progress__cell--picked {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.progress__detail {
+  /* прилипает над нижней панелью вкладок, а не под ней */
+  position: sticky;
+  bottom: calc(var(--tabbar-height) + var(--space-3) + env(safe-area-inset-bottom));
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  margin: var(--space-3) 0 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  font-size: var(--text-sm);
+}
+
+.progress__detail-form {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+}
+
+.progress__detail-stat {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+@media (max-width: 380px) {
+  .progress__col--verb {
+    width: 5.75rem;
+  }
+}
+</style>
