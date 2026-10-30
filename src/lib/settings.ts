@@ -1,10 +1,24 @@
+import { CHAPTERS } from '../data/book'
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
-import type { AnswerMode, Person, SessionConfig, SessionMode, Tense, VerbGroup } from '../types'
+import type {
+  AnswerMode,
+  BookConfig,
+  Person,
+  SessionConfig,
+  SessionMode,
+  Tense,
+  Track,
+  VerbGroup,
+} from '../types'
 import { PERSONS, VERB_GROUPS } from '../types'
 
 export const SETTINGS_KEY = 'tiempos.settings.v1'
 
 export interface SetupSettings {
+  /** Что тренируем: глаголы или главы учебника. */
+  track: Track
+  /** Чекбоксы глав учебника: номер юнита → выбрана. */
+  selectedUnits: Record<number, boolean>
   selected: Record<Tense, boolean>
   /** Чекбоксы местоимений. */
   persons: Record<Person, boolean>
@@ -25,7 +39,15 @@ export function defaultSelectedIrregular(
   return Object.fromEntries(infinitives.map((inf) => [inf, true]))
 }
 
+export function defaultSelectedUnits(
+  units: number[] = CHAPTERS.map((c) => c.unit),
+): Record<number, boolean> {
+  return Object.fromEntries(units.map((unit) => [unit, true]))
+}
+
 export const DEFAULT_SETTINGS: SetupSettings = {
+  track: 'verbs',
+  selectedUnits: defaultSelectedUnits(),
   selected: {
     presente: true,
     indefinido: true,
@@ -58,6 +80,8 @@ const SIZES = new Set([10, 20, 30])
 const MODES = new Set<SessionMode>(['smart', 'weak', 'random'])
 
 const ANSWERS = new Set<AnswerMode>(['text', 'oral'])
+
+const TRACKS = new Set<Track>(['verbs', 'book'])
 
 function isBool(value: unknown): value is boolean {
   return typeof value === 'boolean'
@@ -110,9 +134,25 @@ export function mergeSelectedIrregular(
   return result
 }
 
+/** Как с неправильными глаголами: новые главы включены, снятые галки сохраняются. */
+export function mergeSelectedUnits(
+  saved: unknown,
+  units: number[] = CHAPTERS.map((c) => c.unit),
+): Record<number, boolean> {
+  const result = defaultSelectedUnits(units)
+  if (!saved || typeof saved !== 'object') return result
+  const obj = saved as Record<string, unknown>
+  for (const unit of units) {
+    const value = obj[unit]
+    if (isBool(value)) result[unit] = value
+  }
+  return result
+}
+
 function cloneDefaults(): SetupSettings {
   return {
     ...DEFAULT_SETTINGS,
+    selectedUnits: defaultSelectedUnits(),
     selected: { ...DEFAULT_SETTINGS.selected },
     persons: { ...DEFAULT_SETTINGS.persons },
     groups: { ...DEFAULT_SETTINGS.groups },
@@ -126,6 +166,11 @@ export function loadSettings(): SetupSettings {
     if (!raw) return cloneDefaults()
     const parsed = JSON.parse(raw) as Partial<SetupSettings>
     return {
+      track:
+        typeof parsed.track === 'string' && TRACKS.has(parsed.track)
+          ? parsed.track
+          : DEFAULT_SETTINGS.track,
+      selectedUnits: mergeSelectedUnits(parsed.selectedUnits),
       selected: parseSelected(parsed.selected),
       persons: parsePersons(parsed.persons),
       groups: parseGroups(parsed.groups),
@@ -162,6 +207,23 @@ export function selectedIrregularList(
   map: Record<string, boolean>,
 ): string[] {
   return Object.keys(map).filter((inf) => map[inf])
+}
+
+export function selectedUnitList(map: Record<number, boolean>): number[] {
+  return CHAPTERS.map((c) => c.unit).filter((unit) => map[unit])
+}
+
+export function bookConfigFromSettings(
+  settings: SetupSettings,
+  overrides: Partial<BookConfig> = {},
+): BookConfig {
+  return {
+    units: selectedUnitList(settings.selectedUnits),
+    size: settings.size,
+    mode: settings.mode,
+    answer: settings.answer,
+    ...overrides,
+  }
 }
 
 export function configFromSettings(

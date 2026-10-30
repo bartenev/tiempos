@@ -6,20 +6,26 @@ import ProgressPanel from './components/ProgressPanel.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import SummaryPanel from './components/SummaryPanel.vue'
 import TabBar from './components/TabBar.vue'
+import BookProgress from './components/BookProgress.vue'
 import TablesPanel from './components/TablesPanel.vue'
+import { CHAPTERS } from './data/book'
+import { buildBookSession } from './lib/book'
+import { cardMistake, cardStat, recordCard, restoreCard, retryOf } from './lib/cards'
 import { markPracticed } from './lib/daily'
 import { IRREGULAR_INFINITIVES } from './data/verbs'
-import { buildSession, retryCard } from './lib/session'
-import { configFromSettings } from './lib/settings'
+import { buildSession } from './lib/session'
+import { bookConfigFromSettings, configFromSettings } from './lib/settings'
 import { settings } from './lib/settingsState'
 import type { CellStat } from './lib/stats'
-import { cellKey, loadStats, recordAttempt, restoreStat } from './lib/stats'
 import { initTheme } from './lib/theme'
 import type {
-  DrillCard,
+  AnswerMode,
+  AnyCard,
+  BookConfig,
   Screen,
   SessionConfig,
   SessionMistake,
+  SessionMode,
   SessionResult,
 } from './types'
 import { PERSONS, TENSES, VERB_GROUPS } from './types'
@@ -29,9 +35,16 @@ initTheme()
 /** Через сколько карточек вернуть форму, на которой ошиблись. */
 const RETRY_GAP = 3
 
+/** Запуск сессии: как отвечаем и как собрать карточки (для «Ещё раз» — заново). */
+interface Run {
+  mode: SessionMode
+  answer: AnswerMode
+  build: () => AnyCard[]
+}
+
 const screen = ref<Screen>('setup')
-const config = ref<SessionConfig | null>(null)
-const cards = ref<DrillCard[]>([])
+const run = ref<Run | null>(null)
+const cards = ref<AnyCard[]>([])
 const index = ref(0)
 const correct = ref(0)
 const wrong = ref(0)
@@ -51,8 +64,8 @@ interface GradeSnapshot {
   streak: number
   bestStreak: number
   mistakes: SessionMistake[]
-  cards: DrillCard[]
-  card: DrillCard
+  cards: AnyCard[]
+  card: AnyCard
   stat: CellStat | undefined
 }
 const lastGrade = ref<GradeSnapshot | null>(null)
@@ -79,16 +92,16 @@ const result = computed<SessionResult>(() => ({
   mistakes: mistakes.value,
 }))
 
-function start(cfg: SessionConfig) {
+function begin(next: Run) {
   try {
-    cards.value = buildSession(cfg)
+    cards.value = next.build()
   } catch (e) {
     startError.value = e instanceof Error ? e.message : String(e)
     screen.value = 'setup'
     return
   }
   startError.value = ''
-  config.value = cfg
+  run.value = next
   index.value = 0
   correct.value = 0
   wrong.value = 0
@@ -100,6 +113,14 @@ function start(cfg: SessionConfig) {
   reopenedIndex.value = null
   startedAt.value = Date.now()
   screen.value = 'drill'
+}
+
+function start(cfg: SessionConfig) {
+  begin({ mode: cfg.mode, answer: cfg.answer, build: () => buildSession(cfg) })
+}
+
+function startBook(cfg: BookConfig) {
+  begin({ mode: cfg.mode, answer: cfg.answer, build: () => buildBookSession(cfg) })
 }
 
 function finish() {
@@ -117,8 +138,8 @@ function goNext() {
   index.value += 1
 }
 
-function rememberGrade(card: DrillCard) {
-  if (config.value?.answer !== 'oral') return
+function rememberGrade(card: AnyCard) {
+  if (run.value?.answer !== 'oral') return
   lastGrade.value = {
     index: index.value,
     correct: correct.value,
@@ -128,7 +149,7 @@ function rememberGrade(card: DrillCard) {
     mistakes: [...mistakes.value],
     cards: [...cards.value],
     card,
-    stat: loadStats()[cellKey(card.verb.infinitive, card.tense, card.person)],
+    stat: cardStat(card),
   }
 }
 
@@ -143,7 +164,7 @@ function undoGrade() {
   bestStreak.value = snap.bestStreak
   mistakes.value = snap.mistakes
   cards.value = snap.cards
-  restoreStat(snap.card.verb.infinitive, snap.card.tense, snap.card.person, snap.stat)
+  restoreCard(snap.card, snap.stat)
   lastGrade.value = null
   reopenedIndex.value = snap.index
 }
@@ -155,7 +176,7 @@ function onCorrect() {
   bestStreak.value = Math.max(bestStreak.value, streak.value)
   const card = current.value
   if (!card) return
-  recordAttempt(card.verb.infinitive, card.tense, card.person, true)
+  recordCard(card, true)
 }
 
 function onWrong(given: string) {
@@ -164,18 +185,12 @@ function onWrong(given: string) {
   streak.value = 0
   const card = current.value
   if (!card) return
-  recordAttempt(card.verb.infinitive, card.tense, card.person, false)
-  mistakes.value.push({
-    infinitive: card.verb.infinitive,
-    tense: card.tense,
-    person: card.person,
-    answer: card.answer,
-    given,
-  })
+  recordCard(card, false)
+  mistakes.value.push(cardMistake(card, given))
   // Смарт-режимы: вернуть ошибочную форму ещё раз через пару карточек.
-  if (config.value?.mode !== 'random' && !card.retry) {
+  if (run.value?.mode !== 'random' && !card.retry) {
     const at = Math.min(index.value + 1 + RETRY_GAP, cards.value.length)
-    cards.value.splice(at, 0, retryCard(card))
+    cards.value.splice(at, 0, retryOf(card))
   }
 }
 
@@ -189,11 +204,15 @@ function quit() {
 }
 
 function again() {
-  if (config.value) start(config.value)
+  if (run.value) begin(run.value)
 }
 
 /** С экрана прогресса — все слабые формы, независимо от фильтров настройки. */
 function trainWeak() {
+  if (settings.track === 'book') {
+    startBook(bookConfigFromSettings(settings, { mode: 'weak', units: CHAPTERS.map((c) => c.unit) }))
+    return
+  }
   start(
     configFromSettings(settings, {
       mode: 'weak',
@@ -214,10 +233,12 @@ function trainWeak() {
       v-if="screen === 'setup'"
       :error="startError"
       @start="start"
+      @start-book="startBook"
       @settings="screen = 'settings'"
     />
     <SettingsPanel v-else-if="screen === 'settings'" />
     <TablesPanel v-else-if="screen === 'tables'" />
+    <BookProgress v-else-if="screen === 'progress' && settings.track === 'book'" @train-weak="trainWeak" />
     <ProgressPanel v-else-if="screen === 'progress'" @train-weak="trainWeak" />
     <DrillPanel
       v-else-if="screen === 'drill' && current"
@@ -227,7 +248,7 @@ function trainWeak() {
       :correct="correct"
       :wrong="wrong"
       :streak="streak"
-      :oral="config?.answer === 'oral'"
+      :oral="run?.answer === 'oral'"
       :can-undo="lastGrade !== null"
       :reopened="reopenedIndex === index"
       @correct="onCorrect"

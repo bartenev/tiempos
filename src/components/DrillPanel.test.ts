@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { findVerb } from '../data/verbs'
+import { cardsForUnits } from '../lib/book'
 import { buildCard } from '../lib/session'
 import DrillPanel from './DrillPanel.vue'
 
@@ -49,6 +50,72 @@ describe('DrillPanel', () => {
     await wrapper.find('form').trigger('submit')
     expect(wrapper.emitted('next')).toBeUndefined()
     expect(wrapper.text()).toContain('Почти')
+  })
+})
+
+describe('DrillPanel — textbook exercises', () => {
+  function mountExercise(find: string, oral = false) {
+    const card = cardsForUnits([35, 38, 39]).find((c) => c.sentence.startsWith(find))!
+    return mount(DrillPanel, {
+      props: { card, index: 0, total: 10, correct: 0, wrong: 0, streak: 0, oral },
+    })
+  }
+
+  it('shows the chapter and the task instead of the tense', () => {
+    const wrapper = mountExercise('¿Dónde está Andrés?')
+    expect(wrapper.find('.drill__tense').text()).toBe('Глава 35')
+    expect(wrapper.find('.drill__task').text()).toContain('lo, la, los')
+  })
+
+  it('accepts a typed answer and any variant', async () => {
+    const wrapper = mountExercise('¿Dónde están las cucharas?')
+    await wrapper.find('#answer').setValue('las')
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('correct')).toHaveLength(1)
+  })
+
+  it('ignores punctuation in a whole phrase', async () => {
+    const wrapper = mountExercise('Ama a tus padres.')
+    await wrapper.find('#answer').setValue('Ámalos.')
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('correct')).toHaveLength(1)
+  })
+
+  it('a wrong answer shows the rule without a conjugation table', async () => {
+    const wrapper = mountExercise('¿Dónde está Andrés?')
+    await wrapper.find('#answer').setValue('la')
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('wrong')).toEqual([['la']])
+    expect(wrapper.find('.rule-hint__rule').text().length).toBeGreaterThan(0)
+    expect(wrapper.find('.rule-hint__row').exists()).toBe(false)
+  })
+
+  it('offers buttons instead of a field for a choice', async () => {
+    const wrapper = mountExercise('—¿Quieres este libro?')
+    expect(wrapper.find('#answer').exists()).toBe(false)
+    expect(wrapper.find('.drill__accents').exists()).toBe(false)
+    const right = wrapper.findAll('.drill__option').find((b) => b.text() === 'lo')!
+    await right.trigger('click')
+    expect(wrapper.emitted('correct')).toHaveLength(1)
+    expect(wrapper.emitted('next')).toHaveLength(1)
+  })
+
+  it('a wrong choice marks both buttons and waits for «Дальше»', async () => {
+    const wrapper = mountExercise('—¿Quieres este libro?')
+    await wrapper.findAll('.drill__option').find((b) => b.text() === 'le')!.trigger('click')
+    expect(wrapper.emitted('wrong')).toEqual([['le']])
+    expect(wrapper.emitted('next')).toBeUndefined()
+    expect(wrapper.find('.drill__option--ok').text()).toBe('lo')
+    expect(wrapper.find('.drill__option--bad').text()).toBe('le')
+
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('next')).toHaveLength(1)
+  })
+
+  it('orally the options go next to the blank', () => {
+    const wrapper = mountExercise('—¿Quieres este libro?', true)
+    expect(wrapper.find('.drill__options').exists()).toBe(false)
+    expect(wrapper.find('.drill__infinitive').text()).toMatch(/lo \/ le|le \/ lo/)
   })
 })
 

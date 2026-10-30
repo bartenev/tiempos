@@ -1,9 +1,11 @@
+import { CHAPTERS, TAGS } from '../data/book'
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
 import type { Tense } from '../types'
 import { PERSONS, TENSES, VERB_GROUPS } from '../types'
+import { chapterSize, unitsWithTag } from './book'
 import { pluralRu } from './plural'
 import type { SetupSettings } from './settings'
-import { selectedIrregularList } from './settings'
+import { selectedIrregularList, selectedUnitList } from './settings'
 
 /** Короткие названия времён для сводки на главной. */
 export const TENSE_SHORT_NAMES: Record<Tense, string> = {
@@ -65,6 +67,37 @@ export function describeSettings(settings: SetupSettings): SettingsSummary {
       VERB_GROUPS.length,
     ),
     verbs: describeVerbs(settings),
+    size: `${settings.size} карточек`,
+  }
+}
+
+export interface BookSummary {
+  theme: string
+  chapters: string
+  exercises: string
+  size: string
+}
+
+/** Название выбора: тема, если отмечены ровно её главы, иначе номера глав или «своя подборка». */
+function describeTheme(units: number[]): string {
+  if (units.length === 0) return NOTHING
+  const same = (other: number[]) =>
+    other.length === units.length && other.every((u) => units.includes(u))
+  const theme = TAGS.find(({ tag }) => same(unitsWithTag(tag)))
+  if (theme) return theme.label
+  return units.length === 1 ? `Глава ${units[0]}` : 'своя подборка'
+}
+
+export function describeBook(settings: SetupSettings): BookSummary {
+  const units = selectedUnitList(settings.selectedUnits)
+  const exercises = CHAPTERS.filter((c) => units.includes(c.unit)).reduce(
+    (sum, c) => sum + chapterSize(c),
+    0,
+  )
+  return {
+    theme: describeTheme(units),
+    chapters: units.length === 0 ? NOTHING : `${units.length} из ${CHAPTERS.length}`,
+    exercises: String(exercises),
     size: `${settings.size} карточек`,
   }
 }

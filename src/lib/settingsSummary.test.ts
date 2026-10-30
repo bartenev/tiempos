@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
+import { CHAPTERS } from '../data/book'
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
-import { DEFAULT_SETTINGS, defaultSelectedIrregular } from './settings'
+import { DEFAULT_SETTINGS, defaultSelectedIrregular, defaultSelectedUnits } from './settings'
 import type { SetupSettings } from './settings'
-import { describeSettings, irregularLabel } from './settingsSummary'
+import { describeBook, describeSettings, irregularLabel } from './settingsSummary'
 
 function make(overrides: Partial<SetupSettings> = {}): SetupSettings {
   return {
@@ -71,5 +72,34 @@ describe('irregularLabel', () => {
     expect(irregularLabel(2)).toBe('2 неправильных')
     expect(irregularLabel(11)).toBe('11 неправильных')
     expect(irregularLabel(21)).toBe('21 неправильный')
+  })
+})
+
+describe('describeBook', () => {
+  function withUnits(units: number[]): SetupSettings {
+    return make({ selectedUnits: Object.fromEntries(CHAPTERS.map((c) => [c.unit, units.includes(c.unit)])) })
+  }
+
+  it('names the theme when exactly its chapters are selected', () => {
+    expect(describeBook(make({ selectedUnits: defaultSelectedUnits() })).theme).toBe('Все местоимения')
+    expect(describeBook(withUnits([39, 77, 78])).theme).toBe('С императивом')
+  })
+
+  it('names a single chapter or a custom pick', () => {
+    expect(describeBook(withUnits([37])).theme).toBe('Глава 37')
+    expect(describeBook(withUnits([34, 36])).theme).toBe('своя подборка')
+  })
+
+  it('shows a dash when nothing is selected', () => {
+    const summary = describeBook(withUnits([]))
+    expect(summary.theme).toBe('—')
+    expect(summary.chapters).toBe('—')
+    expect(summary.exercises).toBe('0')
+  })
+
+  it('counts chapters and exercises', () => {
+    const summary = describeBook(withUnits([34, 36]))
+    expect(summary.chapters).toBe(`2 из ${CHAPTERS.length}`)
+    expect(Number(summary.exercises)).toBeGreaterThan(20)
   })
 })

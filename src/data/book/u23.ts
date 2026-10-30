@@ -1,0 +1,148 @@
+import type { Chapter } from '../../types'
+
+const chapter: Chapter = {
+  unit: 23,
+  title: 'Indefinidos (4)',
+  ru: 'Неопределённые (4): alguien, nadie, algo, nada',
+  tags: ['pronombres', 'indefinidos'],
+  sets: [
+    {
+      task: '23.1 Observe las ilustraciones y complete las frases con hay, no hay + alguien, algo, nadie o nada',
+      rule: 'Alguien/nadie — кто-то/никто (о людях); algo/nada — что-то/ничего (о вещах). Все четыре слова не изменяются. Nadie и nada после глагола требуют отрицания: No hay nadie, No hay nada. Hay alguien/algo — утвердительная форма.',
+      items: [
+        {
+          kind: 'rewrite',
+          es: '① ___ en la mesa.',
+          ru: 'На столе ничего нет.',
+          answer: 'No hay nada',
+          prompt: 'Картинка ①: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
+          image: 'book/u23.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '② ___ en mi habitación.',
+          ru: 'В моей комнате кто-то есть.',
+          answer: 'Hay alguien',
+          prompt: 'Картинка ②: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
+          image: 'book/u23.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '③ ___ detrás del árbol.',
+          ru: 'За деревом кто-то есть.',
+          answer: 'Hay alguien',
+          prompt: 'Картинка ③: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
+          image: 'book/u23.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '④ ___ en el salón.',
+          ru: 'В гостиной никого нет.',
+          answer: 'No hay nadie',
+          prompt: 'Картинка ④: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
+          image: 'book/u23.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '⑤ ___ en el libro.',
+          ru: 'В книге что-то есть.',
+          answer: 'Hay algo',
+          prompt: 'Картинка ⑤: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
+          image: 'book/u23.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '⑥ ___ en la piscina.',
+          ru: 'В бассейне никого нет.',
+          answer: 'No hay nadie',
+          prompt: 'Картинка ⑥: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
+          image: 'book/u23.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '⑦ ___ en la caja.',
+          ru: 'В коробке ничего нет.',
+          answer: 'No hay nada',
+          prompt: 'Картинка ⑦: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
+          image: 'book/u23.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '⑧ ___ en el árbol.',
+          ru: 'На дереве что-то есть.',
+          answer: 'Hay algo',
+          prompt: 'Картинка ⑧: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
+          image: 'book/u23.jpg',
+        },
+      ],
+    },
+    {
+      task: '23.2 Complete las frases con alguien, algo, nadie o nada',
+      rule: 'Alguien (кто-то) / nadie (никто) — для людей; algo (что-то) / nada (ничего) — для предметов и ситуаций. Nadie/nada после глагола требуют no: No ha pasado nada; перед глаголом no не нужен: Nadie quiere acompañarme.',
+      items: [
+        { kind: 'fill', es: 'Hay ___ esperándole en recepción.', ru: 'Вас кто-то ждёт на ресепшене.', answer: 'alguien' },
+        { kind: 'fill', es: 'Me han dado ___ para ti.', ru: 'Мне кое-что для тебя передали.', answer: 'algo' },
+        { kind: 'fill', es: '___ huele mal en la cocina.', ru: 'На кухне что-то плохо пахнет.', answer: 'Algo' },
+        { kind: 'fill', es: 'Hoy no he hecho ___.', ru: 'Сегодня я ничего не делал.', answer: 'nada' },
+        { kind: 'fill', es: '¿Ha visto ___ mi bolígrafo?', ru: 'Кто-нибудь видел мою ручку?', answer: 'alguien' },
+        { kind: 'fill', es: '___ quiere acompañarme al cine.', ru: 'Никто не хочет пойти со мной в кино.', answer: 'Nadie' },
+        {
+          kind: 'fill',
+          es: 'Necesito que ___ me ayude con este ejercicio.',
+          ru: 'Мне нужно, чтобы кто-нибудь помог мне с этим упражнением.',
+          answer: 'alguien',
+        },
+        { kind: 'fill', es: 'Hay mucha gente en la calle. ¿Ha pasado ___?', ru: 'На улице много людей. Что-то случилось?', answer: 'algo' },
+        { kind: 'fill', es: 'No ha pasado ___. Ha sido una falsa alarma.', ru: 'Ничего не случилось. Это была ложная тревога.', answer: 'nada' },
+        {
+          kind: 'fill',
+          es: 'No hay ___ en casa de Tomás. No contestan el teléfono.',
+          ru: 'В доме Томаса никого нет. Не берут трубку.',
+          answer: 'nadie',
+        },
+      ],
+    },
+    {
+      task: '23.3 Conteste a las preguntas usando algo, nada, algo de o nada de',
+      rule: 'Algo de / nada de + неисчисляемое существительное — немного/нисколько: algo de pan, nada de leche. Algo/nada без существительного — отдельно: Queda algo, pero poco; No queda nada.',
+      items: [
+        {
+          kind: 'fill',
+          es: '—¿Hay comida? —No queda ___ queso, pero queda ___ jamón.',
+          ru: '— Есть еда? — Сыра не осталось совсем, но немного ветчины есть.',
+          answer: 'nada de; algo de',
+          answers: ['nada de', 'algo de'],
+        },
+        { kind: 'fill', es: '—¿Queda pan? —Queda ___, pero poco.', ru: '— Хлеб остался? — Немного осталось, но мало.', answer: 'algo' },
+        {
+          kind: 'fill',
+          es: '—¿Y leche? —No queda ___, pero queda ___ zumo.',
+          ru: '— А молоко? — Молока нет, но немного сока осталось.',
+          answer: 'nada; algo de',
+          answers: ['nada', 'algo de'],
+        },
+        {
+          kind: 'fill',
+          es: '—Necesitamos comprar comida. ¿Tenéis dinero? —Tenemos ___, pero poco.',
+          ru: '— Нам нужно купить еды. У вас есть деньги? — Кое-что есть, но мало.',
+          answer: 'algo',
+        },
+        {
+          kind: 'fill',
+          es: '—¿Qué podemos comprar? —Bueno, podemos comprar ___ pan y ___ queso.',
+          ru: '— Что мы можем купить? — Ну, можем купить немного хлеба и немного сыра.',
+          answer: 'algo de; algo de',
+          answers: ['algo de', 'algo de'],
+        },
+        {
+          kind: 'fill',
+          es: '—¿Y fruta? —No podemos comprar ___ fruta. No tenemos suficiente dinero.',
+          ru: '— А фрукты? — Фруктов мы совсем не можем купить. У нас недостаточно денег.',
+          answer: 'nada de',
+        },
+      ],
+    },
+  ],
+}
+
+export default chapter

@@ -1,0 +1,136 @@
+import type { Chapter } from '../../types'
+
+const chapter: Chapter = {
+  unit: 19,
+  title: 'Posesivos (2)',
+  ru: 'Притяжательные (2): el mío, la tuya, un amigo mío',
+  tags: ['pronombres', 'posesivos'],
+  sets: [
+    {
+      task: '19.1 Complete las frases como en el ejemplo',
+      rule: 'Ударные формы после глагола ser: mío/a(s), tuyo/a(s), suyo/a(s), nuestro/a(s), vuestro/a(s), suyo/a(s). Они согласуются в роде и числе с предметом обладания: Son mías (llaves), Es mío (libro).',
+      items: [
+        {
+          kind: 'fill',
+          es: '—¿De quién son estas llaves? —Son ___.',
+          ru: '— Чьи это ключи? — Мои.',
+          answer: 'mías',
+          prompt: 'Картинка ①',
+          image: 'book/u19.jpg',
+        },
+        {
+          kind: 'fill',
+          es: '—¿De quién es este libro? —Es ___.',
+          ru: '— Чья это книга? — Моя.',
+          answer: 'mío',
+          prompt: 'Картинка ②',
+          image: 'book/u19.jpg',
+        },
+        {
+          kind: 'fill',
+          es: '—¿De quién es este paraguas? —Es ___.',
+          ru: '— Чей это зонт? — Её (его).',
+          answer: 'suyo',
+          prompt: 'Картинка ③',
+          image: 'book/u19.jpg',
+        },
+        {
+          kind: 'fill',
+          es: '—¿De quién son estos CD? —Son ___.',
+          ru: '— Чьи это диски? — Наши.',
+          answer: 'nuestros',
+          prompt: 'Картинка ④',
+          image: 'book/u19.jpg',
+        },
+        { kind: 'fill', es: '¿Son ___ estos libros?', ru: 'Это ваши книги?', answer: 'vuestros', prompt: 'Картинка ⑤', image: 'book/u19.jpg' },
+        { kind: 'fill', es: '¿Son ___ estas maletas?', ru: 'Это их (Ваши) чемоданы?', answer: 'suyas', prompt: 'Картинка ⑥', image: 'book/u19.jpg' },
+        {
+          kind: 'fill',
+          es: '¿Es ___ este reloj?',
+          ru: 'Эти часы твои (его)?',
+          answer: 'tuyo',
+          also: ['suyo'],
+          prompt: 'Картинка ⑦',
+          image: 'book/u19.jpg',
+        },
+        { kind: 'fill', es: '¿Es ___ esta bufanda?', ru: 'Этот шарф её (Ваш)?', answer: 'suya', prompt: 'Картинка ⑧', image: 'book/u19.jpg' },
+      ],
+    },
+    {
+      task: '19.2 Escriba el mío, la tuya, los suyos... según corresponda en las siguientes frases',
+      rule: 'Чтобы не повторять существительное, ставится артикль + ударная форма: el mío, la tuya, los suyos, las nuestras. Артикль и форма согласуются с опущенным существительным.',
+      items: [
+        { kind: 'fill', es: 'Estas llaves no son mías. ___ son más pequeñas.', ru: 'Эти ключи не мои. Мои меньше.', answer: 'Las mías' },
+        { kind: 'fill', es: '—¿Es ese vuestro coche? —No, ___ es más grande.', ru: '— Это ваша машина? — Нет, наша больше.', answer: 'el nuestro' },
+        { kind: 'fill', es: 'Este abrigo no es de Pedro. ___ es azul.', ru: 'Это пальто не Педро. Его — синее.', answer: 'El suyo' },
+        {
+          kind: 'fill',
+          es: '—Perdona, ¿es este mi asiento? —No, ___ está más atrás.',
+          ru: '— Простите, это моё место? — Нет, твоё дальше сзади.',
+          answer: 'el tuyo',
+        },
+        {
+          kind: 'fill',
+          es: '—¿Es ese nuestro profesor? —No, ___ es mayor.',
+          ru: '— Это наш учитель? — Нет, наш старше.',
+          answer: 'el nuestro',
+          also: ['el vuestro'],
+        },
+        {
+          kind: 'fill',
+          es: '—Mi deporte preferido es el fútbol. ¿Y ___? —___ es el esquí.',
+          ru: '— Мой любимый спорт — футбол. А твой? — Мой — лыжи.',
+          answer: 'el tuyo; El mío',
+          answers: ['el tuyo', 'El mío'],
+        },
+        {
+          kind: 'fill',
+          es: '—Mis hijos practican muchos deportes. ¿Y ___, Manuel? —___ juegan al tenis.',
+          ru: '— Мои дети занимаются многими видами спорта. А твои, Мануэль? — Мои играют в теннис.',
+          answer: 'los tuyos; Los míos',
+          answers: ['los tuyos', 'Los míos'],
+        },
+        {
+          kind: 'fill',
+          es: '—¿Son esos los padres de Arturo? —No, ___ son más jóvenes.',
+          ru: '— Это родители Артуро? — Нет, его моложе.',
+          answer: 'los suyos',
+        },
+        { kind: 'fill', es: '—Mi profesora es peruana. —___ es argentina.', ru: '— Моя учительница из Перу. — Моя из Аргентины.', answer: 'La mía' },
+        {
+          kind: 'fill',
+          es: '—Nuestros hijos son muy trabajadores. —___ son un poco vagos.',
+          ru: '— Наши дети очень трудолюбивые. — Наши немного ленивые.',
+          answer: 'Los nuestros',
+          also: ['Los míos'],
+        },
+      ],
+    },
+    {
+      task: '19.3 Complete con mío, tuyo, suyo... y un, una, unos o unas si es necesario',
+      rule: 'Конструкция «неопределённый артикль + существительное + ударное притяжательное»: un amigo mío (один из моих друзей). После ser артикль не нужен: Es amigo mío. Притяжательное согласуется с существительным: una amiga mía, unos familiares suyos.',
+      items: [
+        { kind: 'fill', es: '(amigo, yo) ___ es pintor.', ru: 'Один мой друг — художник.', answer: 'Un amigo mío' },
+        { kind: 'fill', es: '(amiga, yo) ___ ha ganado un premio.', ru: 'Одна моя подруга получила премию.', answer: 'Una amiga mía' },
+        { kind: 'fill', es: 'Ayer estuve con (primo, vosotros) ___.', ru: 'Вчера я был с вашим двоюродным братом.', answer: 'un primo vuestro' },
+        { kind: 'fill', es: 'El director del banco es (amigo, ellos) ___.', ru: 'Директор банка — их друг.', answer: 'amigo suyo' },
+        { kind: 'fill', es: 'Raquel es (prima, nosotros) ___.', ru: 'Ракель — наша двоюродная сестра.', answer: 'prima nuestra' },
+        { kind: 'fill', es: '¿Es Alicia (tía, tú) ___?', ru: 'Алисия — твоя тётя?', answer: 'tía tuya' },
+        {
+          kind: 'fill',
+          es: '—¿Conocéis a Mariano? —Sí, es (amigo, nosotros) ___.',
+          ru: '— Вы знаете Мариано? — Да, он наш друг.',
+          answer: 'amigo nuestro',
+        },
+        {
+          kind: 'fill',
+          es: 'El domingo conocimos a (familiares, ustedes) ___.',
+          ru: 'В воскресенье мы познакомились с Вашими родственниками.',
+          answer: 'unos familiares suyos',
+        },
+      ],
+    },
+  ],
+}
+
+export default chapter

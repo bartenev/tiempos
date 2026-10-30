@@ -4,6 +4,7 @@ import { settings } from '../lib/settingsState'
 import { setTheme, theme } from '../lib/theme'
 import type { Person } from '../types'
 import { PERSONS, TENSES, TENSE_LABELS, TENSE_RU, VERB_GROUPS } from '../types'
+import BookPicker from './BookPicker.vue'
 import Icon from './Icon.vue'
 
 const irregularList = IRREGULAR_INFINITIVES
@@ -37,6 +38,9 @@ function setAllIrregular(value: boolean) {
   <section class="settings">
     <h1 class="screen__title settings__title">Настройки</h1>
 
+    <BookPicker v-if="settings.track === 'book'" />
+
+    <template v-else>
     <fieldset class="group settings__tenses">
       <legend class="group__legend settings__tenses-legend">Времена</legend>
       <label v-for="tense in TENSES" :key="tense" class="choice settings__tense">
@@ -107,6 +111,8 @@ function setAllIrregular(value: boolean) {
         </div>
       </div>
     </fieldset>
+
+    </template>
 
     <fieldset class="group settings__size">
       <legend class="group__legend settings__size-legend">Длина сессии</legend>

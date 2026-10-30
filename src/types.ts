@@ -47,6 +47,9 @@ export interface DrillCard {
  */
 export type SessionMode = 'smart' | 'weak' | 'random'
 
+/** Что тренируем: спряжение глаголов или главы учебника. */
+export type Track = 'verbs' | 'book'
+
 /** Как отвечать: вписывать форму или сказать её и оценить себя самому. */
 export type AnswerMode = 'text' | 'oral'
 
@@ -67,10 +70,128 @@ export interface SessionConfig {
   selectedIrregular: string[]
 }
 
+/** Тема главы. У главы их несколько: по ним выбирают сразу группу глав. */
+export type BookTag =
+  | 'pronombres'
+  | 'personales'
+  | 'complementos'
+  | 'preposiciones'
+  | 'reflexivos'
+  | 'gustar'
+  | 'imperativo'
+  | 'impersonales'
+  | 'demostrativos'
+  | 'posesivos'
+  | 'indefinidos'
+  | 'relativos'
+  | 'interrogativos'
+
+/**
+ * Формат упражнения из учебника.
+ * fill — пропуск(и) `___` в предложении;
+ * rewrite — переписать / составить фразу целиком;
+ * choice — выбрать из вариантов (в т.ч. «—» = ничего не нужно);
+ * match — сопоставить: слева стимул, справа варианты-кнопки.
+ */
+export type BookItemKind = 'fill' | 'rewrite' | 'choice' | 'match'
+
+/** Одно упражнение главы (как в учебнике). */
+export interface BookItem {
+  /** Формат; по умолчанию fill, если есть `___`, иначе rewrite. */
+  kind?: BookItemKind
+  /**
+   * Стимул: для fill/choice — предложение с `___` (один или несколько);
+   * для rewrite — исходная фраза / номер / описание картинки;
+   * для match — левая колонка.
+   */
+  es: string
+  /** Русский перевод стимула или ожидаемого ответа. */
+  ru: string
+  /** Правильный ответ; прочерк «—» — в пропуске ничего не нужно. */
+  answer: string
+  /** Другие верные варианты (ese/aquel…). */
+  also?: string[]
+  /**
+   * Несколько пропусков в одном предложении: ответы по порядку `___`.
+   * Ввод — через «; » (esta; Esta). Если задано, `answer` = answers.join('; ').
+   */
+  answers?: string[]
+  /** Подсказка в скобках: «a ella», слово из рамки, ключ картинки. */
+  cue?: string
+  /** Варианты на выбор / правая колонка match (среди них должен быть answer). */
+  options?: string[]
+  /** Доп. инструкция к пункту: банк слов, «(yo, =)», картинка. */
+  prompt?: string
+  /** Картинка из учебника: путь от public/, напр. `book/u12.jpg`. */
+  image?: string
+}
+
+/** Набор упражнений на одно правило главы. */
+export interface BookSet {
+  /** Что нужно сделать (формулировка из учебника + перевод). */
+  task: string
+  /** Правило своими словами: показывается после ошибки. */
+  rule: string
+  /** Банк слов / рамка над упражнением, если есть. */
+  bank?: string
+  items: BookItem[]
+}
+
+/** Глава = один юнит учебника = один пул упражнений. */
+export interface Chapter {
+  /** Номер юнита в учебнике. */
+  unit: number
+  /** Название по-испански. */
+  title: string
+  /** О чём глава, по-русски. */
+  ru: string
+  tags: BookTag[]
+  sets: BookSet[]
+}
+
+/** Карточка упражнения: тот же экран, что у глаголов, но без спряжения. */
+export interface BookCard {
+  /** Постоянный ключ упражнения — по нему хранится прогресс. */
+  key: string
+  unit: number
+  task: string
+  rule: string
+  /** Банк слов из рамки упражнения. */
+  bank?: string
+  kind: BookItemKind
+  sentence: string
+  translation: string
+  answer: string
+  /** Все верные варианты, включая answer. */
+  accepted: string[]
+  /** Несколько пропусков: ответы по порядку. */
+  answers?: string[]
+  cue?: string
+  prompt?: string
+  options?: string[]
+  image?: string
+  retry?: boolean
+}
+
+export type AnyCard = DrillCard | BookCard
+
+export function isBookCard(card: AnyCard): card is BookCard {
+  return 'key' in card
+}
+
+export interface BookConfig {
+  /** Номера выбранных глав. */
+  units: number[]
+  size: number
+  mode: SessionMode
+  answer: AnswerMode
+}
+
 export interface SessionMistake {
-  infinitive: string
-  tense: Tense
-  person: Person
+  /** Что считать одной и той же ошибкой (повторы не дублируем в итогах). */
+  key: string
+  /** Подпись: «hablar · pres. · yo», «Глава 35». */
+  meta: string
   answer: string
   given: string
 }

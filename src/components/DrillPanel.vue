@@ -2,14 +2,14 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { explainForm } from '../lib/explain'
 import type { AnswerCheck } from '../lib/normalize'
-import { checkAnswer } from '../lib/normalize'
-import type { DrillCard } from '../types'
-import { TENSE_LABELS } from '../types'
+import { checkAnswers, normalizeAnswer } from '../lib/normalize'
+import type { AnyCard } from '../types'
+import { TENSE_LABELS, isBookCard } from '../types'
 import Icon from './Icon.vue'
 import RuleHint from './RuleHint.vue'
 
 const props = defineProps<{
-  card: DrillCard
+  card: AnyCard
   index: number
   total: number
   correct: number
@@ -46,6 +46,7 @@ const shown = ref(false)
 const GRADE_GUARD_MS = 350
 let shownAt = 0
 const inputEl = ref<HTMLInputElement | null>(null)
+const submitEl = ref<HTMLButtonElement | null>(null)
 /** Короткая зелёная вспышка: прошлый ответ верный, уже следующая карточка. */
 const flashOk = ref(false)
 let flashTimer: ReturnType<typeof setTimeout> | undefined
@@ -59,19 +60,69 @@ const accuracy = computed(() =>
   answered.value === 0 ? null : Math.round((props.correct / answered.value) * 100),
 )
 
+/** Упражнение учебника; у глагола — null. */
+const book = computed(() => (isBookCard(props.card) ? props.card : null))
+
+const label = computed(() => {
+  const { card } = props
+  return isBookCard(card) ? `Глава ${card.unit}` : TENSE_LABELS[card.tense]
+})
+
+const accepted = computed(() => book.value?.accepted ?? [props.card.answer])
+
+/** Варианты на кнопках; устно отвечают без кнопок — они уходят в подсказку у пропуска. */
+const options = computed(() => (props.oral ? undefined : book.value?.options))
+
+/** Подсказка в скобках у пропуска: инфинитив или текст из упражнения. */
+const cue = computed(() => {
+  const { card } = props
+  if (!isBookCard(card)) return card.verb.infinitive
+  return (props.oral && card.options?.join(' / ')) || card.cue
+})
+
+/** fill с пропуском — рисуем blank; rewrite/match — целиком стимул. */
+const hasBlank = computed(() => props.card.sentence.includes('___'))
+
+const blankCount = computed(() => props.card.sentence.split('___').length - 1)
+
 const hint = computed(() => {
   const show = feedback.value === 'wrong' || feedback.value === 'almost' || shown.value
   if (!show) return null
-  return explainForm(props.card.verb, props.card.tense, props.card.person)
+  const { card } = props
+  return isBookCard(card)
+    ? { rule: card.rule, row: [] }
+    : explainForm(card.verb, card.tense, card.person)
 })
 
-/** Части предложения вокруг пропуска `___`. */
+function isAccepted(option: string): boolean {
+  return accepted.value.some((answer) => normalizeAnswer(answer) === normalizeAnswer(option))
+}
+
+/**
+ * Части вокруг пропусков. Несколько `___` — каждый рисуем blank;
+ * ответ вводят через «; » в одном поле.
+ */
+const sentenceChunks = computed(() => {
+  if (!hasBlank.value) return [] as string[]
+  return props.card.sentence.split('___')
+})
+
+/** Части предложения вокруг пропуска `___` (один пропуск — старый путь). */
 const sentenceParts = computed(() => {
   const parts = props.card.sentence.split('___')
   return {
     before: parts[0] ?? '',
     after: parts.slice(1).join('___'),
   }
+})
+
+const inputPlaceholder = computed(() => {
+  if (!book.value) return 'форма глагола…'
+  if (blankCount.value > 1 || (book.value.answers && book.value.answers.length > 1)) {
+    return 'ответ; ответ…'
+  }
+  if (book.value.kind === 'rewrite' || book.value.kind === 'match') return 'фраза целиком…'
+  return 'ответ…'
 })
 
 /** Ответ открыт: устно после тапа или текстом после ошибки. */
@@ -94,7 +145,7 @@ function focusInput() {
 }
 
 watch(
-  () => [props.card.sentence, props.card.verb.infinitive, props.card.answer, props.index],
+  () => [props.card.sentence, cue.value, props.card.answer, props.index],
   async () => {
     input.value = ''
     feedback.value = null
@@ -125,7 +176,7 @@ function submit() {
     return
   }
   if (!canCheck.value) return
-  const result = checkAnswer(input.value, props.card.answer)
+  const result = checkAnswers(input.value, accepted.value)
   if (result === 'exact') {
     acceptCorrect()
     return
@@ -133,6 +184,14 @@ function submit() {
   feedback.value = result
   emit('wrong', input.value.trim())
   focusInput()
+  // с вариантами поля нет — Enter должен попасть в «Дальше»
+  if (options.value) nextTick(() => submitEl.value?.focus({ preventScroll: true }))
+}
+
+function choose(option: string) {
+  if (revealed.value) return
+  input.value = option
+  submit()
 }
 
 function skip() {
@@ -228,9 +287,19 @@ onBeforeUnmount(() => {
       @click="reveal"
     >
       <div class="drill__tense">
-        {{ TENSE_LABELS[card.tense] }}
+        {{ label }}
         <span v-if="card.retry" class="drill__retry">повтор</span>
       </div>
+      <p v-if="book" class="drill__task">{{ book.task }}</p>
+      <p v-if="book?.bank" class="drill__bank" lang="es">{{ book.bank }}</p>
+      <p v-if="book?.prompt" class="drill__prompt">{{ book.prompt }}</p>
+      <img
+        v-if="book?.image"
+        class="drill__image"
+        :src="`/${book.image}`"
+        alt="Иллюстрация из учебника"
+        loading="lazy"
+      />
       <p
         class="drill__sentence"
         :class="{
@@ -238,11 +307,28 @@ onBeforeUnmount(() => {
           'drill__sentence--almost': feedback === 'almost',
           'drill__sentence--bad': feedback === 'wrong',
           'drill__sentence--shown': shown,
+          'drill__sentence--stimulus': book && !hasBlank,
         }"
       >
-        <span class="drill__sentence-before">{{ sentenceParts.before }}</span>
-        <span class="drill__blank">{{ filledBlank }}</span> <span class="drill__infinitive">({{ card.verb.infinitive }})</span>
-        <span class="drill__sentence-after">{{ sentenceParts.after }}</span>
+        <template v-if="hasBlank && blankCount > 1">
+          <template v-for="(chunk, i) in sentenceChunks" :key="i">
+            <span>{{ chunk }}</span>
+            <template v-if="i < sentenceChunks.length - 1">
+              <span class="drill__blank">{{ answerShown ? (book?.answers?.[i] ?? card.answer) : '\u00a0' }}</span>
+            </template>
+          </template>
+          <span v-if="cue" class="drill__infinitive">({{ cue }})</span>
+        </template>
+        <template v-else-if="hasBlank">
+          <span class="drill__sentence-before">{{ sentenceParts.before }}</span>
+          <span class="drill__blank">{{ filledBlank }}</span>
+          <span v-if="cue" class="drill__infinitive">({{ cue }})</span>
+          <span class="drill__sentence-after">{{ sentenceParts.after }}</span>
+        </template>
+        <template v-else>
+          <span class="drill__sentence-before">{{ card.sentence }}</span>
+          <span v-if="cue" class="drill__infinitive">({{ cue }})</span>
+        </template>
       </p>
       <p class="drill__translation">{{ card.translation }}</p>
     </div>
@@ -257,7 +343,7 @@ onBeforeUnmount(() => {
           <Icon name="back" />Вернуть прошлую карточку
         </button>
         <button v-if="!shown" class="drill__reveal" type="button" @click="reveal">
-          Скажите форму вслух или про себя —<br class="drill__reveal-break" />тапните, чтобы проверить
+          Скажите {{ book ? 'ответ' : 'форму' }} вслух или про себя —<br class="drill__reveal-break" />тапните, чтобы проверить
         </button>
         <div v-else class="drill__grades">
           <button class="drill__grade drill__grade--bad" type="button" @click="grade(false)"><Icon name="cross" />Ошибся</button>
@@ -267,8 +353,26 @@ onBeforeUnmount(() => {
     </template>
 
     <form v-else class="drill__form" @submit.prevent="submit">
-      <label class="sr-only drill__label" for="answer">Форма глагола</label>
+      <div v-if="options" class="drill__options" role="group" aria-label="Варианты ответа">
+        <button
+          v-for="option in options"
+          :key="option"
+          class="drill__option"
+          :class="{
+            'drill__option--ok': revealed && isAccepted(option),
+            'drill__option--bad': revealed && option === input,
+          }"
+          type="button"
+          :disabled="revealed"
+          @click="choose(option)"
+        >
+          {{ option }}
+        </button>
+      </div>
+
+      <label v-if="!options" class="sr-only drill__label" for="answer">{{ book ? 'Ответ' : 'Форма глагола' }}</label>
       <input
+        v-if="!options"
         id="answer"
         ref="inputEl"
         v-model="input"
@@ -287,10 +391,10 @@ onBeforeUnmount(() => {
         spellcheck="false"
         lang="es"
         :readonly="revealed"
-        placeholder="форма глагола…"
+        :placeholder="inputPlaceholder"
       />
 
-      <div v-if="!revealed" class="drill__accents" role="group" aria-label="Буквы с ударением">
+      <div v-if="!revealed && !options" class="drill__accents" role="group" aria-label="Буквы с ударением">
         <button
           v-for="ch in ACCENTS"
           :key="ch"
@@ -315,7 +419,13 @@ onBeforeUnmount(() => {
       <RuleHint v-if="hint" class="drill__hint" :hint="hint" />
 
       <div class="screen__actions drill__actions">
-        <button class="button button--primary drill__submit" type="submit" :disabled="!canSubmit">
+        <button
+          v-if="revealed || !options"
+          ref="submitEl"
+          class="button button--primary drill__submit"
+          type="submit"
+          :disabled="!canSubmit"
+        >
           {{ revealed ? 'Дальше' : 'Проверить' }}
         </button>
         <button v-if="!revealed" class="button button--ghost drill__skip" type="button" @click="skip">
@@ -376,6 +486,39 @@ onBeforeUnmount(() => {
 }
 
 /* ===== drill: карточка задания (два размера: предложение и служебное) ===== */
+
+.drill__bank {
+  margin: 0 0 var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--line);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-style: italic;
+}
+
+.drill__prompt {
+  margin: 0 0 var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.drill__image {
+  display: block;
+  width: 100%;
+  max-height: 12rem;
+  margin: 0 auto var(--space-3);
+  object-fit: contain;
+  object-position: top;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--card);
+}
+
+.drill__sentence--stimulus {
+  font-size: var(--text-lg);
+  color: var(--ink);
+}
 
 .drill__card {
   margin-bottom: var(--space-4);
@@ -468,6 +611,11 @@ onBeforeUnmount(() => {
   margin: 0;
 }
 
+/* упражнение учебника: что сделать */
+.drill__task {
+  margin: var(--space-2) 0 0;
+}
+
 /* ===== drill: крупный ответ под карточкой ===== */
 
 .drill__answer {
@@ -491,6 +639,47 @@ onBeforeUnmount(() => {
     opacity: 0;
     transform: scale(0.92);
   }
+}
+
+/* ===== drill: варианты на выбор ===== */
+
+.drill__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
+  gap: var(--space-2);
+}
+
+.drill__option {
+  min-height: 3.25rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  font: inherit;
+  font-size: var(--text-lg);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.drill__option:active:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.drill__option:disabled {
+  cursor: default;
+}
+
+.drill__option--ok {
+  border-color: var(--ok);
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.drill__option--bad {
+  border-color: var(--bad);
+  background: var(--bad-bg);
+  color: var(--bad);
 }
 
 /* ===== drill: ввод текстом ===== */

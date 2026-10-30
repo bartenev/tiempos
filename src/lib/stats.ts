@@ -6,6 +6,9 @@ import type { Person, Tense } from '../types'
  */
 export const STATS_KEY = 'tiempos.stats.v1'
 
+/** То же по упражнениям учебника: ключ — BookCard.key. */
+export const BOOK_STATS_KEY = 'tiempos.book.v1'
+
 export interface CellStat {
   /** Верных ответов всего. */
   ok: number
@@ -61,9 +64,9 @@ function isCellStat(value: unknown): value is CellStat {
   )
 }
 
-export function loadStats(): StatsStore {
+function loadStore(storageKey: string): StatsStore {
   try {
-    const raw = localStorage.getItem(STATS_KEY)
+    const raw = localStorage.getItem(storageKey)
     if (!raw) return {}
     const parsed = JSON.parse(raw) as unknown
     if (!parsed || typeof parsed !== 'object') return {}
@@ -77,19 +80,20 @@ export function loadStats(): StatsStore {
   }
 }
 
+export function loadStats(): StatsStore {
+  return loadStore(STATS_KEY)
+}
+
 export function saveStats(store: StatsStore): void {
   localStorage.setItem(STATS_KEY, JSON.stringify(store))
 }
 
-export function recordAttempt(
-  infinitive: string,
-  tense: Tense,
-  person: Person,
-  correct: boolean,
-  now: number = Date.now(),
-): CellStat {
-  const store = loadStats()
-  const key = cellKey(infinitive, tense, person)
+export function loadBookStats(): StatsStore {
+  return loadStore(BOOK_STATS_KEY)
+}
+
+function record(storageKey: string, key: string, correct: boolean, now: number): CellStat {
+  const store = loadStore(storageKey)
   const stat = store[key] ?? { ok: 0, bad: 0, streak: 0, last: 0 }
   if (correct) {
     stat.ok += 1
@@ -100,8 +104,33 @@ export function recordAttempt(
   }
   stat.last = now
   store[key] = stat
-  saveStats(store)
+  localStorage.setItem(storageKey, JSON.stringify(store))
   return stat
+}
+
+export function recordAttempt(
+  infinitive: string,
+  tense: Tense,
+  person: Person,
+  correct: boolean,
+  now: number = Date.now(),
+): CellStat {
+  return record(STATS_KEY, cellKey(infinitive, tense, person), correct, now)
+}
+
+export function recordBookAttempt(
+  key: string,
+  correct: boolean,
+  now: number = Date.now(),
+): CellStat {
+  return record(BOOK_STATS_KEY, key, correct, now)
+}
+
+function restore(storageKey: string, key: string, previous: CellStat | undefined): void {
+  const store = loadStore(storageKey)
+  if (previous) store[key] = previous
+  else delete store[key]
+  localStorage.setItem(storageKey, JSON.stringify(store))
 }
 
 /** Вернуть форме прежнюю историю (отмена ответа); undefined — истории не было. */
@@ -111,11 +140,11 @@ export function restoreStat(
   person: Person,
   previous: CellStat | undefined,
 ): void {
-  const store = loadStats()
-  const key = cellKey(infinitive, tense, person)
-  if (previous) store[key] = previous
-  else delete store[key]
-  saveStats(store)
+  restore(STATS_KEY, cellKey(infinitive, tense, person), previous)
+}
+
+export function restoreBookStat(key: string, previous: CellStat | undefined): void {
+  restore(BOOK_STATS_KEY, key, previous)
 }
 
 /** Слабая форма: были ошибки и с тех пор меньше recoveryStreak(bad) верных подряд. */

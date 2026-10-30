@@ -1,0 +1,150 @@
+import type { Chapter } from '../../types'
+
+const chapter: Chapter = {
+  unit: 20,
+  title: 'Indefinidos (1)',
+  ru: 'Неопределённые (1): todo, alguno, ninguno, uno',
+  tags: ['pronombres', 'indefinidos'],
+  sets: [
+    {
+      task: '20.1 Observe las ilustraciones y complete las frases con todo, algún, un, ningún... y las palabras del recuadro',
+      rule: 'Todo/a/os/as — все, весь; algún/alguno/a/os/as — какой-нибудь, некоторые; un/una — один; ningún/ninguno/a — никакой, ни один. Перед существительным мужского рода в единственном числе: algún, ningún, un. Ningún и ninguna не употребляются во множественном числе.',
+      bank: 'caja, caja, coche, manzana, pera, plato, vaso, vaso',
+      items: [
+        {
+          kind: 'rewrite',
+          es: '① ___ están vacías.',
+          ru: 'Все коробки пусты.',
+          answer: 'Todas las cajas',
+          prompt: 'Картинка ①: допишите подлежащее (слово из рамки).',
+          image: 'book/u20.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '② ___ están cerradas.',
+          ru: 'Некоторые коробки закрыты.',
+          answer: 'Algunas cajas',
+          prompt: 'Картинка ②: допишите подлежащее (слово из рамки).',
+          image: 'book/u20.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '③ ___ están rotos.',
+          ru: 'Некоторые тарелки разбиты.',
+          answer: 'Algunos platos',
+          prompt: 'Картинка ③: допишите подлежащее (слово из рамки).',
+          image: 'book/u20.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '④ ___ está roto.',
+          ru: 'Один стакан разбит.',
+          answer: 'Un vaso',
+          prompt: 'Картинка ④: допишите подлежащее (слово из рамки).',
+          image: 'book/u20.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '⑤ ___ están parados.',
+          ru: 'Все машины стоят.',
+          answer: 'Todos los coches',
+          prompt: 'Картинка ⑤: допишите подлежащее (слово из рамки).',
+          image: 'book/u20.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '⑥ ___ está podrida.',
+          ru: 'Одно яблоко гнилое.',
+          answer: 'Una manzana',
+          prompt: 'Картинка ⑥: допишите подлежащее (слово из рамки).',
+          image: 'book/u20.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '⑦ ___ está podrida.',
+          ru: 'Ни одна груша не гнилая.',
+          answer: 'Ninguna pera',
+          prompt: 'Картинка ⑦: допишите подлежащее (слово из рамки).',
+          image: 'book/u20.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: '⑧ ___ están relucientes.',
+          ru: 'Некоторые стаканы сверкают.',
+          answer: 'Algunos vasos',
+          prompt: 'Картинка ⑧: допишите подлежащее (слово из рамки).',
+          image: 'book/u20.jpg',
+        },
+      ],
+    },
+    {
+      task: '20.2 Escriba todo, algún, un, ningún... según corresponda',
+      rule: 'Перед существительным: unos/algunos + мн. число (некоторые), algún/ningún + м.р. ед. ч., toda/todas/todos — все, вся; todo + артикль/притяжательное: toda mi familia, todas mis amigas. Ningún + существительное в ед. числе.',
+      items: [
+        { kind: 'fill', es: 'Alicia está estudiando con ___ compañeros.', ru: 'Алисия занимается с (какими-то) однокурсниками.', answer: 'unos' },
+        { kind: 'fill', es: 'En ___ países de África se habla español.', ru: 'В некоторых странах Африки говорят по-испански.', answer: 'algunos' },
+        { kind: 'fill', es: '¿Has estado en ___ país de América?', ru: 'Ты бывал в какой-нибудь стране Америки?', answer: 'algún' },
+        { kind: 'fill', es: '___ mi familia habla español.', ru: 'Вся моя семья говорит по-испански.', answer: 'Toda' },
+        { kind: 'fill', es: '___ mis amigas son simpáticas.', ru: 'Все мои подруги симпатичные.', answer: 'Todas' },
+        { kind: 'fill', es: '___ aves no pueden volar.', ru: 'Некоторые птицы не умеют летать.', answer: 'Algunas' },
+        { kind: 'fill', es: '___ elefante come carne.', ru: 'Ни один слон не ест мясо.', answer: 'Ningún' },
+      ],
+    },
+    {
+      task: '20.3 Complete las frases con uno, alguno, ninguno... + de cuando sea necesario',
+      rule: 'Когда за словом следует определённая группа (de + притяжательное/артикль/местоимение), используются uno/alguno/ninguno + de: uno de tus hermanos, alguno de ustedes, ninguna de mis abuelas. Женский род: una/alguna/ninguna de.',
+      items: [
+        { kind: 'fill', es: 'Ayer conocí a ___ tus hermanos.', ru: 'Вчера я познакомился с одним из твоих братьев.', answer: 'uno de' },
+        { kind: 'fill', es: '¿___ ustedes habla quechua?', ru: 'Кто-нибудь из Вас говорит на кечуа?', answer: 'Alguno de' },
+        { kind: 'fill', es: 'No he conocido a ___ mis abuelas.', ru: 'Я не знал ни одной из моих бабушек.', answer: 'ninguna de' },
+        { kind: 'fill', es: '¿Trabaja ___ tus hermanos?', ru: 'Кто-нибудь из твоих братьев работает?', answer: 'alguno de' },
+        { kind: 'fill', es: 'Felipe sale con ___ mis amigas.', ru: 'Фелипе встречается с одной из моих подруг.', answer: 'una de' },
+        {
+          kind: 'fill',
+          es: '___ nosotros ha estado en la Isla de Pascua, pero nos gustaría ir.',
+          ru: 'Никто из нас не был на острове Пасхи, но нам хотелось бы поехать.',
+          answer: 'Ninguno de',
+        },
+      ],
+    },
+    {
+      task: '20.4 Complete los diálogos con todo, algún, ningún...',
+      rule: 'Без существительного используются формы: todos/todas, algunos/algunas, alguno/alguna, ninguno/ninguna. Ninguno/ninguna без существительного обычно в единственном числе и требует отрицания (no conozco ninguno).',
+      items: [
+        {
+          kind: 'fill',
+          es: '—¿Conoces a los amigos de Pedro? —Conozco a ___, pero no a ___.',
+          ru: '— Ты знаешь друзей Педро? — Я знаю некоторых, но не всех.',
+          answer: 'algunos; todos',
+          answers: ['algunos', 'todos'],
+        },
+        {
+          kind: 'fill',
+          es: '—¿Has comprado ya los libros? —Sí, los he comprado ___.',
+          ru: '— Ты уже купил книги? — Да, я купил все.',
+          answer: 'todos',
+        },
+        {
+          kind: 'fill',
+          es: '—¿Conoces algún país de Asia? —No, no conozco ___.',
+          ru: '— Ты знаешь какую-нибудь страну Азии? — Нет, ни одной.',
+          answer: 'ninguno',
+        },
+        {
+          kind: 'fill',
+          es: '—¿Has visto a alguna de mis hermanas? —No, no he visto a ___.',
+          ru: '— Ты видел какую-нибудь из моих сестёр? — Нет, ни одной.',
+          answer: 'ninguna',
+        },
+        {
+          kind: 'fill',
+          es: 'Me encantan las mariposas. ___ tienen las alas muy bonitas.',
+          ru: 'Я обожаю бабочек. У некоторых очень красивые крылья.',
+          answer: 'Algunas',
+        },
+      ],
+    },
+  ],
+}
+
+export default chapter

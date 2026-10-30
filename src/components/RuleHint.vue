@@ -23,7 +23,7 @@ const SLOT: Record<Person, string> = {
 <template>
   <div class="rule-hint">
     <p class="rule-hint__rule">{{ hint.rule }}</p>
-    <ul class="rule-hint__row">
+    <ul v-if="hint.row.length > 0" class="rule-hint__row">
       <li
         v-for="item in hint.row"
         :key="item.person"

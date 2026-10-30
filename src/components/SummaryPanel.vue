@@ -3,7 +3,6 @@ import { computed } from 'vue'
 import { currentStreak, daysLabel, loadDaily } from '../lib/daily'
 import { pluralRu } from '../lib/plural'
 import type { SessionResult } from '../types'
-import { TENSE_SHORT, personLabel } from '../types'
 import Icon from './Icon.vue'
 
 const props = defineProps<{
@@ -32,9 +31,8 @@ const days = currentStreak(loadDaily())
 const uniqueMistakes = computed(() => {
   const seen = new Set<string>()
   return props.result.mistakes.filter((m) => {
-    const key = `${m.infinitive}|${m.tense}|${m.person}`
-    if (seen.has(key)) return false
-    seen.add(key)
+    if (seen.has(m.key)) return false
+    seen.add(m.key)
     return true
   })
 })
@@ -73,10 +71,10 @@ const uniqueMistakes = computed(() => {
       <ul class="form-list summary__mistakes">
         <li
           v-for="m in uniqueMistakes"
-          :key="`${m.infinitive}|${m.tense}|${m.person}`"
+          :key="m.key"
           class="form-list__item summary__mistake"
         >
-          <span class="form-list__meta summary__mistake-meta">{{ m.infinitive }} · {{ TENSE_SHORT[m.tense] }} · {{ personLabel(m.tense, m.person) }}</span>
+          <span class="form-list__meta summary__mistake-meta">{{ m.meta }}</span>
           <span class="form-list__forms summary__mistake-forms">
             <s v-if="m.given" class="form-list__given summary__mistake-given">{{ m.given }}</s>
             <b class="form-list__answer form-list__answer--ok summary__mistake-answer">{{ m.answer }}</b>
@@ -93,6 +91,12 @@ const uniqueMistakes = computed(() => {
 
 <style scoped lang="scss">
 /* ===== summary ===== */
+
+/* длинное предложение упражнения не сжимает ответ в столбик */
+.summary__mistake-forms {
+  flex: none;
+  max-width: 55%;
+}
 
 .summary__counts {
   display: flex;

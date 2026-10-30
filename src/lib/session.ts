@@ -9,7 +9,7 @@ import { cellPortionKey, portionKey, portionStatuses } from './portions'
 import type { CellStat, StatsStore } from './stats'
 import { cellKey, cellWeight, isWeak, loadStats } from './stats'
 
-function shuffle<T>(items: T[]): T[] {
+export function shuffle<T>(items: T[]): T[] {
   const arr = [...items]
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))

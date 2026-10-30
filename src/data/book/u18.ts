@@ -1,0 +1,134 @@
+import type { Chapter } from '../../types'
+
+const chapter: Chapter = {
+  unit: 18,
+  title: 'Posesivos (1)',
+  ru: 'Притяжательные (1): mi, tu, su, nuestro, vuestro',
+  tags: ['pronombres', 'posesivos'],
+  sets: [
+    {
+      task: '18.1 Observe los árboles genealógicos y complete las frases con mi, tu, su...',
+      rule: 'Притяжательные перед существительным: mi(s), tu(s), su(s), nuestro/a(s), vuestro/a(s), su(s). Mi/tu/su согласуются только в числе с предметом обладания; nuestro/vuestro — в роде и числе. Su(s) — его, её, их, Ваш.',
+      items: [
+        {
+          kind: 'fill',
+          es: 'ARTURO: ¿Cómo se llaman ___ padres, Blanca?',
+          ru: 'Артуро: Как зовут твоих родителей, Бланка?',
+          answer: 'tus',
+          image: 'book/u18.jpg',
+        },
+        {
+          kind: 'fill',
+          es: 'EMILIO: ___ hermanas se llaman Blanca y Lucía.',
+          ru: 'Эмилио: Моих сестёр зовут Бланка и Лусия.',
+          answer: 'Mis',
+          image: 'book/u18.jpg',
+        },
+        {
+          kind: 'fill',
+          es: 'CARLOTA: ¿Cómo se llama ___ mujer, don Carmelo?',
+          ru: 'Карлота: Как зовут Вашу жену, дон Кармело?',
+          answer: 'su',
+          image: 'book/u18.jpg',
+        },
+        {
+          kind: 'fill',
+          es: 'BLANCA y LUCÍA: ___ abuela se llama Rosario.',
+          ru: 'Бланка и Лусия: Нашу бабушку зовут Росарио.',
+          answer: 'Nuestra',
+          image: 'book/u18.jpg',
+        },
+        {
+          kind: 'fill',
+          es: 'EMILIO: Arturo, Carlota, ¿cómo se llaman ___ abuelos?',
+          ru: 'Эмилио: Артуро, Карлота, как зовут ваших дедушку и бабушку?',
+          answer: 'vuestros',
+          image: 'book/u18.jpg',
+        },
+        { kind: 'fill', es: 'ALFONSO: ___ madre se llama María.', ru: 'Альфонсо: Мою мать зовут Мария.', answer: 'Mi', image: 'book/u18.jpg' },
+        {
+          kind: 'fill',
+          es: 'BLANCA: ¿Cómo se llama ___ tía, Arturo?',
+          ru: 'Бланка: Как зовут твою тётю, Артуро?',
+          answer: 'tu',
+          image: 'book/u18.jpg',
+        },
+        {
+          kind: 'fill',
+          es: 'CARLOTA: ¿Cómo se llaman ___ hijos, don Julio?',
+          ru: 'Карлота: Как зовут Ваших детей, дон Хулио?',
+          answer: 'sus',
+          image: 'book/u18.jpg',
+        },
+        {
+          kind: 'fill',
+          es: 'CARMELO y LUPE: ___ padres se llaman Julio y Rosario.',
+          ru: 'Кармело и Лупе: Наших родителей зовут Хулио и Росарио.',
+          answer: 'Nuestros',
+          image: 'book/u18.jpg',
+        },
+        {
+          kind: 'fill',
+          es: 'ARTURO: Blanca, Lucía, ¿cómo se llama ___ madre?',
+          ru: 'Артуро: Бланка, Лусия, как зовут вашу маму?',
+          answer: 'vuestra',
+          image: 'book/u18.jpg',
+        },
+      ],
+    },
+    {
+      task: '18.2 Complete las frases con mi, tu, su...',
+      rule: 'Mi/tu/su стоят перед существительным и не имеют формы рода: mi hermano, mi hermana; множественное число — mis, tus, sus. Nuestro/vuestro меняются по роду и числу: nuestro deporte, vuestros libros.',
+      items: [
+        { kind: 'fill', es: '—¿Cuál es ___ color preferido, Berta? —El azul.', ru: '— Какой твой любимый цвет, Берта? — Синий.', answer: 'tu' },
+        {
+          kind: 'fill',
+          es: 'Mi hermano y yo jugamos mucho al tenis. Es ___ deporte preferido.',
+          ru: 'Мы с братом много играем в теннис. Это наш любимый вид спорта.',
+          answer: 'nuestro',
+        },
+        { kind: 'fill', es: 'La señora Valverde y ___ hijas son muy agradables.', ru: 'Сеньора Вальверде и её дочери очень приятные.', answer: 'sus' },
+        { kind: 'fill', es: '—¿Dónde están Sol y Rocío? —En ___ casa.', ru: '— Где Соль и Росио? — У себя дома.', answer: 'su' },
+        {
+          kind: 'fill',
+          es: 'Anoche fui al cine con ___ padre y ___ hermanos.',
+          ru: 'Вчера вечером я ходил в кино с отцом и братьями.',
+          answer: 'mi; mis',
+          answers: ['mi', 'mis'],
+        },
+        { kind: 'fill', es: 'Jorge, Juan, ¿dónde están ___ libros?', ru: 'Хорхе, Хуан, где ваши книги?', answer: 'vuestros' },
+        { kind: 'fill', es: '—¿Cuál es ___ comida preferida, Enrique? —La paella.', ru: '— Какая твоя любимая еда, Энрике? — Паэлья.', answer: 'tu' },
+        {
+          kind: 'fill',
+          es: 'Ayer conocí a ___ padres, Verónica. Son muy simpáticos.',
+          ru: 'Вчера я познакомился с твоими родителями, Вероника. Они очень милые.',
+          answer: 'tus',
+        },
+      ],
+    },
+    {
+      task: '18.3 Rodee la forma correcta en cada caso',
+      rule: 'С частями тела, одеждой и личными вещами, когда владелец понятен из контекста (особенно с возвратным глаголом, императивом или косвенным дополнением le/se), вместо притяжательного обычно ставится определённый артикль: Me lavo el pelo, Átate los zapatos, Le di la mano.',
+      items: [
+        { kind: 'choice', es: 'Me estoy lavando ___ pelo.', ru: 'Я мою голову (волосы).', answer: 'el', options: ['mi', 'el'] },
+        { kind: 'choice', es: 'Átate ___ zapatos.', ru: 'Завяжи ботинки.', answer: 'los', options: ['tus', 'los'] },
+        { kind: 'choice', es: 'Rodrigo trabaja con ___ padre.', ru: 'Родриго работает со своим отцом.', answer: 'su', options: ['su', 'el'] },
+        { kind: 'choice', es: 'Tenéis ___ ojos rojos.', ru: 'У вас красные глаза.', answer: 'los', options: ['vuestros', 'los'] },
+        { kind: 'choice', es: '___ tíos viven en Puerto Rico.', ru: 'Мои дяди живут в Пуэрто-Рико.', answer: 'Mis', options: ['Mis', 'Los'] },
+        { kind: 'choice', es: 'Le di ___ mano.', ru: 'Я подал ему руку.', answer: 'la', options: ['mi', 'la'] },
+        { kind: 'choice', es: '___ abuela tiene 85 años.', ru: 'Его (её) бабушке 85 лет.', answer: 'Su', options: ['Su', 'La'] },
+        { kind: 'choice', es: 'Tienes una mancha en ___ nariz.', ru: 'У тебя пятно на носу.', answer: 'la', options: ['tu', 'la'] },
+        { kind: 'choice', es: 'Quitaos ___ chaquetas.', ru: 'Снимите куртки.', answer: 'las', options: ['vuestras', 'las'] },
+        {
+          kind: 'choice',
+          es: 'Al señor Alfonsín se le ha estropeado ___ coche.',
+          ru: 'У сеньора Альфонсина сломалась машина.',
+          answer: 'el',
+          options: ['su', 'el'],
+        },
+      ],
+    },
+  ],
+}
+
+export default chapter

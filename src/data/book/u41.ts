@@ -1,0 +1,130 @@
+import type { Chapter } from '../../types'
+
+const chapter: Chapter = {
+  unit: 41,
+  title: 'Pronombres personales con preposiciones',
+  ru: 'Местоимения после предлогов: para mí, con él, conmigo, contigo, según tú',
+  tags: ['pronombres', 'personales', 'preposiciones'],
+  sets: [
+    {
+      task: '41.1 Complete las frases utilizando pronombres. — Дополните фразы местоимениями.',
+      rule: 'После предлогов — ударные местоимения: mí, ti, él, ella, usted, nosotros/-as, vosotros/-as, ellos/-as, ustedes. С предлогом con: conmigo, contigo (но con él, con ella, con nosotros…).',
+      items: [
+        { kind: 'rewrite', es: 'Para ___', ru: 'Для тебя.', answer: 'ti', prompt: 'Картинка ①.', image: 'book/u41.jpg' },
+        { kind: 'rewrite', es: 'Para ___', ru: 'Для вас (мн. ч., вежливо).', answer: 'ustedes', prompt: 'Картинка ②.', image: 'book/u41.jpg' },
+        { kind: 'rewrite', es: 'Estoy enfadada con ___.', ru: 'Я на тебя сержусь.', answer: 'contigo', prompt: 'Картинка ③.', image: 'book/u41.jpg' },
+        { kind: 'rewrite', es: 'Para ___.', ru: 'Для вас (жен.).', answer: 'vosotras', prompt: 'Картинка ④.', image: 'book/u41.jpg' },
+        {
+          kind: 'rewrite',
+          es: '¿Es para ___? Gracias.',
+          ru: 'Это для нас? Спасибо.',
+          answer: 'nosotros',
+          prompt: 'Картинка ⑤.',
+          image: 'book/u41.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: 'Buenos días, don Salvador. Me gustaría hablar con ___.',
+          ru: 'Добрый день, дон Сальвадор. Мне хотелось бы поговорить с вами.',
+          answer: 'usted',
+          prompt: 'Картинка ⑥.',
+          image: 'book/u41.jpg',
+        },
+        {
+          kind: 'rewrite',
+          es: 'Está hecha por ___.',
+          ru: 'Это сделано нами (жен.).',
+          answer: 'nosotras',
+          prompt: 'Картинка ⑦.',
+          image: 'book/u41.jpg',
+        },
+        { kind: 'rewrite', es: '¿Para ___? Gracias.', ru: 'Это для меня? Спасибо.', answer: 'mí', prompt: 'Картинка ⑧.', image: 'book/u41.jpg' },
+      ],
+    },
+    {
+      task: '41.2 Complete las frases con el pronombre adecuado. — Дополните фразы нужным местоимением.',
+      rule: 'После предлогов (con, para, sin, de, a…) ставят ударные местоимения. С con для 1-го и 2-го лица ед. числа — слитные формы conmigo, contigo.',
+      items: [
+        { kind: 'fill', es: '¿Has visto a Adolfo? Quiero hablar con ___.', ru: 'Ты видел Адольфо? Я хочу поговорить с ним.', answer: 'él' },
+        { kind: 'fill', es: '¿Has visto a Petra? Quiero hablar con ___.', ru: 'Ты видел Петру? Я хочу поговорить с ней.', answer: 'ella' },
+        {
+          kind: 'fill',
+          es: '¿Has visto al señor Carmona? Tengo algo para ___.',
+          ru: 'Вы видели сеньора Кармону? У меня кое-что для него.',
+          answer: 'él',
+        },
+        {
+          kind: 'fill',
+          es: 'Antonio te está buscando. Quiere hablar con ___.',
+          ru: 'Антонио тебя ищет. Он хочет поговорить с тобой.',
+          answer: 'contigo',
+        },
+        {
+          kind: 'fill',
+          es: '¿Dónde están Pepe y Susana? Mercedes quiere hablar con ___.',
+          ru: 'Где Пепе и Сусана? Мерседес хочет поговорить с ними.',
+          answer: 'ellos',
+        },
+        {
+          kind: 'fill',
+          es: 'Aurora nos está buscando. No puede estar un momento sin ___.',
+          ru: 'Аврора нас ищет. Она ни минуты не может без нас.',
+          answer: 'nosotros',
+          also: ['nosotras'],
+        },
+        {
+          kind: 'fill',
+          es: 'Mi jefe me necesita. No sabe hacer nada sin ___.',
+          ru: 'Я нужен начальнику. Он ничего не умеет делать без меня.',
+          answer: 'mí',
+        },
+      ],
+    },
+    {
+      task: '41.3 Complete las frases con yo, mí, -migo o tú, ti, -tigo. — Дополните фразы: yo, mí, -migo или tú, ti, -tigo.',
+      rule: 'Yo/tú — после «según», «menos», «entre», «excepto», «incluso», «hasta» (в значении «даже»). Mí/ti — после остальных предлогов (para, a, de, por, sin…). С con — conmigo, contigo.',
+      items: [
+        { kind: 'fill', es: 'Estoy triste. Luisa no quiere salir ___.', ru: 'Мне грустно. Луиса не хочет со мной гулять.', answer: 'conmigo' },
+        { kind: 'fill', es: 'Lo siento, Jaime. Han aprobado todos menos ___.', ru: 'Мне жаль, Хайме. Сдали все, кроме тебя.', answer: 'tú' },
+        { kind: 'fill', es: 'Toma, un regalo para ___ de parte de Ana.', ru: 'Держи, подарок для тебя от Аны.', answer: 'ti' },
+        {
+          kind: 'fill',
+          es: 'Oye, Luis, según ___, ¿quién va a ganar el domingo?',
+          ru: 'Слушай, Луис, по-твоему, кто выиграет в воскресенье?',
+          answer: 'tú',
+        },
+        { kind: 'fill', es: '¿Esto es para ___? Gracias.', ru: 'Это для меня? Спасибо.', answer: 'mí' },
+        { kind: 'fill', es: 'Ven con ___, por favor. Necesito ayuda.', ru: 'Пойдём со мной, пожалуйста. Мне нужна помощь.', answer: 'conmigo' },
+        { kind: 'fill', es: '¿Está Berta con ___, María?', ru: 'Берта с тобой, Мария?', answer: 'contigo' },
+      ],
+    },
+    {
+      task: '41.4 Rodee la forma correcta en cada caso. — Выберите правильную форму.',
+      rule: 'После según, menos, entre, excepto — yo/tú (а не mí/ti). После других предлогов — mí/ti. С con — conmigo/contigo, а не «con yo».',
+      items: [
+        {
+          kind: 'choice',
+          es: 'Según ___, ¿quién es el mejor cantante del mundo?',
+          ru: 'По-твоему, кто лучший певец в мире?',
+          answer: 'tú',
+          options: ['ti', 'tú'],
+        },
+        { kind: 'choice', es: 'Toma. Este disco es para ___.', ru: 'Держи. Этот диск для тебя.', answer: 'ti', options: ['ti', 'tú'] },
+        { kind: 'choice', es: 'Ven. Siéntate junto a ___.', ru: 'Иди сюда. Сядь рядом со мной.', answer: 'mí', options: ['mí', 'yo'] },
+        { kind: 'choice', es: 'Luisa se sienta entre Jorge y ___.', ru: 'Луиса сидит между Хорхе и мной.', answer: 'yo', options: ['mí', 'yo'] },
+        { kind: 'choice', es: '¿Quieres venir ___, Sonia?', ru: 'Хочешь пойти со мной, Сония?', answer: 'conmigo', options: ['conmigo', 'con yo'] },
+        { kind: 'choice', es: 'Sebastián se sienta delante de ___.', ru: 'Себастьян сидит передо мной.', answer: 'mí', options: ['mí', 'yo'] },
+        { kind: 'choice', es: 'A todos les gusta el pescado menos a ___.', ru: 'Рыба нравится всем, кроме меня.', answer: 'mí', options: ['mí', 'yo'] },
+        {
+          kind: 'choice',
+          es: 'Han leído todos el Quijote menos ___.',
+          ru: 'Все прочитали «Дон Кихота», кроме меня.',
+          answer: 'yo',
+          options: ['mí', 'yo'],
+        },
+      ],
+    },
+  ],
+}
+
+export default chapter

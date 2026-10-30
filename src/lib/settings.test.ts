@@ -1,13 +1,18 @@
 import { beforeEach, describe, expect, it } from 'vitest'
+import { CHAPTERS } from '../data/book'
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
 import {
   DEFAULT_SETTINGS,
   SETTINGS_KEY,
+  bookConfigFromSettings,
   configFromSettings,
   defaultSelectedIrregular,
+  defaultSelectedUnits,
   loadSettings,
   mergeSelectedIrregular,
+  mergeSelectedUnits,
   saveSettings,
+  selectedUnitList,
 } from './settings'
 
 beforeEach(() => {
@@ -30,6 +35,8 @@ describe('settings', () => {
     selectedIrregular.ser = false
     selectedIrregular.ir = false
     saveSettings({
+      track: 'book',
+      selectedUnits: { ...defaultSelectedUnits(), 35: false },
       selected: { presente: true, indefinido: false, imperfecto: true, imperativo: false },
       persons: { yo: true, tú: false, él: true, nosotros: true, vosotros: false, ellos: true },
       groups: { ar: true, er: false, ir: true },
@@ -41,6 +48,9 @@ describe('settings', () => {
       answer: 'oral',
     })
     const loaded = loadSettings()
+    expect(loaded.track).toBe('book')
+    expect(loaded.selectedUnits[35]).toBe(false)
+    expect(loaded.selectedUnits[36]).toBe(true)
     expect(loaded.selected.indefinido).toBe(false)
     expect(loaded.selected.imperativo).toBe(false)
     expect(loaded.selectedIrregular.ser).toBe(false)
@@ -106,5 +116,35 @@ describe('settings', () => {
       ['ser', 'ir', 'nuevo'],
     )
     expect(merged).toEqual({ ser: false, ir: true, nuevo: true })
+  })
+})
+
+describe('textbook settings', () => {
+  it('starts on verbs with every chapter selected', () => {
+    const loaded = loadSettings()
+    expect(loaded.track).toBe('verbs')
+    expect(selectedUnitList(loaded.selectedUnits)).toEqual(CHAPTERS.map((c) => c.unit))
+  })
+
+  it('settings saved before the textbook still load', () => {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ size: 30 }))
+    const loaded = loadSettings()
+    expect(loaded.size).toBe(30)
+    expect(loaded.track).toBe('verbs')
+    expect(loaded.selectedUnits[34]).toBe(true)
+  })
+
+  it('new chapters come in selected, unticked ones stay unticked', () => {
+    const merged = mergeSelectedUnits({ 34: false, 999: true }, [34, 35])
+    expect(merged).toEqual({ 34: false, 35: true })
+  })
+
+  it('builds a session config from the ticked chapters', () => {
+    const selectedUnits = mergeSelectedUnits({ ...defaultSelectedUnits(), 34: false })
+    const settings = { ...DEFAULT_SETTINGS, selectedUnits, size: 10 }
+    const config = bookConfigFromSettings(settings, { mode: 'weak' })
+    expect(config.units).not.toContain(34)
+    expect(config.units).toContain(35)
+    expect(config).toMatchObject({ size: 10, mode: 'weak', answer: 'text' })
   })
 })

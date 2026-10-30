@@ -1,0 +1,168 @@
+import type { Chapter } from '../../types'
+
+const chapter: Chapter = {
+  unit: 30,
+  title: 'Interrogativos (1)',
+  ru: 'Вопросительные (1): qué, quién, quiénes',
+  tags: ['pronombres', 'interrogativos'],
+  sets: [
+    {
+      task: '30.1 Ordene las palabras de las siguientes preguntas',
+      rule: 'Вопросительное слово стоит в начале вопроса (после предлога, если он нужен): ¿Con quién...?, ¿De qué...?. Qué — о предметах («что»), quién/quiénes — о людях («кто»; во мн. числе quiénes). Вопросительные слова пишутся с ударением. Порядок: вопросительное слово + глагол + подлежащее.',
+      items: [
+        {
+          kind: 'rewrite',
+          es: '¿tiene / en la mano / Julián / qué?',
+          ru: 'Что у Хулиана в руке?',
+          answer: '¿Qué tiene Julián en la mano?',
+          prompt: 'Составьте вопрос из слов.',
+        },
+        {
+          kind: 'rewrite',
+          es: '¿quién / Eloísa / está bailando / con?',
+          ru: 'С кем танцует Элоиса?',
+          answer: '¿Con quién está bailando Eloísa?',
+          prompt: 'Составьте вопрос из слов.',
+        },
+        {
+          kind: 'rewrite',
+          es: '¿ese anillo / para / es / quién?',
+          ru: 'Для кого это кольцо?',
+          answer: '¿Para quién es ese anillo?',
+          prompt: 'Составьте вопрос из слов.',
+        },
+        {
+          kind: 'rewrite',
+          es: '¿anoche / pasó / qué?',
+          ru: 'Что случилось вчера вечером?',
+          answer: '¿Qué pasó anoche?',
+          prompt: 'Составьте вопрос из слов.',
+        },
+        {
+          kind: 'rewrite',
+          es: '¿quién / esa bolsa / de / es?',
+          ru: 'Чья эта сумка?',
+          answer: '¿De quién es esa bolsa?',
+          prompt: 'Составьте вопрос из слов.',
+        },
+        {
+          kind: 'rewrite',
+          es: '¿tus padres / te / qué / han regalado?',
+          ru: 'Что тебе подарили родители?',
+          answer: '¿Qué te han regalado tus padres?',
+          prompt: 'Составьте вопрос из слов.',
+        },
+        {
+          kind: 'rewrite',
+          es: '¿la puerta / qué / has abierto / con?',
+          ru: 'Чем ты открыл дверь?',
+          answer: '¿Con qué has abierto la puerta?',
+          prompt: 'Составьте вопрос из слов.',
+        },
+        {
+          kind: 'rewrite',
+          es: '¿está escribiendo / una novela / quién?',
+          ru: 'Кто пишет роман?',
+          answer: '¿Quién está escribiendo una novela?',
+          prompt: 'Составьте вопрос из слов.',
+        },
+        { kind: 'rewrite', es: '¿María / qué / quiere?', ru: 'Что хочет Мария?', answer: '¿Qué quiere María?', prompt: 'Составьте вопрос из слов.' },
+        {
+          kind: 'rewrite',
+          es: '¿quiere / a María / quién?',
+          ru: 'Кто любит Марию?',
+          answer: '¿Quién quiere a María?',
+          prompt: 'Составьте вопрос из слов.',
+        },
+        {
+          kind: 'rewrite',
+          es: '¿es / la sopa / qué / de?',
+          ru: 'Из чего этот суп?',
+          answer: '¿De qué es la sopa?',
+          prompt: 'Составьте вопрос из слов.',
+        },
+      ],
+    },
+    {
+      task: '30.2 Complete las preguntas con quién, quiénes o qué',
+      rule: 'Quién — о человеке (ед. число), quiénes — о людях (мн. число), qué — о предметах и действиях; qué перед существительным — «какой» (¿Qué libros...?). Предлоги стоят перед вопросительным словом: ¿Con quién...?, ¿A quién...?',
+      items: [
+        { kind: 'fill', es: '¿___ te ha regalado ese collar?', ru: 'Кто подарил тебе это ожерелье?', answer: 'Quién' },
+        { kind: 'fill', es: '¿De ___ es esta pluma?', ru: 'Чьё это перо?', answer: 'quién' },
+        { kind: 'fill', es: '¿___ miel tomas normalmente?', ru: 'Какой мёд ты обычно ешь?', answer: 'Qué' },
+        { kind: 'fill', es: '¿Con ___ fuiste a Bolivia?', ru: 'С кем ты ездил в Боливию?', answer: 'quién' },
+        { kind: 'fill', es: '¿___ estás haciendo?', ru: 'Что ты делаешь?', answer: 'Qué' },
+        { kind: 'fill', es: '¿___ van a jugar en el equipo esta semana?', ru: 'Кто будет играть в команде на этой неделе?', answer: 'Quiénes' },
+        { kind: 'fill', es: '¿___ libros le gustan a Teresa?', ru: 'Какие книги нравятся Тересе?', answer: 'Qué' },
+        { kind: 'fill', es: '¿Con ___ has abierto el paquete?', ru: 'Чем ты открыл посылку?', answer: 'qué' },
+        { kind: 'fill', es: '¿A ___ visteis anoche en la fiesta?', ru: 'Кого вы видели вчера на вечеринке?', answer: 'quién' },
+        { kind: 'fill', es: '¿___ visteis anoche en la tele?', ru: 'Что вы смотрели вчера по телевизору?', answer: 'Qué' },
+        { kind: 'fill', es: '¿___ quería Julián?', ru: 'Что хотел Хулиан?', answer: 'Qué' },
+      ],
+    },
+    {
+      task: '30.3 Formule preguntas sobre la información marcada en cada caso',
+      rule: 'Вопрос к подчёркнутой части: предлог остаётся перед вопросительным словом: con Águeda → ¿Con quién?, de cuerda → ¿De qué?, a Ariel → ¿A quién?, para mi abuela → ¿Para quién? Люди — quién/quiénes, предметы и действия — qué.',
+      items: [
+        {
+          kind: 'fill',
+          es: '—Ayer estuve con Águeda. —¿___ estuviste ayer?',
+          ru: '— Вчера я был с Агедой. — С кем ты был вчера?',
+          answer: 'Con quién',
+        },
+        {
+          kind: 'fill',
+          es: '—Esa silla está hecha de cuerda. —¿___ está hecha esa silla?',
+          ru: '— Этот стул сделан из верёвки. — Из чего сделан этот стул?',
+          answer: 'De qué',
+        },
+        {
+          kind: 'fill',
+          es: '—Normalmente comemos con pan de molde. —¿___ pan coméis?',
+          ru: '— Обычно мы едим с тостовым хлебом. — С каким хлебом вы едите?',
+          answer: 'Con qué',
+        },
+        {
+          kind: 'fill',
+          es: '—Alfonso quiere comprarse un CD. —¿___ quiere comprarse Alfonso?',
+          ru: '— Альфонсо хочет купить себе диск. — Что хочет купить себе Альфонсо?',
+          answer: 'Qué',
+        },
+        { kind: 'fill', es: '—Estas gafas son de Pablo. —¿___ son esas gafas?', ru: '— Эти очки Пабло. — Чьи эти очки?', answer: 'De quién' },
+        {
+          kind: 'fill',
+          es: '—Georgina está trabajando con su madre. —¿___ está trabajando Georgina?',
+          ru: '— Хеоргина работает со своей матерью. — С кем работает Хеоргина?',
+          answer: 'Con quién',
+        },
+        { kind: 'fill', es: '—Han ganado Eduardo y Marisa. —¿___ han ganado?', ru: '— Выиграли Эдуардо и Мариса. — Кто выиграл?', answer: 'Quiénes' },
+        {
+          kind: 'fill',
+          es: '—Mira. Esos chicos están bailando. —¿___ están haciendo esos chicos?',
+          ru: '— Смотри. Эти ребята танцуют. — Что делают эти ребята?',
+          answer: 'Qué',
+        },
+        {
+          kind: 'fill',
+          es: '—Belinda no quiere a Ariel. —¿___ no quiere Belinda?',
+          ru: '— Белинда не любит Ариэля. — Кого не любит Белинда?',
+          answer: 'A quién',
+        },
+        {
+          kind: 'fill',
+          es: '—Estas flores son para mi abuela. —¿___ son esas flores?',
+          ru: '— Эти цветы для моей бабушки. — Для кого эти цветы?',
+          answer: 'Para quién',
+        },
+        {
+          kind: 'fill',
+          es: '—Me han regalado unos bombones. —¿___ te han regalado?',
+          ru: '— Мне подарили конфеты. — Что тебе подарили?',
+          answer: 'Qué',
+        },
+      ],
+    },
+  ],
+}
+
+export default chapter
