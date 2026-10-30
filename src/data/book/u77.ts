@@ -18,7 +18,7 @@ const chapter: Chapter = {
           answer: 'Pónganse',
           cue: 'ponerse',
           prompt: 'Картинка ①: ustedes',
-          image: 'book/u77.jpg',
+          image: 'book/77.1-1.jpg',
         },
         {
           kind: 'rewrite',
@@ -27,7 +27,7 @@ const chapter: Chapter = {
           answer: 'Abróchense',
           cue: 'abrocharse',
           prompt: 'Картинка ②: ustedes',
-          image: 'book/u77.jpg',
+          image: 'book/77.1-2.jpg',
         },
         {
           kind: 'rewrite',
@@ -36,7 +36,7 @@ const chapter: Chapter = {
           answer: 'No te rías',
           cue: 'reírse',
           prompt: 'Картинка ③: tú',
-          image: 'book/u77.jpg',
+          image: 'book/77.1-3.jpg',
         },
         {
           kind: 'rewrite',
@@ -45,7 +45,7 @@ const chapter: Chapter = {
           answer: 'Siéntese',
           cue: 'sentarse',
           prompt: 'Картинка ④: usted',
-          image: 'book/u77.jpg',
+          image: 'book/77.1-4.jpg',
         },
       ],
     },

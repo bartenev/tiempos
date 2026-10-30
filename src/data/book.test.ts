@@ -70,6 +70,12 @@ describe('book data', () => {
     expect(new Set(keys).size).toBe(keys.length)
   })
 
+  it('every picture exists and every file in public/book is used', () => {
+    const used = new Set(items.flatMap(({ item }) => item.image ?? []))
+    const files = Object.keys(import.meta.glob('/public/book/*.jpg'))
+    expect(files.map((f) => f.replace('/public/', '')).sort()).toEqual([...used].sort())
+  })
+
   it('the blank with «—» only appears where an option offers it', () => {
     for (const { item } of items) {
       if (item.answer === '—') expect(item.options, item.es).toContain('—')

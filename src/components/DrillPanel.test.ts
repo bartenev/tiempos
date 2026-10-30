@@ -112,6 +112,31 @@ describe('DrillPanel — textbook exercises', () => {
     expect(wrapper.emitted('next')).toHaveLength(1)
   })
 
+  it('resolves a picture against the site base and zooms it on tap', async () => {
+    vi.stubEnv('BASE_URL', '/tiempos/')
+    const card = cardsForUnits([18]).find((c) => c.image)!
+    const wrapper = mount(DrillPanel, {
+      props: { card, index: 0, total: 10, correct: 0, wrong: 0, streak: 0 },
+    })
+    expect(wrapper.find('.zoom-image__picture').attributes('src')).toBe(`/tiempos/${card.image}`)
+    vi.unstubAllEnvs()
+
+    expect(wrapper.find('.zoom-image__overlay').exists()).toBe(false)
+    await wrapper.find('.zoom-image__open').trigger('click')
+    expect(wrapper.find('.zoom-image__overlay').exists()).toBe(true)
+    await wrapper.find('.zoom-image__overlay').trigger('click')
+    expect(wrapper.find('.zoom-image__overlay').exists()).toBe(false)
+  })
+
+  it('a tap on the picture does not reveal the answer orally', async () => {
+    const card = cardsForUnits([18]).find((c) => c.image)!
+    const wrapper = mount(DrillPanel, {
+      props: { card, index: 0, total: 10, correct: 0, wrong: 0, streak: 0, oral: true },
+    })
+    await wrapper.find('.zoom-image__open').trigger('click')
+    expect(wrapper.find('.drill__answer').exists()).toBe(false)
+  })
+
   it('orally the options go next to the blank', () => {
     const wrapper = mountExercise('—¿Quieres este libro?', true)
     expect(wrapper.find('.drill__options').exists()).toBe(false)

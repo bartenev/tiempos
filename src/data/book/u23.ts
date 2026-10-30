@@ -16,7 +16,7 @@ const chapter: Chapter = {
           ru: 'На столе ничего нет.',
           answer: 'No hay nada',
           prompt: 'Картинка ①: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
-          image: 'book/u23.jpg',
+          image: 'book/23.1-1.jpg',
         },
         {
           kind: 'rewrite',
@@ -24,7 +24,7 @@ const chapter: Chapter = {
           ru: 'В моей комнате кто-то есть.',
           answer: 'Hay alguien',
           prompt: 'Картинка ②: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
-          image: 'book/u23.jpg',
+          image: 'book/23.1-2.jpg',
         },
         {
           kind: 'rewrite',
@@ -32,7 +32,7 @@ const chapter: Chapter = {
           ru: 'За деревом кто-то есть.',
           answer: 'Hay alguien',
           prompt: 'Картинка ③: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
-          image: 'book/u23.jpg',
+          image: 'book/23.1-3.jpg',
         },
         {
           kind: 'rewrite',
@@ -40,7 +40,7 @@ const chapter: Chapter = {
           ru: 'В гостиной никого нет.',
           answer: 'No hay nadie',
           prompt: 'Картинка ④: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
-          image: 'book/u23.jpg',
+          image: 'book/23.1-4.jpg',
         },
         {
           kind: 'rewrite',
@@ -48,7 +48,7 @@ const chapter: Chapter = {
           ru: 'В книге что-то есть.',
           answer: 'Hay algo',
           prompt: 'Картинка ⑤: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
-          image: 'book/u23.jpg',
+          image: 'book/23.1-5.jpg',
         },
         {
           kind: 'rewrite',
@@ -56,7 +56,7 @@ const chapter: Chapter = {
           ru: 'В бассейне никого нет.',
           answer: 'No hay nadie',
           prompt: 'Картинка ⑥: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
-          image: 'book/u23.jpg',
+          image: 'book/23.1-6.jpg',
         },
         {
           kind: 'rewrite',
@@ -64,7 +64,7 @@ const chapter: Chapter = {
           ru: 'В коробке ничего нет.',
           answer: 'No hay nada',
           prompt: 'Картинка ⑦: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
-          image: 'book/u23.jpg',
+          image: 'book/23.1-7.jpg',
         },
         {
           kind: 'rewrite',
@@ -72,7 +72,7 @@ const chapter: Chapter = {
           ru: 'На дереве что-то есть.',
           answer: 'Hay algo',
           prompt: 'Картинка ⑧: скажите, есть ли кто-то/что-то (hay / no hay + alguien, algo, nadie, nada).',
-          image: 'book/u23.jpg',
+          image: 'book/23.1-8.jpg',
         },
       ],
     },

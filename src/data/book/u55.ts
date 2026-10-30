@@ -18,7 +18,7 @@ const chapter: Chapter = {
           answer: 'Te gusta; no me gusta',
           answers: ['Te gusta', 'no me gusta'],
           prompt: 'Таблица: ☺ gustar, ☺☺ encantar, X no gustar.',
-          image: 'book/u55.jpg',
+          image: 'book/55.1.jpg',
         },
         {
           kind: 'rewrite',
@@ -26,7 +26,7 @@ const chapter: Chapter = {
           ru: 'Херардо: Нати нравится тортилья.',
           answer: 'le gusta',
           prompt: 'Таблица: ☺ gustar, ☺☺ encantar, X no gustar.',
-          image: 'book/u55.jpg',
+          image: 'book/55.1.jpg',
         },
         {
           kind: 'rewrite',
@@ -35,7 +35,7 @@ const chapter: Chapter = {
           answer: 'Le gusta; me gusta',
           answers: ['Le gusta', 'me gusta'],
           prompt: 'Таблица: ☺ gustar, ☺☺ encantar, X no gustar.',
-          image: 'book/u55.jpg',
+          image: 'book/55.1.jpg',
         },
         {
           kind: 'rewrite',
@@ -43,7 +43,7 @@ const chapter: Chapter = {
           ru: 'Дон Хесус: Нати и Херардо не нравится сыр.',
           answer: 'no les gusta',
           prompt: 'Таблица: ☺ gustar, ☺☺ encantar, X no gustar.',
-          image: 'book/u55.jpg',
+          image: 'book/55.1.jpg',
         },
         {
           kind: 'rewrite',
@@ -51,7 +51,7 @@ const chapter: Chapter = {
           ru: 'Херардо: Нам с Нати очень нравится паэлья.',
           answer: 'nos encanta',
           prompt: 'Таблица: ☺ gustar, ☺☺ encantar, X no gustar.',
-          image: 'book/u55.jpg',
+          image: 'book/55.1.jpg',
         },
         {
           kind: 'rewrite',
@@ -60,7 +60,7 @@ const chapter: Chapter = {
           answer: 'Le gusta; me encanta',
           answers: ['Le gusta', 'me encanta'],
           prompt: 'Таблица: ☺ gustar, ☺☺ encantar, X no gustar.',
-          image: 'book/u55.jpg',
+          image: 'book/55.1.jpg',
         },
         {
           kind: 'rewrite',
@@ -69,7 +69,7 @@ const chapter: Chapter = {
           answer: 'Te gustan; me gustan',
           answers: ['Te gustan', 'me gustan'],
           prompt: 'Таблица: ☺ gustar, ☺☺ encantar, X no gustar.',
-          image: 'book/u55.jpg',
+          image: 'book/55.1.jpg',
         },
         {
           kind: 'rewrite',
@@ -77,7 +77,7 @@ const chapter: Chapter = {
           ru: 'Херардо: Мне не нравятся кальмары.',
           answer: 'no me gustan',
           prompt: 'Таблица: ☺ gustar, ☺☺ encantar, X no gustar.',
-          image: 'book/u55.jpg',
+          image: 'book/55.1.jpg',
         },
         {
           kind: 'rewrite',
@@ -86,7 +86,7 @@ const chapter: Chapter = {
           answer: 'Os gustan; nos encantan',
           answers: ['Os gustan', 'nos encantan'],
           prompt: 'Таблица: ☺ gustar, ☺☺ encantar, X no gustar.',
-          image: 'book/u55.jpg',
+          image: 'book/55.1.jpg',
         },
         {
           kind: 'rewrite',
@@ -95,7 +95,7 @@ const chapter: Chapter = {
           answer: 'Le gustan; no me gustan',
           answers: ['Le gustan', 'no me gustan'],
           prompt: 'Таблица: ☺ gustar, ☺☺ encantar, X no gustar.',
-          image: 'book/u55.jpg',
+          image: 'book/55.1.jpg',
         },
       ],
     },

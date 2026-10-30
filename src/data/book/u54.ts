@@ -11,14 +11,14 @@ const chapter: Chapter = {
       rule: 'Один глагол — разный смысл. Без se действие направлено на другого или на предмет: «lava coches», «despierta a los niños». С me/te/se — на самого себя: «me lavo», «me despierto».',
       bank: 'bañar · bañarse · despertar · despertarse · lavar · lavarse · manchar · mancharse',
       items: [
-        { kind: 'rewrite', es: 'Raúl ___ coches.', ru: 'Рауль моет машины.', answer: 'lava', prompt: 'Картинка ①.', image: 'book/u54.jpg' },
+        { kind: 'rewrite', es: 'Raúl ___ coches.', ru: 'Рауль моет машины.', answer: 'lava', prompt: 'Картинка ①.', image: 'book/54.1-1.jpg' },
         {
           kind: 'rewrite',
           es: 'Siempre ___ la camisa.',
           ru: 'Я всегда пачкаю рубашку.',
           answer: 'me mancho',
           prompt: 'Картинка ②.',
-          image: 'book/u54.jpg',
+          image: 'book/54.1-2.jpg',
         },
         {
           kind: 'rewrite',
@@ -26,7 +26,7 @@ const chapter: Chapter = {
           ru: 'Мария будит детей в восемь.',
           answer: 'despierta',
           prompt: 'Картинка ③.',
-          image: 'book/u54.jpg',
+          image: 'book/54.1-3.jpg',
         },
         {
           kind: 'rewrite',
@@ -34,7 +34,7 @@ const chapter: Chapter = {
           ru: 'Я купаю детей каждый вечер.',
           answer: 'Baño',
           prompt: 'Картинка ④.',
-          image: 'book/u54.jpg',
+          image: 'book/54.1-4.jpg',
         },
         {
           kind: 'rewrite',
@@ -42,7 +42,7 @@ const chapter: Chapter = {
           ru: 'Я чищу зубы перед сном.',
           answer: 'Me lavo',
           prompt: 'Картинка ⑤.',
-          image: 'book/u54.jpg',
+          image: 'book/54.1-5.jpg',
         },
         {
           kind: 'rewrite',
@@ -50,7 +50,7 @@ const chapter: Chapter = {
           ru: 'Лукас сильно пачкает тетради.',
           answer: 'mancha',
           prompt: 'Картинка ⑥.',
-          image: 'book/u54.jpg',
+          image: 'book/54.1-6.jpg',
         },
         {
           kind: 'rewrite',
@@ -58,7 +58,7 @@ const chapter: Chapter = {
           ru: 'Летом мы купаемся в море.',
           answer: 'nos bañamos',
           prompt: 'Картинка ⑦.',
-          image: 'book/u54.jpg',
+          image: 'book/54.1-7.jpg',
         },
         {
           kind: 'rewrite',
@@ -66,7 +66,7 @@ const chapter: Chapter = {
           ru: 'По воскресеньям я просыпаюсь поздно.',
           answer: 'me despierto',
           prompt: 'Картинка ⑧.',
-          image: 'book/u54.jpg',
+          image: 'book/54.1-8.jpg',
         },
       ],
     },

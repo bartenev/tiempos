@@ -17,7 +17,7 @@ const chapter: Chapter = {
           ru: 'Все коробки пусты.',
           answer: 'Todas las cajas',
           prompt: 'Картинка ①: допишите подлежащее (слово из рамки).',
-          image: 'book/u20.jpg',
+          image: 'book/20.1-1.jpg',
         },
         {
           kind: 'rewrite',
@@ -25,7 +25,7 @@ const chapter: Chapter = {
           ru: 'Некоторые коробки закрыты.',
           answer: 'Algunas cajas',
           prompt: 'Картинка ②: допишите подлежащее (слово из рамки).',
-          image: 'book/u20.jpg',
+          image: 'book/20.1-2.jpg',
         },
         {
           kind: 'rewrite',
@@ -33,7 +33,7 @@ const chapter: Chapter = {
           ru: 'Некоторые тарелки разбиты.',
           answer: 'Algunos platos',
           prompt: 'Картинка ③: допишите подлежащее (слово из рамки).',
-          image: 'book/u20.jpg',
+          image: 'book/20.1-3.jpg',
         },
         {
           kind: 'rewrite',
@@ -41,7 +41,7 @@ const chapter: Chapter = {
           ru: 'Один стакан разбит.',
           answer: 'Un vaso',
           prompt: 'Картинка ④: допишите подлежащее (слово из рамки).',
-          image: 'book/u20.jpg',
+          image: 'book/20.1-4.jpg',
         },
         {
           kind: 'rewrite',
@@ -49,7 +49,7 @@ const chapter: Chapter = {
           ru: 'Все машины стоят.',
           answer: 'Todos los coches',
           prompt: 'Картинка ⑤: допишите подлежащее (слово из рамки).',
-          image: 'book/u20.jpg',
+          image: 'book/20.1-5.jpg',
         },
         {
           kind: 'rewrite',
@@ -57,7 +57,7 @@ const chapter: Chapter = {
           ru: 'Одно яблоко гнилое.',
           answer: 'Una manzana',
           prompt: 'Картинка ⑥: допишите подлежащее (слово из рамки).',
-          image: 'book/u20.jpg',
+          image: 'book/20.1-6.jpg',
         },
         {
           kind: 'rewrite',
@@ -65,7 +65,7 @@ const chapter: Chapter = {
           ru: 'Ни одна груша не гнилая.',
           answer: 'Ninguna pera',
           prompt: 'Картинка ⑦: допишите подлежащее (слово из рамки).',
-          image: 'book/u20.jpg',
+          image: 'book/20.1-7.jpg',
         },
         {
           kind: 'rewrite',
@@ -73,7 +73,7 @@ const chapter: Chapter = {
           ru: 'Некоторые стаканы сверкают.',
           answer: 'Algunos vasos',
           prompt: 'Картинка ⑧: допишите подлежащее (слово из рамки).',
-          image: 'book/u20.jpg',
+          image: 'book/20.1-8.jpg',
         },
       ],
     },

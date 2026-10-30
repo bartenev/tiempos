@@ -7,6 +7,7 @@ import type { AnyCard } from '../types'
 import { TENSE_LABELS, isBookCard } from '../types'
 import Icon from './Icon.vue'
 import RuleHint from './RuleHint.vue'
+import ZoomImage from './ZoomImage.vue'
 
 const props = defineProps<{
   card: AnyCard
@@ -293,13 +294,7 @@ onBeforeUnmount(() => {
       <p v-if="book" class="drill__task">{{ book.task }}</p>
       <p v-if="book?.bank" class="drill__bank" lang="es">{{ book.bank }}</p>
       <p v-if="book?.prompt" class="drill__prompt">{{ book.prompt }}</p>
-      <img
-        v-if="book?.image"
-        class="drill__image"
-        :src="`/${book.image}`"
-        alt="Иллюстрация из учебника"
-        loading="lazy"
-      />
+      <ZoomImage v-if="book?.image" class="drill__image" :src="book.image" alt="Иллюстрация из учебника" />
       <p
         class="drill__sentence"
         :class="{
@@ -501,18 +496,6 @@ onBeforeUnmount(() => {
   margin: 0 0 var(--space-2);
   color: var(--muted);
   font-size: var(--text-sm);
-}
-
-.drill__image {
-  display: block;
-  width: 100%;
-  max-height: 12rem;
-  margin: 0 auto var(--space-3);
-  object-fit: contain;
-  object-position: top;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--line);
-  background: var(--card);
 }
 
 .drill__sentence--stimulus {

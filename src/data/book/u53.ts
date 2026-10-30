@@ -17,7 +17,7 @@ const chapter: Chapter = {
           ru: 'Артуро просыпается в восемь.',
           answer: 'se despierta',
           prompt: 'Картинка ①.',
-          image: 'book/u53.jpg',
+          image: 'book/53.1-1.jpg',
         },
         {
           kind: 'rewrite',
@@ -25,7 +25,7 @@ const chapter: Chapter = {
           ru: 'Мерче и Эрнесто встают в половине девятого.',
           answer: 'se levantan',
           prompt: 'Картинка ②.',
-          image: 'book/u53.jpg',
+          image: 'book/53.1-2.jpg',
         },
         {
           kind: 'rewrite',
@@ -33,7 +33,7 @@ const chapter: Chapter = {
           ru: 'Хайме принимает душ каждое утро.',
           answer: 'se ducha',
           prompt: 'Картинка ③.',
-          image: 'book/u53.jpg',
+          image: 'book/53.1-3.jpg',
         },
         {
           kind: 'rewrite',
@@ -41,7 +41,7 @@ const chapter: Chapter = {
           ru: 'Хайме одевается после душа.',
           answer: 'se viste',
           prompt: 'Картинка ④.',
-          image: 'book/u53.jpg',
+          image: 'book/53.1-4.jpg',
         },
         {
           kind: 'rewrite',
@@ -49,7 +49,7 @@ const chapter: Chapter = {
           ru: 'Мерче и Эрнесто ложатся спать в половине двенадцатого.',
           answer: 'se acuestan',
           prompt: 'Картинка ⑤.',
-          image: 'book/u53.jpg',
+          image: 'book/53.1-5.jpg',
         },
       ],
     },

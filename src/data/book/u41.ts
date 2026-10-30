@@ -10,17 +10,17 @@ const chapter: Chapter = {
       task: '41.1 Complete las frases utilizando pronombres. — Дополните фразы местоимениями.',
       rule: 'После предлогов — ударные местоимения: mí, ti, él, ella, usted, nosotros/-as, vosotros/-as, ellos/-as, ustedes. С предлогом con: conmigo, contigo (но con él, con ella, con nosotros…).',
       items: [
-        { kind: 'rewrite', es: 'Para ___', ru: 'Для тебя.', answer: 'ti', prompt: 'Картинка ①.', image: 'book/u41.jpg' },
-        { kind: 'rewrite', es: 'Para ___', ru: 'Для вас (мн. ч., вежливо).', answer: 'ustedes', prompt: 'Картинка ②.', image: 'book/u41.jpg' },
-        { kind: 'rewrite', es: 'Estoy enfadada con ___.', ru: 'Я на тебя сержусь.', answer: 'contigo', prompt: 'Картинка ③.', image: 'book/u41.jpg' },
-        { kind: 'rewrite', es: 'Para ___.', ru: 'Для вас (жен.).', answer: 'vosotras', prompt: 'Картинка ④.', image: 'book/u41.jpg' },
+        { kind: 'rewrite', es: 'Para ___', ru: 'Для тебя.', answer: 'ti', prompt: 'Картинка ①.', image: 'book/41.1-1.jpg' },
+        { kind: 'rewrite', es: 'Para ___', ru: 'Для вас (мн. ч., вежливо).', answer: 'ustedes', prompt: 'Картинка ②.', image: 'book/41.1-2.jpg' },
+        { kind: 'rewrite', es: 'Estoy enfadada con ___.', ru: 'Я на тебя сержусь.', answer: 'contigo', prompt: 'Картинка ③.', image: 'book/41.1-3.jpg' },
+        { kind: 'rewrite', es: 'Para ___.', ru: 'Для вас (жен.).', answer: 'vosotras', prompt: 'Картинка ④.', image: 'book/41.1-4.jpg' },
         {
           kind: 'rewrite',
           es: '¿Es para ___? Gracias.',
           ru: 'Это для нас? Спасибо.',
           answer: 'nosotros',
           prompt: 'Картинка ⑤.',
-          image: 'book/u41.jpg',
+          image: 'book/41.1-5.jpg',
         },
         {
           kind: 'rewrite',
@@ -28,7 +28,7 @@ const chapter: Chapter = {
           ru: 'Добрый день, дон Сальвадор. Мне хотелось бы поговорить с вами.',
           answer: 'usted',
           prompt: 'Картинка ⑥.',
-          image: 'book/u41.jpg',
+          image: 'book/41.1-6.jpg',
         },
         {
           kind: 'rewrite',
@@ -36,9 +36,9 @@ const chapter: Chapter = {
           ru: 'Это сделано нами (жен.).',
           answer: 'nosotras',
           prompt: 'Картинка ⑦.',
-          image: 'book/u41.jpg',
+          image: 'book/41.1-7.jpg',
         },
-        { kind: 'rewrite', es: '¿Para ___? Gracias.', ru: 'Это для меня? Спасибо.', answer: 'mí', prompt: 'Картинка ⑧.', image: 'book/u41.jpg' },
+        { kind: 'rewrite', es: '¿Para ___? Gracias.', ru: 'Это для меня? Спасибо.', answer: 'mí', prompt: 'Картинка ⑧.', image: 'book/41.1-8.jpg' },
       ],
     },
     {

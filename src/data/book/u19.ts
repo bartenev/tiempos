@@ -16,7 +16,7 @@ const chapter: Chapter = {
           ru: '— Чьи это ключи? — Мои.',
           answer: 'mías',
           prompt: 'Картинка ①',
-          image: 'book/u19.jpg',
+          image: 'book/19.1-1.jpg',
         },
         {
           kind: 'fill',
@@ -24,7 +24,7 @@ const chapter: Chapter = {
           ru: '— Чья это книга? — Моя.',
           answer: 'mío',
           prompt: 'Картинка ②',
-          image: 'book/u19.jpg',
+          image: 'book/19.1-2.jpg',
         },
         {
           kind: 'fill',
@@ -32,7 +32,7 @@ const chapter: Chapter = {
           ru: '— Чей это зонт? — Её (его).',
           answer: 'suyo',
           prompt: 'Картинка ③',
-          image: 'book/u19.jpg',
+          image: 'book/19.1-3.jpg',
         },
         {
           kind: 'fill',
@@ -40,10 +40,10 @@ const chapter: Chapter = {
           ru: '— Чьи это диски? — Наши.',
           answer: 'nuestros',
           prompt: 'Картинка ④',
-          image: 'book/u19.jpg',
+          image: 'book/19.1-4.jpg',
         },
-        { kind: 'fill', es: '¿Son ___ estos libros?', ru: 'Это ваши книги?', answer: 'vuestros', prompt: 'Картинка ⑤', image: 'book/u19.jpg' },
-        { kind: 'fill', es: '¿Son ___ estas maletas?', ru: 'Это их (Ваши) чемоданы?', answer: 'suyas', prompt: 'Картинка ⑥', image: 'book/u19.jpg' },
+        { kind: 'fill', es: '¿Son ___ estos libros?', ru: 'Это ваши книги?', answer: 'vuestros', prompt: 'Картинка ⑤', image: 'book/19.1-5.jpg' },
+        { kind: 'fill', es: '¿Son ___ estas maletas?', ru: 'Это их (Ваши) чемоданы?', answer: 'suyas', prompt: 'Картинка ⑥', image: 'book/19.1-6.jpg' },
         {
           kind: 'fill',
           es: '¿Es ___ este reloj?',
@@ -51,9 +51,9 @@ const chapter: Chapter = {
           answer: 'tuyo',
           also: ['suyo'],
           prompt: 'Картинка ⑦',
-          image: 'book/u19.jpg',
+          image: 'book/19.1-7.jpg',
         },
-        { kind: 'fill', es: '¿Es ___ esta bufanda?', ru: 'Этот шарф её (Ваш)?', answer: 'suya', prompt: 'Картинка ⑧', image: 'book/u19.jpg' },
+        { kind: 'fill', es: '¿Es ___ esta bufanda?', ru: 'Этот шарф её (Ваш)?', answer: 'suya', prompt: 'Картинка ⑧', image: 'book/19.1-8.jpg' },
       ],
     },
     {

@@ -10,14 +10,14 @@ const chapter: Chapter = {
       task: '21.1 Observe las situaciones y complete las frases con un, una... u otro, otros...',
       rule: 'Un/una/unos/unas — неопределённый предмет, один из многих; otro/otra/otros/otras — ещё один, другой (артикль перед ним не ставится: otra tónica, не una otra). Otro согласуется с существительным в роде и числе.',
       items: [
-        { kind: 'fill', es: '___ tónica, por favor.', ru: 'Тоник, пожалуйста.', answer: 'Una', prompt: 'Картинка ①', image: 'book/u21.jpg' },
+        { kind: 'fill', es: '___ tónica, por favor.', ru: 'Тоник, пожалуйста.', answer: 'Una', prompt: 'Картинка ①', image: 'book/21.1-1.jpg' },
         {
           kind: 'fill',
           es: 'Deme ___ bolsa, por favor. Esta está rota.',
           ru: 'Дайте мне другой пакет, пожалуйста. Этот порван.',
           answer: 'otra',
           prompt: 'Картинка ②',
-          image: 'book/u21.jpg',
+          image: 'book/21.1-2.jpg',
         },
         {
           kind: 'fill',
@@ -25,16 +25,16 @@ const chapter: Chapter = {
           ru: 'Одолжи мне книгу, пожалуйста.',
           answer: 'un',
           prompt: 'Картинка ③',
-          image: 'book/u21.jpg',
+          image: 'book/21.1-3.jpg',
         },
-        { kind: 'fill', es: '___ tónica, por favor.', ru: 'Ещё один тоник, пожалуйста.', answer: 'Otra', prompt: 'Картинка ④', image: 'book/u21.jpg' },
+        { kind: 'fill', es: '___ tónica, por favor.', ru: 'Ещё один тоник, пожалуйста.', answer: 'Otra', prompt: 'Картинка ④', image: 'book/21.1-4.jpg' },
         {
           kind: 'fill',
           es: 'Préstame ___ libros. Estos los he leído.',
           ru: 'Одолжи мне другие книги. Эти я уже прочитал.',
           answer: 'otros',
           prompt: 'Картинка ⑤',
-          image: 'book/u21.jpg',
+          image: 'book/21.1-5.jpg',
         },
         {
           kind: 'fill',
@@ -42,7 +42,7 @@ const chapter: Chapter = {
           ru: 'Дайте мне пакет, пожалуйста.',
           answer: 'una',
           prompt: 'Картинка ⑥',
-          image: 'book/u21.jpg',
+          image: 'book/21.1-6.jpg',
         },
         {
           kind: 'fill',
@@ -50,7 +50,7 @@ const chapter: Chapter = {
           ru: 'Принесите нам другие ложки, пожалуйста. Эти грязные.',
           answer: 'otras',
           prompt: 'Картинка ⑦',
-          image: 'book/u21.jpg',
+          image: 'book/21.1-7.jpg',
         },
         {
           kind: 'fill',
@@ -58,7 +58,7 @@ const chapter: Chapter = {
           ru: 'Какая вкусная была! Дашь мне ещё яблоко?',
           answer: 'otra',
           prompt: 'Картинка ⑧',
-          image: 'book/u21.jpg',
+          image: 'book/21.1-8.jpg',
         },
       ],
     },

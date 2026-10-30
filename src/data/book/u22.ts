@@ -127,7 +127,7 @@ const chapter: Chapter = {
           ru: 'Много машин.',
           answer: 'Muchos coches',
           prompt: 'Картинка ①: опишите, что изображено, с mucho/poco/bastante + слово из рамки.',
-          image: 'book/u22.jpg',
+          image: 'book/22.3-1.jpg',
         },
         {
           kind: 'rewrite',
@@ -135,7 +135,7 @@ const chapter: Chapter = {
           ru: 'Мало воды.',
           answer: 'Poca agua',
           prompt: 'Картинка ②: опишите, что изображено, с mucho/poco/bastante + слово из рамки.',
-          image: 'book/u22.jpg',
+          image: 'book/22.3-2.jpg',
         },
         {
           kind: 'rewrite',
@@ -143,7 +143,7 @@ const chapter: Chapter = {
           ru: 'Достаточно еды.',
           answer: 'Bastante comida',
           prompt: 'Картинка ③: опишите, что изображено, с mucho/poco/bastante + слово из рамки.',
-          image: 'book/u22.jpg',
+          image: 'book/22.3-3.jpg',
         },
         {
           kind: 'rewrite',
@@ -151,7 +151,7 @@ const chapter: Chapter = {
           ru: 'Довольно много людей.',
           answer: 'Bastante gente',
           prompt: 'Картинка ④: опишите, что изображено, с mucho/poco/bastante + слово из рамки.',
-          image: 'book/u22.jpg',
+          image: 'book/22.3-4.jpg',
         },
         {
           kind: 'rewrite',
@@ -159,7 +159,7 @@ const chapter: Chapter = {
           ru: 'Мало людей.',
           answer: 'Poca gente',
           prompt: 'Картинка ⑤: опишите, что изображено, с mucho/poco/bastante + слово из рамки.',
-          image: 'book/u22.jpg',
+          image: 'book/22.3-5.jpg',
         },
         {
           kind: 'rewrite',
@@ -167,7 +167,7 @@ const chapter: Chapter = {
           ru: 'Много деревьев.',
           answer: 'Muchos árboles',
           prompt: 'Картинка ⑥: опишите, что изображено, с mucho/poco/bastante + слово из рамки.',
-          image: 'book/u22.jpg',
+          image: 'book/22.3-6.jpg',
         },
         {
           kind: 'rewrite',
@@ -175,7 +175,7 @@ const chapter: Chapter = {
           ru: 'Много людей.',
           answer: 'Mucha gente',
           prompt: 'Картинка ⑦: опишите, что изображено, с mucho/poco/bastante + слово из рамки.',
-          image: 'book/u22.jpg',
+          image: 'book/22.3-7.jpg',
         },
         {
           kind: 'rewrite',
@@ -183,7 +183,7 @@ const chapter: Chapter = {
           ru: 'Мало деревьев.',
           answer: 'Pocos árboles',
           prompt: 'Картинка ⑧: опишите, что изображено, с mucho/poco/bastante + слово из рамки.',
-          image: 'book/u22.jpg',
+          image: 'book/22.3-8.jpg',
         },
       ],
     },
