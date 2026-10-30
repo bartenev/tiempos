@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { cardBlanks } from '../lib/cards'
 import { explainForm } from '../lib/explain'
 import type { AnswerCheck } from '../lib/normalize'
-import { checkAnswers, normalizeAnswer } from '../lib/normalize'
+import { checkBlanks, overallCheck } from '../lib/normalize'
 import type { AnyCard } from '../types'
-import { TENSE_LABELS, isBookCard } from '../types'
+import { isBookCard } from '../types'
+import AnswerForm from './AnswerForm.vue'
+import DrillPrompt from './DrillPrompt.vue'
 import Icon from './Icon.vue'
+import OralDock from './OralDock.vue'
 import RuleHint from './RuleHint.vue'
-import ZoomImage from './ZoomImage.vue'
 
 const props = defineProps<{
   card: AnyCard
@@ -31,13 +34,12 @@ const emit = defineEmits<{
   quit: []
   next: []
   undo: []
+  /** Снять только что засчитанную ошибку: ответ был верным. */
+  revert: []
 }>()
 
-/** Буквы, которых нет на русской/английской раскладке. */
-const ACCENTS = ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü']
-
-const input = ref('')
-const feedback = ref<AnswerCheck | null>(null)
+/** Проверка по полям ввода; null — ещё не проверяли или ответ принят. */
+const checks = ref<AnswerCheck[] | null>(null)
 /** Устный режим: ответ открыт, ждём самооценку. */
 const shown = ref(false)
 /**
@@ -46,114 +48,33 @@ const shown = ref(false)
  */
 const GRADE_GUARD_MS = 350
 let shownAt = 0
-const inputEl = ref<HTMLInputElement | null>(null)
-const submitEl = ref<HTMLButtonElement | null>(null)
 /** Короткая зелёная вспышка: прошлый ответ верный, уже следующая карточка. */
 const flashOk = ref(false)
 let flashTimer: ReturnType<typeof setTimeout> | undefined
 
 const progress = computed(() => `${props.index + 1} / ${props.total}`)
-const revealed = computed(() => feedback.value !== null)
-const canCheck = computed(() => input.value.trim().length > 0)
-const canSubmit = computed(() => revealed.value || canCheck.value)
 const answered = computed(() => props.correct + props.wrong)
 const accuracy = computed(() =>
   answered.value === 0 ? null : Math.round((props.correct / answered.value) * 100),
 )
 
-/** Упражнение учебника; у глагола — null. */
-const book = computed(() => (isBookCard(props.card) ? props.card : null))
-
-const label = computed(() => {
-  const { card } = props
-  return isBookCard(card) ? `Глава ${card.unit}` : TENSE_LABELS[card.tense]
-})
-
-const accepted = computed(() => book.value?.accepted ?? [props.card.answer])
-
-/** Варианты на кнопках; устно отвечают без кнопок — они уходят в подсказку у пропуска. */
-const options = computed(() => (props.oral ? undefined : book.value?.options))
-
-/** Подсказка в скобках у пропуска: инфинитив или текст из упражнения. */
-const cue = computed(() => {
-  const { card } = props
-  if (!isBookCard(card)) return card.verb.infinitive
-  return (props.oral && card.options?.join(' / ')) || card.cue
-})
-
-/** fill с пропуском — рисуем blank; rewrite/match — целиком стимул. */
-const hasBlank = computed(() => props.card.sentence.includes('___'))
-
-const blankCount = computed(() => props.card.sentence.split('___').length - 1)
+/** Ответ открыт: устно после тапа или текстом после ошибки. */
+const answerShown = computed(() => shown.value || checks.value !== null)
 
 const hint = computed(() => {
-  const show = feedback.value === 'wrong' || feedback.value === 'almost' || shown.value
-  if (!show) return null
+  if (!answerShown.value) return null
   const { card } = props
   return isBookCard(card)
     ? { rule: card.rule, row: [] }
     : explainForm(card.verb, card.tense, card.person)
 })
 
-function isAccepted(option: string): boolean {
-  return accepted.value.some((answer) => normalizeAnswer(answer) === normalizeAnswer(option))
-}
-
-/**
- * Части вокруг пропусков. Несколько `___` — каждый рисуем blank;
- * ответ вводят через «; » в одном поле.
- */
-const sentenceChunks = computed(() => {
-  if (!hasBlank.value) return [] as string[]
-  return props.card.sentence.split('___')
-})
-
-/** Части предложения вокруг пропуска `___` (один пропуск — старый путь). */
-const sentenceParts = computed(() => {
-  const parts = props.card.sentence.split('___')
-  return {
-    before: parts[0] ?? '',
-    after: parts.slice(1).join('___'),
-  }
-})
-
-const inputPlaceholder = computed(() => {
-  if (!book.value) return 'форма глагола…'
-  if (blankCount.value > 1 || (book.value.answers && book.value.answers.length > 1)) {
-    return 'ответ; ответ…'
-  }
-  if (book.value.kind === 'rewrite' || book.value.kind === 'match') return 'фраза целиком…'
-  return 'ответ…'
-})
-
-/** Ответ открыт: устно после тапа или текстом после ошибки. */
-const answerShown = computed(
-  () => shown.value || feedback.value === 'wrong' || feedback.value === 'almost',
-)
-
-/**
- * Пустой пропуск — неразрывный пробел: линию рисует border-bottom,
- * символы «___» дали бы вторую линию.
- */
-const filledBlank = computed(() => {
-  if (feedback.value === null && !shown.value) return '\u00a0'
-  return props.card.answer
-})
-
-function focusInput() {
-  // preventScroll: на телефоне не прыгаем к полю при каждом фокусе
-  inputEl.value?.focus({ preventScroll: true })
-}
-
 watch(
-  () => [props.card.sentence, cue.value, props.card.answer, props.index],
-  async () => {
-    input.value = ''
-    feedback.value = null
+  () => [props.card, props.index],
+  () => {
+    checks.value = null
     shown.value = Boolean(props.oral && props.reopened)
     shownAt = Date.now()
-    await nextTick()
-    focusInput()
   },
   { immediate: true },
 )
@@ -171,49 +92,25 @@ function acceptCorrect() {
   })
 }
 
-function submit() {
-  if (feedback.value !== null) {
-    emit('next')
-    return
-  }
-  if (!canCheck.value) return
-  const result = checkAnswers(input.value, accepted.value)
-  if (result === 'exact') {
+function check(inputs: string[]) {
+  const result = checkBlanks(inputs, cardBlanks(props.card))
+  if (overallCheck(result) === 'exact') {
     acceptCorrect()
     return
   }
-  feedback.value = result
-  emit('wrong', input.value.trim())
-  focusInput()
-  // с вариантами поля нет — Enter должен попасть в «Дальше»
-  if (options.value) nextTick(() => submitEl.value?.focus({ preventScroll: true }))
+  checks.value = result
+  emit('wrong', inputs.length > 1 ? inputs.map((value) => value || '—').join('; ') : inputs[0]!)
 }
 
-function choose(option: string) {
-  if (revealed.value) return
-  input.value = option
-  submit()
+/** Ответ верный, просто его нет среди вариантов: ошибка не считается. */
+function acceptOwn() {
+  emit('revert')
+  acceptCorrect()
 }
 
 function skip() {
-  if (feedback.value === null) emit('skip')
+  emit('skip')
   emit('next')
-}
-
-function insertAccent(ch: string) {
-  if (revealed.value) return
-  const el = inputEl.value
-  if (!el) {
-    input.value += ch
-    return
-  }
-  const start = el.selectionStart ?? input.value.length
-  const end = el.selectionEnd ?? input.value.length
-  input.value = input.value.slice(0, start) + ch + input.value.slice(end)
-  nextTick(() => {
-    el.setSelectionRange(start + ch.length, start + ch.length)
-    focusInput()
-  })
 }
 
 function reveal() {
@@ -282,152 +179,40 @@ onBeforeUnmount(() => {
       </span>
     </div>
 
-    <div
-      class="drill__card"
-      :class="{ 'drill__card--flash': flashOk, 'drill__card--tappable': oral && !shown }"
-      @click="reveal"
-    >
-      <div class="drill__tense">
-        {{ label }}
-        <span v-if="card.retry" class="drill__retry">повтор</span>
-      </div>
-      <p v-if="book" class="drill__task">{{ book.task }}</p>
-      <p v-if="book?.bank" class="drill__bank" lang="es">{{ book.bank }}</p>
-      <p v-if="book?.prompt" class="drill__prompt">{{ book.prompt }}</p>
-      <ZoomImage v-if="book?.image" class="drill__image" :src="book.image" alt="Иллюстрация из учебника" />
-      <p
-        class="drill__sentence"
-        :class="{
-          'drill__sentence--ok': feedback === 'exact',
-          'drill__sentence--almost': feedback === 'almost',
-          'drill__sentence--bad': feedback === 'wrong',
-          'drill__sentence--shown': shown,
-          'drill__sentence--stimulus': book && !hasBlank,
-        }"
-      >
-        <template v-if="hasBlank && blankCount > 1">
-          <template v-for="(chunk, i) in sentenceChunks" :key="i">
-            <span>{{ chunk }}</span>
-            <template v-if="i < sentenceChunks.length - 1">
-              <span class="drill__blank">{{ answerShown ? (book?.answers?.[i] ?? card.answer) : '\u00a0' }}</span>
-            </template>
-          </template>
-          <span v-if="cue" class="drill__infinitive">({{ cue }})</span>
-        </template>
-        <template v-else-if="hasBlank">
-          <span class="drill__sentence-before">{{ sentenceParts.before }}</span>
-          <span class="drill__blank">{{ filledBlank }}</span>
-          <span v-if="cue" class="drill__infinitive">({{ cue }})</span>
-          <span class="drill__sentence-after">{{ sentenceParts.after }}</span>
-        </template>
-        <template v-else>
-          <span class="drill__sentence-before">{{ card.sentence }}</span>
-          <span v-if="cue" class="drill__infinitive">({{ cue }})</span>
-        </template>
-      </p>
-      <p class="drill__translation">{{ card.translation }}</p>
-    </div>
+    <DrillPrompt
+      :card="card"
+      :oral="oral"
+      :checks="checks"
+      :shown="shown"
+      :flash="flashOk"
+      @reveal="reveal"
+    />
 
     <p v-if="answerShown" class="drill__answer" lang="es">{{ card.answer }}</p>
 
     <template v-if="oral">
       <RuleHint v-if="hint" class="drill__hint" :hint="hint" />
-      <!-- На телефоне закреплено внизу экрана — под большой палец. -->
-      <div class="drill__dock">
-        <button v-if="canUndo" class="drill__undo" type="button" @click="emit('undo')">
-          <Icon name="back" />Вернуть прошлую карточку
-        </button>
-        <button v-if="!shown" class="drill__reveal" type="button" @click="reveal">
-          Скажите {{ book ? 'ответ' : 'форму' }} вслух или про себя —<br class="drill__reveal-break" />тапните, чтобы проверить
-        </button>
-        <div v-else class="drill__grades">
-          <button class="drill__grade drill__grade--bad" type="button" @click="grade(false)"><Icon name="cross" />Ошибся</button>
-          <button class="drill__grade drill__grade--ok" type="button" @click="grade(true)"><Icon name="check" />Сказал верно</button>
-        </div>
-      </div>
+      <OralDock
+        :shown="shown"
+        :can-undo="canUndo"
+        :subject="isBookCard(card) ? 'ответ' : 'форму'"
+        @reveal="reveal"
+        @grade="grade"
+        @undo="emit('undo')"
+      />
     </template>
 
-    <form v-else class="drill__form" @submit.prevent="submit">
-      <div v-if="options" class="drill__options" role="group" aria-label="Варианты ответа">
-        <button
-          v-for="option in options"
-          :key="option"
-          class="drill__option"
-          :class="{
-            'drill__option--ok': revealed && isAccepted(option),
-            'drill__option--bad': revealed && option === input,
-          }"
-          type="button"
-          :disabled="revealed"
-          @click="choose(option)"
-        >
-          {{ option }}
-        </button>
-      </div>
-
-      <label v-if="!options" class="sr-only drill__label" for="answer">{{ book ? 'Ответ' : 'Форма глагола' }}</label>
-      <input
-        v-if="!options"
-        id="answer"
-        ref="inputEl"
-        v-model="input"
-        class="drill__input"
-        :class="{
-          'drill__input--ok': feedback === 'exact',
-          'drill__input--almost': feedback === 'almost',
-          'drill__input--bad': feedback === 'wrong',
-        }"
-        type="text"
-        inputmode="text"
-        enterkeyhint="go"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-        lang="es"
-        :readonly="revealed"
-        :placeholder="inputPlaceholder"
-      />
-
-      <div v-if="!revealed && !options" class="drill__accents" role="group" aria-label="Буквы с ударением">
-        <button
-          v-for="ch in ACCENTS"
-          :key="ch"
-          class="drill__accent"
-          type="button"
-          tabindex="-1"
-          @pointerdown.prevent
-          @click="insertAccent(ch)"
-        >
-          {{ ch }}
-        </button>
-      </div>
-
-      <!-- правильная форма уже крупно под карточкой — здесь только вердикт -->
-      <p v-if="feedback === 'almost'" class="notice notice--almost drill__feedback">
-        Почти — проверьте ударения.
-      </p>
-      <p v-else-if="feedback === 'wrong'" class="notice notice--bad drill__feedback">
-        Неверно.
-      </p>
-
-      <RuleHint v-if="hint" class="drill__hint" :hint="hint" />
-
-      <div class="screen__actions drill__actions">
-        <button
-          v-if="revealed || !options"
-          ref="submitEl"
-          class="button button--primary drill__submit"
-          type="submit"
-          :disabled="!canSubmit"
-        >
-          {{ revealed ? 'Дальше' : 'Проверить' }}
-        </button>
-        <button v-if="!revealed" class="button button--ghost drill__skip" type="button" @click="skip">
-          Пропустить
-        </button>
-      </div>
-    </form>
+    <AnswerForm
+      v-else
+      :card="card"
+      :index="index"
+      :checks="checks"
+      :hint="hint"
+      @check="check"
+      @next="emit('next')"
+      @skip="skip"
+      @own="acceptOwn"
+    />
   </section>
 </template>
 
@@ -480,125 +265,6 @@ onBeforeUnmount(() => {
   color: var(--ink);
 }
 
-/* ===== drill: карточка задания (два размера: предложение и служебное) ===== */
-
-.drill__bank {
-  margin: 0 0 var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
-  background: var(--line);
-  color: var(--ink);
-  font-size: var(--text-sm);
-  font-style: italic;
-}
-
-.drill__prompt {
-  margin: 0 0 var(--space-2);
-  color: var(--muted);
-  font-size: var(--text-sm);
-}
-
-.drill__sentence--stimulus {
-  font-size: var(--text-lg);
-  color: var(--ink);
-}
-
-.drill__card {
-  margin-bottom: var(--space-4);
-  padding: var(--space-5) var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--card);
-  text-align: center;
-  font-size: var(--text-sm);
-  color: var(--muted);
-}
-
-.drill__card--tappable {
-  cursor: pointer;
-}
-
-.drill__card--flash {
-  animation: flash-ok 0.6s ease-out;
-}
-
-@keyframes flash-ok {
-  0% {
-    border-color: var(--ok);
-    box-shadow: 0 0 0 3px var(--ok-bg);
-  }
-  100% {
-    border-color: var(--line);
-    box-shadow: 0 0 0 3px transparent;
-  }
-}
-
-.drill__tense {
-  font-weight: var(--weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.drill__retry {
-  margin-left: var(--space-2);
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-}
-
-.drill__sentence {
-  margin: var(--space-3) 0;
-  font-size: var(--text-xl);
-  font-weight: var(--weight-semibold);
-  line-height: 1.45;
-  color: var(--ink);
-  text-wrap: balance;
-}
-
-.drill__blank {
-  display: inline-block;
-  min-width: 4ch;
-  padding: 0 var(--space-1);
-  border-bottom: 2px solid var(--accent);
-  font-weight: var(--weight-bold);
-  color: var(--accent);
-}
-
-.drill__sentence--ok .drill__blank {
-  border-color: var(--ok);
-  color: var(--ok);
-}
-
-.drill__sentence--almost .drill__blank {
-  border-color: var(--almost);
-  color: var(--almost);
-}
-
-.drill__sentence--bad .drill__blank {
-  border-color: var(--bad);
-  color: var(--bad);
-}
-
-.drill__sentence--shown .drill__blank {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.drill__infinitive {
-  font-weight: var(--weight-regular);
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-.drill__translation {
-  margin: 0;
-}
-
-/* упражнение учебника: что сделать */
-.drill__task {
-  margin: var(--space-2) 0 0;
-}
-
 /* ===== drill: крупный ответ под карточкой ===== */
 
 .drill__answer {
@@ -624,226 +290,16 @@ onBeforeUnmount(() => {
   }
 }
 
-/* ===== drill: варианты на выбор ===== */
-
-.drill__options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
-  gap: var(--space-2);
-}
-
-.drill__option {
-  min-height: 3.25rem;
-  padding: var(--space-2) var(--space-3);
-  border: 1.5px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--card);
-  font: inherit;
-  font-size: var(--text-lg);
-  color: var(--ink);
-  cursor: pointer;
-}
-
-.drill__option:active:not(:disabled) {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
-.drill__option:disabled {
-  cursor: default;
-}
-
-.drill__option--ok {
-  border-color: var(--ok);
-  background: var(--ok-bg);
-  color: var(--ok);
-}
-
-.drill__option--bad {
-  border-color: var(--bad);
-  background: var(--bad-bg);
-  color: var(--bad);
-}
-
-/* ===== drill: ввод текстом ===== */
-
-.drill__input {
-  width: 100%;
-  min-height: 3.25rem;
-  padding: var(--space-3) var(--space-4);
-  border: 1.5px solid var(--line);
-  border-radius: var(--radius-md);
-  outline: none;
-  background: var(--input-bg);
-  font: inherit;
-  font-size: var(--text-lg);
-  color: var(--ink);
-}
-
-.drill__input:focus {
-  border-color: var(--accent);
-}
-
-.drill__input--ok {
-  border-color: var(--ok);
-  background: var(--ok-bg);
-}
-
-.drill__input--almost {
-  border-color: var(--almost);
-  background: var(--almost-bg);
-}
-
-.drill__input--bad {
-  border-color: var(--bad);
-  background: var(--bad-bg);
-}
-
-.drill__accents {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: var(--space-2);
-  margin-top: var(--space-2);
-}
-
-.drill__accent {
-  min-height: var(--tap);
-  padding: 0;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--card);
-  font: inherit;
-  font-size: var(--text-lg);
-  color: var(--ink);
-  cursor: pointer;
-}
-
-.drill__accent:active:not(:disabled) {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
-.drill__submit {
-  flex: 1;
-}
-
-/* ===== drill: устный режим ===== */
-
-.drill__dock {
-  margin-top: var(--space-4);
-}
-
-.drill__undo {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  margin-bottom: var(--space-2);
-  padding: var(--space-1) var(--space-2);
-  border: none;
-  border-radius: var(--radius-pill);
-  background: var(--card);
-  font: inherit;
-  font-size: var(--text-sm);
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.drill__undo:hover {
-  color: var(--ink);
-}
-
-.drill__reveal {
-  width: 100%;
-  min-height: 6rem;
-  padding: var(--space-4);
-  border: 1.5px dashed var(--line);
-  border-radius: var(--radius-md);
-  background: var(--card);
-  font: inherit;
-  line-height: 1.45;
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.drill__reveal:hover {
-  border-color: var(--accent);
-  color: var(--ink);
-}
-
-.drill__grades {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
-}
-
-.drill__grade {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  min-height: 6rem;
-  border: 1.5px solid transparent;
-  border-radius: var(--radius-md);
-  font: inherit;
-  font-weight: var(--weight-bold);
-  cursor: pointer;
-}
-
-.drill__grade--bad {
-  border-color: var(--bad);
-  background: var(--bad-bg);
-  color: var(--bad);
-}
-
-.drill__grade--ok {
-  border-color: var(--ok);
-  background: var(--ok-bg);
-  color: var(--ok);
-}
-
-/* ===== адаптив ===== */
-
 @media (prefers-reduced-motion: reduce) {
-  .drill__card--flash,
   .drill__answer {
     animation: none;
   }
 }
 
-/* телефон: зона тапа и оценки — внизу экрана, контент прокручивается над ней */
+/* телефон: контент прокручивается над зоной оценки */
 @media (max-width: 640px) {
-  /* «Проверить / Дальше» — тоже у нижнего края, когда подсказка длинная */
-  .drill__actions {
-    position: sticky;
-    bottom: 0;
-    z-index: 2;
-    margin: var(--space-2) calc(-1 * var(--space-4)) 0;
-    padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
-    background: linear-gradient(to top, var(--bg) 70%, transparent);
-  }
-
   .drill--oral {
     padding-bottom: calc(8rem + env(safe-area-inset-bottom));
-  }
-
-  .drill__dock {
-    position: fixed;
-    left: 50%;
-    bottom: 0;
-    z-index: 3;
-    width: 100%;
-    max-width: 460px;
-    margin: 0;
-    padding: var(--space-5) calc(var(--space-4) + env(safe-area-inset-right))
-      calc(var(--space-4) + env(safe-area-inset-bottom)) calc(var(--space-4) + env(safe-area-inset-left));
-    background: linear-gradient(to top, var(--bg) 75%, transparent);
-    transform: translateX(-50%);
-  }
-}
-
-@media (max-width: 420px) {
-  .drill__sentence {
-    font-size: var(--text-lg);
   }
 }
 </style>

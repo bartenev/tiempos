@@ -1,11 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
+  BOOK_STATS_KEY,
+  LEGACY_BOOK_STATS_KEY,
   STATS_KEY,
   cellKey,
   cellWeight,
   isWeak,
+  loadBookStats,
   loadStats,
   masteryOf,
+  migrateBookStats,
   recordAttempt,
   recoveryStreak,
   restoreStat,
@@ -77,5 +81,24 @@ describe('stats', () => {
   it('ignores corrupt entries', () => {
     localStorage.setItem(STATS_KEY, JSON.stringify({ a: { ok: 'x' }, b: { ok: 1, bad: 0, streak: 1, last: 0 } }))
     expect(Object.keys(loadStats())).toEqual(['b'])
+  })
+
+  it('moves textbook progress to the new keys and drops the old store', () => {
+    const stat = { ok: 2, bad: 1, streak: 2, last: 5 }
+    localStorage.setItem(LEGACY_BOOK_STATS_KEY, JSON.stringify({ old: stat, gone: stat }))
+    migrateBookStats({ old: '18.1.1' })
+    expect(loadBookStats()).toEqual({ '18.1.1': stat })
+    expect(localStorage.getItem(LEGACY_BOOK_STATS_KEY)).toBeNull()
+  })
+
+  it('never overwrites newer progress and does nothing without the old store', () => {
+    const newer = { ok: 9, bad: 0, streak: 9, last: 9 }
+    localStorage.setItem(BOOK_STATS_KEY, JSON.stringify({ '18.1.1': newer }))
+    migrateBookStats({ old: '18.1.1' })
+    expect(loadBookStats()).toEqual({ '18.1.1': newer })
+
+    localStorage.setItem(LEGACY_BOOK_STATS_KEY, JSON.stringify({ old: { ok: 1, bad: 0, streak: 1, last: 1 } }))
+    migrateBookStats({ old: '18.1.1' })
+    expect(loadBookStats()).toEqual({ '18.1.1': newer })
   })
 })

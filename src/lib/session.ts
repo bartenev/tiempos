@@ -25,7 +25,7 @@ function pickRandom<T>(items: T[]): T {
 function makeCard(verb: Verb, tense: Tense, person: Person): DrillCard {
   const answer = conjugate(verb, tense, person)
   const own = buildVerbSentence(verb.infinitive, tense, person, pickRandom)
-  if (own) return { verb, tense, person, ...own, answer }
+  if (own) return { type: 'verb', verb, tense, person, ...own, answer }
 
   const frames = framesFor(tense, person)
   if (frames.length === 0) {
@@ -33,6 +33,7 @@ function makeCard(verb: Verb, tense: Tense, person: Person): DrillCard {
   }
   const frame = pickRandom(frames)
   return {
+    type: 'verb',
     verb,
     tense,
     person,
@@ -348,7 +349,7 @@ export function buildSession(
 export function buildCard(verb: Verb, tense: Tense, person: Person): DrillCard {
   const answer = conjugate(verb, tense, person)
   const own = buildVerbSentence(verb.infinitive, tense, person)
-  if (own) return { verb, tense, person, ...own, answer }
+  if (own) return { type: 'verb', verb, tense, person, ...own, answer }
 
   const frames = framesFor(tense, person)
   if (frames.length === 0) {
@@ -356,6 +357,7 @@ export function buildCard(verb: Verb, tense: Tense, person: Person): DrillCard {
   }
   const frame = frames[0]!
   return {
+    type: 'verb',
     verb,
     tense,
     person,

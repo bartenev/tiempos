@@ -7,7 +7,10 @@ import type { Person, Tense } from '../types'
 export const STATS_KEY = 'tiempos.stats.v1'
 
 /** То же по упражнениям учебника: ключ — BookCard.key. */
-export const BOOK_STATS_KEY = 'tiempos.book.v1'
+export const BOOK_STATS_KEY = 'tiempos.book.v2'
+
+/** Прежний прогресс по учебнику: ключом был текст упражнения. */
+export const LEGACY_BOOK_STATS_KEY = 'tiempos.book.v1'
 
 export interface CellStat {
   /** Верных ответов всего. */
@@ -90,6 +93,22 @@ export function saveStats(store: StatsStore): void {
 
 export function loadBookStats(): StatsStore {
   return loadStore(BOOK_STATS_KEY)
+}
+
+/** Перенести прогресс на новые ключи при запуске; старый ключ стираем после записи. */
+export function migrateBookStats(newKeys: Record<string, string>): void {
+  try {
+    if (localStorage.getItem(LEGACY_BOOK_STATS_KEY) === null) return
+    const store = loadStore(BOOK_STATS_KEY)
+    for (const [oldKey, stat] of Object.entries(loadStore(LEGACY_BOOK_STATS_KEY))) {
+      const key = newKeys[oldKey]
+      if (key && !store[key]) store[key] = stat
+    }
+    localStorage.setItem(BOOK_STATS_KEY, JSON.stringify(store))
+    localStorage.removeItem(LEGACY_BOOK_STATS_KEY)
+  } catch {
+    /* хранилище недоступно — старый ключ остаётся до следующего запуска */
+  }
 }
 
 function record(storageKey: string, key: string, correct: boolean, now: number): CellStat {

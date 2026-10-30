@@ -27,6 +27,7 @@ export interface Verb {
 }
 
 export interface DrillCard {
+  type: 'verb'
   verb: Verb
   tense: Tense
   person: Person
@@ -86,48 +87,51 @@ export type BookTag =
   | 'relativos'
   | 'interrogativos'
 
-/**
- * Формат упражнения из учебника.
- * fill — пропуск(и) `___` в предложении;
- * rewrite — переписать / составить фразу целиком;
- * choice — выбрать из вариантов (в т.ч. «—» = ничего не нужно);
- * match — сопоставить: слева стимул, справа варианты-кнопки.
- */
-export type BookItemKind = 'fill' | 'rewrite' | 'choice' | 'match'
-
-/** Одно упражнение главы (как в учебнике). */
-export interface BookItem {
-  /** Формат; по умолчанию fill, если есть `___`, иначе rewrite. */
-  kind?: BookItemKind
-  /**
-   * Стимул: для fill/choice — предложение с `___` (один или несколько);
-   * для rewrite — исходная фраза / номер / описание картинки;
-   * для match — левая колонка.
-   */
+interface BookItemBase {
+  /** Стимул: предложение с `___` или фраза, которую нужно переделать. */
   es: string
   /** Русский перевод стимула или ожидаемого ответа. */
   ru: string
-  /** Правильный ответ; прочерк «—» — в пропуске ничего не нужно. */
-  answer: string
-  /** Другие верные варианты (ese/aquel…). */
-  also?: string[]
-  /**
-   * Несколько пропусков в одном предложении: ответы по порядку `___`.
-   * Ввод — через «; » (esta; Esta). Если задано, `answer` = answers.join('; ').
-   */
-  answers?: string[]
   /** Подсказка в скобках: «a ella», слово из рамки, ключ картинки. */
   cue?: string
-  /** Варианты на выбор / правая колонка match (среди них должен быть answer). */
-  options?: string[]
   /** Доп. инструкция к пункту: банк слов, «(yo, =)», картинка. */
   prompt?: string
-  /** Картинка из учебника: путь от public/, напр. `book/u12.jpg`. */
+  /** Картинка из учебника: путь от public/, напр. `book/12.1-3.jpg`. */
   image?: string
 }
 
+/** Вписать ответ в каждый пропуск `___`. */
+export interface FillItem extends BookItemBase {
+  kind: 'fill'
+  /** Верные варианты по каждому пропуску; прочерк «—» — ничего не нужно. */
+  blanks: string[][]
+}
+
+/** Выбрать вариант; прочерк «—» среди них — ничего не нужно. */
+export interface ChoiceItem extends BookItemBase {
+  kind: 'choice'
+  answer: string
+  options: string[]
+}
+
+/** Написать фразу целиком: верные варианты, основной — первый. */
+export interface RewriteItem extends BookItemBase {
+  kind: 'rewrite'
+  answers: string[]
+}
+
+/** Одно упражнение главы. */
+export type BookItem = FillItem | ChoiceItem | RewriteItem
+
+export type BookItemKind = BookItem['kind']
+
 /** Набор упражнений на одно правило главы. */
 export interface BookSet {
+  /**
+   * Номер упражнения в учебнике, напр. `18.2`. Прогресс хранится по id и месту
+   * в наборе, поэтому новые пункты добавляем только в конец.
+   */
+  id: string
   /** Что нужно сделать (формулировка из учебника + перевод). */
   task: string
   /** Правило своими словами: показывается после ошибки. */
@@ -151,6 +155,7 @@ export interface Chapter {
 
 /** Карточка упражнения: тот же экран, что у глаголов, но без спряжения. */
 export interface BookCard {
+  type: 'book'
   /** Постоянный ключ упражнения — по нему хранится прогресс. */
   key: string
   unit: number
@@ -161,11 +166,10 @@ export interface BookCard {
   kind: BookItemKind
   sentence: string
   translation: string
+  /** Основной ответ целиком: то, что показываем после проверки. */
   answer: string
-  /** Все верные варианты, включая answer. */
-  accepted: string[]
-  /** Несколько пропусков: ответы по порядку. */
-  answers?: string[]
+  /** Верные варианты по полям ввода; основной — первый. */
+  blanks: string[][]
   cue?: string
   prompt?: string
   options?: string[]
@@ -176,7 +180,7 @@ export interface BookCard {
 export type AnyCard = DrillCard | BookCard
 
 export function isBookCard(card: AnyCard): card is BookCard {
-  return 'key' in card
+  return card.type === 'book'
 }
 
 export interface BookConfig {

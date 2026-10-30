@@ -56,7 +56,7 @@ const startedAt = ref(0)
 const finishedAt = ref(0)
 const startError = ref('')
 
-/** Состояние до последней самооценки в устном режиме — чтобы отменить случайный тап. */
+/** Состояние до последнего ответа: отмена самооценки и «Мой ответ верный». */
 interface GradeSnapshot {
   index: number
   correct: number
@@ -139,7 +139,6 @@ function goNext() {
 }
 
 function rememberGrade(card: AnyCard) {
-  if (run.value?.answer !== 'oral') return
   lastGrade.value = {
     index: index.value,
     correct: correct.value,
@@ -153,10 +152,7 @@ function rememberGrade(card: AnyCard) {
   }
 }
 
-/** Отменить последнюю самооценку и вернуться к той карточке с открытым ответом. */
-function undoGrade() {
-  const snap = lastGrade.value
-  if (!snap) return
+function restoreGrade(snap: GradeSnapshot) {
   index.value = snap.index
   correct.value = snap.correct
   wrong.value = snap.wrong
@@ -166,7 +162,19 @@ function undoGrade() {
   cards.value = snap.cards
   restoreCard(snap.card, snap.stat)
   lastGrade.value = null
+}
+
+/** Отменить последнюю самооценку и вернуться к той карточке с открытым ответом. */
+function undoGrade() {
+  const snap = lastGrade.value
+  if (!snap) return
+  restoreGrade(snap)
   reopenedIndex.value = snap.index
+}
+
+/** Ошибка снята: «Мой ответ верный». Ответ засчитают следующим шагом. */
+function revertGrade() {
+  if (lastGrade.value) restoreGrade(lastGrade.value)
 }
 
 function onCorrect() {
@@ -257,6 +265,7 @@ function trainWeak() {
       @next="goNext"
       @quit="quit"
       @undo="undoGrade"
+      @revert="revertGrade"
     />
     <SummaryPanel
       v-else-if="screen === 'summary'"

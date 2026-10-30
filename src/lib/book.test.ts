@@ -9,6 +9,7 @@ import {
   chapterOf,
   chapterProgress,
   chapterSize,
+  legacyBookKeys,
   retryBookCard,
   unitsWithTag,
 } from './book'
@@ -45,12 +46,42 @@ describe('chapters and tags', () => {
     const cards = cardsForUnits([34])
     const card = cards.find((c) => c.sentence.startsWith('___ quiero ser abogada'))!
     expect(card.answer).toBe('Yo')
-    expect(card.accepted).toContain('yo')
+    expect(card.blanks).toEqual([['Yo', '—']])
+  })
+
+  it('joins the main answers of a multi-blank exercise', () => {
+    const card = cardsForUnits([34]).find((c) => c.sentence.startsWith('—¿De dónde sois Adolfo'))!
+    expect(card.answer).toBe('tú; —')
+    expect(card.blanks).toEqual([['tú'], ['—']])
+  })
+
+  it('a whole phrase is one field with all its variants', () => {
+    const card = cardsForUnits([39]).find((c) => c.sentence === '¿me / ayudar / puedes?')!
+    expect(card.kind).toBe('rewrite')
+    expect(card.blanks).toEqual([['¿Puedes ayudarme?', '¿Me puedes ayudar?']])
   })
 
   it('leaves the answer alone in the middle of a sentence', () => {
     const card = cardsForUnits([35]).find((c) => c.sentence.startsWith('¿Dónde está Andrés?'))!
     expect(card.answer).toBe('lo')
+  })
+})
+
+describe('progress keys', () => {
+  it('names an exercise by its set and place, not by its text', () => {
+    const chapter = chapterOf(18)!
+    expect(chapterCards(chapter).map((c) => c.key).slice(0, 2)).toEqual(['18.1.1', '18.1.2'])
+    const edited = structuredClone(chapter)
+    edited.sets[0]!.items[0]!.es = 'другой текст ___'
+    expect(chapterCards(edited)[0]!.key).toBe('18.1.1')
+  })
+
+  it('maps the old text keys, with and without a prompt', () => {
+    const keys = legacyBookKeys()
+    expect(keys['18|ARTURO: ¿Cómo se llaman ___ padres, Blanca?']).toBe('18.1.1')
+    const [first] = chapterOf(21)!.sets[0]!.items
+    expect(keys[`21|${first!.es}|${first!.prompt}`]).toBe('21.1.1')
+    expect(new Set(Object.values(keys)).size).toBe(Object.keys(keys).length)
   })
 })
 

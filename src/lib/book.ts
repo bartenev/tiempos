@@ -3,7 +3,6 @@ import type {
   BookCard,
   BookConfig,
   BookItem,
-  BookItemKind,
   BookSet,
   BookTag,
   Chapter,
@@ -24,10 +23,22 @@ export function unitsWithTag(tag: BookTag, chapters: Chapter[] = CHAPTERS): numb
   return chapters.filter((c) => c.tags.includes(tag)).map((c) => c.unit)
 }
 
-/** Постоянный ключ: порядок упражнений можно менять, прогресс не собьётся. */
-export function itemKey(unit: number, item: BookItem): string {
-  const id = item.prompt ? `${item.es}|${item.prompt}` : item.es
-  return `${unit}|${id}`
+/** Постоянный ключ: текст упражнения можно править, прогресс не собьётся. */
+export function itemKey(set: BookSet, index: number): string {
+  return `${set.id}.${index + 1}`
+}
+
+/** Прежние ключи прогресса (по тексту упражнения) → новые. */
+export function legacyBookKeys(chapters: Chapter[] = CHAPTERS): Record<string, string> {
+  const keys: Record<string, string> = {}
+  for (const chapter of chapters) {
+    for (const set of chapter.sets) {
+      set.items.forEach(({ es, prompt }, index) => {
+        keys[`${chapter.unit}|${prompt ? `${es}|${prompt}` : es}`] = itemKey(set, index)
+      })
+    }
+  }
+  return keys
 }
 
 /** Пропуск открывает предложение — ответ покажем с большой буквы. */
@@ -39,51 +50,45 @@ function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1)
 }
 
-function resolveKind(item: BookItem): BookItemKind {
-  if (item.kind) return item.kind
-  if (item.options?.length) return 'choice'
-  if (item.es.includes('___')) return 'fill'
-  return 'rewrite'
+/** Верные варианты по полям ввода: фраза целиком или выбор — одно поле. */
+function blanksOf(item: BookItem): string[][] {
+  if (item.kind === 'rewrite') return [item.answers]
+  const blanks = item.kind === 'fill' ? item.blanks : [[item.answer]]
+  const [first, ...rest] = blanks[0]!
+  if (blanks.length > 1 || !startsSentence(item.es)) return blanks
+  return [[capitalize(first!), ...rest]]
 }
 
-/** Все принятые ответы: основной, also, и перестановки регистра для fill. */
-function acceptedOf(item: BookItem): string[] {
-  const primary = item.answers?.join('; ') ?? item.answer
-  const variants = [primary, item.answer, ...(item.also ?? [])]
-  return [...new Set(variants.filter(Boolean))]
-}
-
-function displayAnswer(item: BookItem): string {
-  const raw = item.answers?.join('; ') ?? item.answer
-  if (item.answers || resolveKind(item) === 'rewrite' || resolveKind(item) === 'match') return raw
-  if (item.es.includes('___') && startsSentence(item.es)) return capitalize(raw)
-  return raw
-}
-
-function makeCard(chapter: Chapter, set: BookSet, item: BookItem): BookCard {
-  const kind = resolveKind(item)
+function makeCard(chapter: Chapter, set: BookSet, item: BookItem, index: number): BookCard {
+  const blanks = blanksOf(item)
   return {
-    key: itemKey(chapter.unit, item),
+    type: 'book',
+    key: itemKey(set, index),
     unit: chapter.unit,
     task: set.task,
     rule: set.rule,
     bank: set.bank,
-    kind,
+    kind: item.kind,
     sentence: item.es,
     translation: item.ru,
-    answer: displayAnswer(item),
-    accepted: acceptedOf(item),
-    answers: item.answers,
+    answer: blanks.map(([main]) => main).join('; '),
+    blanks,
     cue: item.cue,
     prompt: item.prompt,
-    options: item.options && shuffle(item.options),
+    options: item.kind === 'choice' ? shuffle(item.options) : undefined,
     image: item.image,
   }
 }
 
 /** Все упражнения главы; порядок — как в наборах главы. */
 export function chapterCards(chapter: Chapter): BookCard[] {
-  return chapter.sets.flatMap((set) => set.items.map((item) => makeCard(chapter, set, item)))
+  return chapter.sets.flatMap((set) =>
+    set.items.map((item, index) => makeCard(chapter, set, item, index)),
+  )
+}
+
+function chapterKeys(chapter: Chapter): string[] {
+  return chapter.sets.flatMap((set) => set.items.map((_, index) => itemKey(set, index)))
 }
 
 export function chapterSize(chapter: Chapter): number {
@@ -105,7 +110,7 @@ export function chapterProgress(
   stats: StatsStore = loadBookStats(),
 ): ChapterProgress {
   const counts: ChapterProgress = { new: 0, weak: 0, learning: 0, solid: 0 }
-  for (const card of chapterCards(chapter)) counts[masteryOf(stats[card.key])] += 1
+  for (const key of chapterKeys(chapter)) counts[masteryOf(stats[key])] += 1
   return counts
 }
 

@@ -31,10 +31,15 @@ export function restoreCard(card: AnyCard, previous: CellStat | undefined): void
   else restoreStat(card.verb.infinitive, card.tense, card.person, previous)
 }
 
+/** Верные варианты по полям ввода: у глагола поле одно. */
+export function cardBlanks(card: AnyCard): string[][] {
+  return isBookCard(card) ? card.blanks : [[card.answer]]
+}
+
 export function cardMistake(card: AnyCard, given: string): SessionMistake {
   const { answer } = card
   if (isBookCard(card)) {
-    const meta = `Глава ${card.unit} · ${card.sentence.replace('___', '…')}`
+    const meta = `Глава ${card.unit} · ${card.sentence.replaceAll('___', '…')}`
     return { key: card.key, meta, answer, given }
   }
   const { infinitive } = card.verb

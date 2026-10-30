@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { itemKey } from '../lib/book'
 import type { BookTag } from '../types'
 import { CHAPTERS, TAGS } from './book'
 
@@ -40,34 +39,34 @@ describe('book data', () => {
     }
   })
 
-  it('every item has a translation, an answer, and blanks match answers', () => {
+  it('every item has a translation and its blanks match the sentence', () => {
     for (const { item } of items) {
       expect(item.ru.length, item.es).toBeGreaterThan(0)
-      expect(item.answer.length, item.es).toBeGreaterThan(0)
       const blanks = item.es.split('___').length - 1
-      if (item.answers) {
-        expect(item.answers.length, item.es).toBe(blanks)
-        expect(item.answer, item.es).toBe(item.answers.join('; '))
-      } else if (item.kind === 'rewrite' || item.kind === 'match' || blanks === 0) {
-        // целая фраза / стимул без пропуска
-        expect(blanks, item.es).toBeGreaterThanOrEqual(0)
+      if (item.kind === 'fill') {
+        expect(item.blanks.length, item.es).toBe(blanks)
+        for (const variants of item.blanks) expect(variants.length, item.es).toBeGreaterThan(0)
       } else {
-        expect(blanks, item.es).toBeGreaterThanOrEqual(1)
+        expect(blanks, item.es).toBeLessThanOrEqual(1)
       }
+      if (item.kind === 'rewrite') expect(item.answers.length, item.es).toBeGreaterThan(0)
     }
   })
 
   it('options contain the answer', () => {
     for (const { item } of items) {
-      if (!item.options) continue
+      if (item.kind !== 'choice') continue
       expect(item.options, item.es).toContain(item.answer)
       expect(new Set(item.options).size, item.es).toBe(item.options.length)
     }
   })
 
-  it('keys are unique within the book, so progress never collides', () => {
-    const keys = items.map(({ unit, item }) => itemKey(unit, item))
-    expect(new Set(keys).size).toBe(keys.length)
+  it('set ids belong to their chapter, so progress keys never collide', () => {
+    const ids = CHAPTERS.flatMap((c) => c.sets.map((set) => set.id))
+    expect(new Set(ids).size).toBe(ids.length)
+    for (const chapter of CHAPTERS) {
+      for (const { id } of chapter.sets) expect(id).toMatch(new RegExp(`^${chapter.unit}\\.\\d+$`))
+    }
   })
 
   it('every picture exists and every file in public/book is used', () => {
@@ -76,9 +75,10 @@ describe('book data', () => {
     expect(files.map((f) => f.replace('/public/', '')).sort()).toEqual([...used].sort())
   })
 
-  it('the blank with «—» only appears where an option offers it', () => {
+  it('a multi-blank exercise always asks for at least one word', () => {
     for (const { item } of items) {
-      if (item.answer === '—') expect(item.options, item.es).toContain('—')
+      if (item.kind !== 'fill' || item.blanks.length < 2) continue
+      expect(item.blanks.some((v) => v[0] !== '—'), item.es).toBe(true)
     }
   })
 })

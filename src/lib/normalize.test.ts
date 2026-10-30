@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { checkAnswer, checkAnswers, normalizeAnswer, stripDiacritics } from './normalize'
+import {
+  checkAnswer,
+  checkAnswers,
+  checkBlanks,
+  normalizeAnswer,
+  overallCheck,
+  stripDiacritics,
+} from './normalize'
 
 describe('normalizeAnswer', () => {
   it('trims and lowercases', () => {
@@ -41,5 +48,33 @@ describe('checkAnswers', () => {
   it('does not count punctuation or extra spaces', () => {
     expect(checkAnswers('  no me  lo   des. ', ['no me lo des'])).toBe('exact')
     expect(checkAnswers('¿Cuál?', ['cuál'])).toBe('exact')
+  })
+})
+
+describe('checkBlanks', () => {
+  it('checks every field on its own', () => {
+    expect(checkBlanks(['mi', 'mas'], [['mi'], ['mis']])).toEqual(['exact', 'wrong'])
+    expect(checkBlanks(['tú', 'tu'], [['tú'], ['tú']])).toEqual(['exact', 'almost'])
+  })
+
+  it('takes any variant of a blank', () => {
+    expect(checkBlanks(['nosotras'], [['nosotros', 'nosotras']])).toEqual(['exact'])
+  })
+
+  it('an empty field or a dash means nothing goes in the blank', () => {
+    const blanks = [['—'], ['Él'], ['ella']]
+    expect(checkBlanks(['', 'Él', 'ella'], blanks)).toEqual(['exact', 'exact', 'exact'])
+    expect(checkBlanks(['-', 'Él', 'ella'], blanks)).toEqual(['exact', 'exact', 'exact'])
+    expect(checkBlanks(['—', 'Él', 'ella'], blanks)).toEqual(['exact', 'exact', 'exact'])
+  })
+
+  it('an empty field is wrong where a word is needed', () => {
+    expect(checkBlanks(['', 'x'], [['yo'], ['x']])).toEqual(['wrong', 'exact'])
+  })
+
+  it('sums up: wrong beats almost, almost beats exact', () => {
+    expect(overallCheck(['exact', 'exact'])).toBe('exact')
+    expect(overallCheck(['exact', 'almost'])).toBe('almost')
+    expect(overallCheck(['almost', 'wrong'])).toBe('wrong')
   })
 })

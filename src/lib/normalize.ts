@@ -1,10 +1,14 @@
-/** Trim + lowercase for comparison; punctuation and extra spaces don't count. */
+/**
+ * Trim + lowercase for comparison; punctuation and extra spaces don't count.
+ * A lone dash means «nothing goes here», same as an empty field.
+ */
 export function normalizeAnswer(value: string): string {
-  return value
+  const normalized = value
     .toLowerCase()
-    .replace(/[¿?¡!.,;:]/g, ' ')
+    .replace(/[¿?¡!.,;:—–]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
+  return normalized === '-' ? '' : normalized
 }
 
 /** Strip Spanish diacritics for «almost» check. */
@@ -32,4 +36,15 @@ export function checkAnswers(input: string, accepted: string[]): AnswerCheck {
   const checks = accepted.map((answer) => checkAnswer(input, answer))
   if (checks.includes('exact')) return 'exact'
   return checks.includes('almost') ? 'almost' : 'wrong'
+}
+
+/** Каждое поле проверяем отдельно: видно, какой именно пропуск неверный. */
+export function checkBlanks(inputs: string[], blanks: string[][]): AnswerCheck[] {
+  return blanks.map((accepted, i) => checkAnswers(inputs[i] ?? '', accepted))
+}
+
+/** Итог по всем полям: верно, только если верно всё. */
+export function overallCheck(checks: AnswerCheck[]): AnswerCheck {
+  if (checks.includes('wrong')) return 'wrong'
+  return checks.includes('almost') ? 'almost' : 'exact'
 }

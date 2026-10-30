@@ -1,9 +1,12 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import { legacyBookKeys } from './lib/book'
+import { migrateBookStats } from './lib/stats'
 import { removeObsoleteKeys, requestPersistentStorage } from './lib/storage'
 import './style.css'
 
 removeObsoleteKeys()
+migrateBookStats(legacyBookKeys())
 void requestPersistentStorage()
 createApp(App).mount('#app')
 

@@ -144,6 +144,104 @@ describe('DrillPanel — textbook exercises', () => {
   })
 })
 
+describe('DrillPanel — several blanks', () => {
+  function mountBlanks(find: string) {
+    const card = cardsForUnits([18, 34]).find((c) => c.sentence.startsWith(find))!
+    return mount(DrillPanel, {
+      props: { card, index: 0, total: 10, correct: 0, wrong: 0, streak: 0 },
+    })
+  }
+
+  it('gives every blank its own field', async () => {
+    const wrapper = mountBlanks('Anoche fui al cine')
+    const fields = wrapper.findAll('.drill__input')
+    expect(fields).toHaveLength(2)
+    expect(wrapper.findAll('.drill__blank-number').map((b) => b.text())).toEqual(['1', '2'])
+    await fields[0]!.setValue('mi')
+    await fields[1]!.setValue('mis')
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('correct')).toHaveLength(1)
+  })
+
+  it('shows which blank is wrong', async () => {
+    const wrapper = mountBlanks('Anoche fui al cine')
+    const fields = wrapper.findAll('.drill__input')
+    await fields[0]!.setValue('mi')
+    await fields[1]!.setValue('mi')
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('wrong')).toEqual([['mi; mi']])
+    expect(fields[0]!.classes()).toContain('drill__input--ok')
+    expect(fields[1]!.classes()).toContain('drill__input--bad')
+    expect(wrapper.findAll('.drill__blank').map((b) => b.classes().at(-1))).toEqual([
+      'drill__blank--ok',
+      'drill__blank--bad',
+    ])
+  })
+
+  it('an empty field stands for «nothing goes here»', async () => {
+    const wrapper = mountBlanks('Adriana: ¿De dónde son Pep y Concha?')
+    const fields = wrapper.findAll('.drill__input')
+    await fields[1]!.setValue('Él')
+    await fields[2]!.setValue('ella')
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('correct')).toHaveLength(1)
+  })
+
+  it('Enter moves to the next blank and checks on the last one', async () => {
+    const wrapper = mountBlanks('Anoche fui al cine')
+    const fields = wrapper.findAll('.drill__input')
+    await fields[0]!.setValue('mi')
+    await fields[1]!.setValue('mis')
+    await fields[0]!.trigger('keydown', { key: 'Enter' })
+    expect(wrapper.emitted('correct')).toBeUndefined()
+    await fields[1]!.trigger('keydown', { key: 'Enter' })
+    expect(wrapper.emitted('correct')).toHaveLength(1)
+  })
+
+  it('needs at least one filled field', async () => {
+    const wrapper = mountBlanks('Anoche fui al cine')
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('wrong')).toBeUndefined()
+  })
+})
+
+describe('DrillPanel — «Мой ответ верный»', () => {
+  function mountPhrase() {
+    const card = cardsForUnits([22]).find((c) => c.kind === 'rewrite')!
+    return mount(DrillPanel, {
+      props: { card, index: 0, total: 10, correct: 0, wrong: 0, streak: 0 },
+    })
+  }
+
+  it('appears after a mismatch and turns the mistake into a correct answer', async () => {
+    const wrapper = mountPhrase()
+    expect(wrapper.find('.drill__own').exists()).toBe(false)
+    await wrapper.find('#answer').setValue('другая верная фраза')
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('wrong')).toHaveLength(1)
+
+    await wrapper.find('.drill__own').trigger('click')
+    expect(wrapper.emitted('revert')).toHaveLength(1)
+    expect(wrapper.emitted('correct')).toHaveLength(1)
+    expect(wrapper.emitted('next')).toHaveLength(1)
+  })
+
+  it('is not offered for verbs or for a choice', async () => {
+    const verb = mountDrill()
+    await verb.find('#answer').setValue('hablas')
+    await verb.find('form').trigger('submit')
+    expect(verb.find('.drill__own').exists()).toBe(false)
+
+    const card = cardsForUnits([38]).find((c) => c.options)!
+    const choice = mount(DrillPanel, {
+      props: { card, index: 0, total: 10, correct: 0, wrong: 0, streak: 0 },
+    })
+    const wrong = choice.findAll('.drill__option').find((b) => b.text() !== card.answer)!
+    await wrong.trigger('click')
+    expect(choice.find('.drill__own').exists()).toBe(false)
+  })
+})
+
 describe('DrillPanel — oral (self-check)', () => {
   let wrapper: ReturnType<typeof mountOral> | undefined
 
