@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 55,
   title: 'Verbos con me, te, le…',
   ru: 'Gustar и похожие глаголы: me gusta, me encanta, me duele, me apetece, me queda',
-  tags: ['pronombres', 'gustar', 'complementos'],
+  section: 'pronombres',
+  tags: ['gustar', 'complementos'],
   sets: [
     {
       id: '55.1',

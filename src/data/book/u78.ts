@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 78,
   title: 'Imperativo con pronombres de complemento',
   ru: 'Императив с местоимениями-дополнениями: hazla, no la hagas, dámelo, no se lo des',
-  tags: ['pronombres', 'imperativo', 'complementos'],
+  section: 'pronombres',
+  tags: ['imperativo', 'complementos'],
   sets: [
     {
       id: '78.1',

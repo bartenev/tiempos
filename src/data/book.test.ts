@@ -1,30 +1,30 @@
 import { describe, expect, it } from 'vitest'
-import type { BookTag } from '../types'
-import { CHAPTERS, TAGS } from './book'
+import { CHAPTERS, SECTIONS } from './book'
 
 const items = CHAPTERS.flatMap((c) =>
   c.sets.flatMap((set) => set.items.map((item) => ({ unit: c.unit, set, item }))),
 )
 
 describe('book data', () => {
-  it('has the pronoun units of the textbook, in book order', () => {
-    expect(CHAPTERS.map((c) => c.unit)).toEqual([
-      12, 18, 19, 20, 21, 22, 23, 28, 29, 30, 31, 34, 35, 36, 37, 38, 39, 40, 41, 53, 54, 55, 77,
-      78, 109, 122,
-    ])
+  it('chapters go in book order, without repeats', () => {
+    const units = CHAPTERS.map((c) => c.unit)
+    expect(units).toEqual([...new Set(units)].sort((a, b) => a - b))
   })
 
-  it('tags every chapter as pronouns and with known tags only', () => {
-    const known = new Set<BookTag>(TAGS.map((t) => t.tag))
+  it('every chapter sits in a known section and uses only its tags', () => {
     for (const chapter of CHAPTERS) {
-      expect(chapter.tags).toContain('pronombres')
-      for (const tag of chapter.tags) expect(known.has(tag)).toBe(true)
+      const section = SECTIONS.find((s) => s.section === chapter.section)
+      expect(section, `unit ${chapter.unit}`).toBeDefined()
+      const known = section!.tags.map((t) => t.tag)
+      for (const tag of chapter.tags) expect(known).toContain(tag)
     }
   })
 
   it('every tag has at least one chapter', () => {
-    for (const { tag } of TAGS) {
-      expect(CHAPTERS.some((c) => c.tags.includes(tag))).toBe(true)
+    for (const { section, tags } of SECTIONS) {
+      for (const { tag } of tags) {
+        expect(CHAPTERS.some((c) => c.section === section && c.tags.includes(tag))).toBe(true)
+      }
     }
   })
 

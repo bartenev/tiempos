@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 109,
   title: 'Expresión de coincidencia o no coincidencia',
   ru: 'Согласие и несогласие: yo también, yo tampoco, a mí sí, a mí no',
-  tags: ['pronombres', 'personales'],
+  section: 'pronombres',
+  tags: ['personales'],
   sets: [
     {
       id: '109.1',

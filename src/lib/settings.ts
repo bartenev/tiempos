@@ -1,8 +1,8 @@
-import { CHAPTERS } from '../data/book'
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
 import type {
   AnswerMode,
   BookConfig,
+  BookSelection,
   Person,
   SessionConfig,
   SessionMode,
@@ -11,14 +11,20 @@ import type {
   VerbGroup,
 } from '../types'
 import { PERSONS, VERB_GROUPS } from '../types'
+import {
+  defaultSelection,
+  parseSelection,
+  selectedUnits,
+  selectionFromTicks,
+} from './bookSelection'
 
 export const SETTINGS_KEY = 'tiempos.settings.v1'
 
 export interface SetupSettings {
   /** Что тренируем: глаголы или главы учебника. */
   track: Track
-  /** Чекбоксы глав учебника: номер юнита → выбрана. */
-  selectedUnits: Record<number, boolean>
+  /** Что выбрано в учебнике: темы или свой список глав. */
+  bookSelection: BookSelection
   selected: Record<Tense, boolean>
   /** Чекбоксы местоимений. */
   persons: Record<Person, boolean>
@@ -39,15 +45,9 @@ export function defaultSelectedIrregular(
   return Object.fromEntries(infinitives.map((inf) => [inf, true]))
 }
 
-export function defaultSelectedUnits(
-  units: number[] = CHAPTERS.map((c) => c.unit),
-): Record<number, boolean> {
-  return Object.fromEntries(units.map((unit) => [unit, true]))
-}
-
 export const DEFAULT_SETTINGS: SetupSettings = {
   track: 'verbs',
-  selectedUnits: defaultSelectedUnits(),
+  bookSelection: defaultSelection(),
   selected: {
     presente: true,
     indefinido: true,
@@ -134,25 +134,10 @@ export function mergeSelectedIrregular(
   return result
 }
 
-/** Как с неправильными глаголами: новые главы включены, снятые галки сохраняются. */
-export function mergeSelectedUnits(
-  saved: unknown,
-  units: number[] = CHAPTERS.map((c) => c.unit),
-): Record<number, boolean> {
-  const result = defaultSelectedUnits(units)
-  if (!saved || typeof saved !== 'object') return result
-  const obj = saved as Record<string, unknown>
-  for (const unit of units) {
-    const value = obj[unit]
-    if (isBool(value)) result[unit] = value
-  }
-  return result
-}
-
 function cloneDefaults(): SetupSettings {
   return {
     ...DEFAULT_SETTINGS,
-    selectedUnits: defaultSelectedUnits(),
+    bookSelection: defaultSelection(),
     selected: { ...DEFAULT_SETTINGS.selected },
     persons: { ...DEFAULT_SETTINGS.persons },
     groups: { ...DEFAULT_SETTINGS.groups },
@@ -164,13 +149,16 @@ export function loadSettings(): SetupSettings {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY)
     if (!raw) return cloneDefaults()
-    const parsed = JSON.parse(raw) as Partial<SetupSettings>
+    const parsed = JSON.parse(raw) as Partial<SetupSettings> & { selectedUnits?: unknown }
     return {
       track:
         typeof parsed.track === 'string' && TRACKS.has(parsed.track)
           ? parsed.track
           : DEFAULT_SETTINGS.track,
-      selectedUnits: mergeSelectedUnits(parsed.selectedUnits),
+      bookSelection:
+        parseSelection(parsed.bookSelection) ??
+        selectionFromTicks(parsed.selectedUnits) ??
+        defaultSelection(),
       selected: parseSelected(parsed.selected),
       persons: parsePersons(parsed.persons),
       groups: parseGroups(parsed.groups),
@@ -209,16 +197,12 @@ export function selectedIrregularList(
   return Object.keys(map).filter((inf) => map[inf])
 }
 
-export function selectedUnitList(map: Record<number, boolean>): number[] {
-  return CHAPTERS.map((c) => c.unit).filter((unit) => map[unit])
-}
-
 export function bookConfigFromSettings(
   settings: SetupSettings,
   overrides: Partial<BookConfig> = {},
 ): BookConfig {
   return {
-    units: selectedUnitList(settings.selectedUnits),
+    units: selectedUnits(settings.bookSelection),
     size: settings.size,
     mode: settings.mode,
     answer: settings.answer,

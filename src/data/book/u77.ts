@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 77,
   title: 'Imperativos de verbos con se',
   ru: 'Императив возвратных глаголов: pónganse, siéntese, no te rías, callaos',
-  tags: ['pronombres', 'reflexivos', 'imperativo'],
+  section: 'pronombres',
+  tags: ['reflexivos', 'imperativo'],
   sets: [
     {
       id: '77.1',

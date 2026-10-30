@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 53,
   title: 'Verbos con me, te, se…',
   ru: 'Возвратные глаголы: levantarse, ducharse, vestirse, acostarse',
-  tags: ['pronombres', 'reflexivos'],
+  section: 'pronombres',
+  tags: ['reflexivos'],
   sets: [
     {
       id: '53.1',

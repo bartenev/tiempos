@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 12,
   title: 'Demostrativos',
   ru: 'Указательные: este, ese, aquel, esto',
-  tags: ['pronombres', 'demostrativos'],
+  section: 'pronombres',
+  tags: ['demostrativos'],
   sets: [
     {
       id: '12.1',

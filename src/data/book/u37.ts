@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 37,
   title: 'Pronombres de complemento indirecto y directo',
   ru: 'Два местоимения подряд: me lo, te la, se lo, nos los',
-  tags: ['pronombres', 'personales', 'complementos'],
+  section: 'pronombres',
+  tags: ['personales', 'complementos'],
   sets: [
     {
       id: '37.1',

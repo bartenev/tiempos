@@ -4,7 +4,6 @@ import type {
   BookConfig,
   BookItem,
   BookSet,
-  BookTag,
   Chapter,
 } from '../types'
 import { shuffle } from './session'
@@ -17,10 +16,6 @@ const WEAK_SHARE = 1 / 3
 
 export function chapterOf(unit: number): Chapter | undefined {
   return CHAPTERS.find((c) => c.unit === unit)
-}
-
-export function unitsWithTag(tag: BookTag, chapters: Chapter[] = CHAPTERS): number[] {
-  return chapters.filter((c) => c.tags.includes(tag)).map((c) => c.unit)
 }
 
 /** Постоянный ключ: текст упражнения можно править, прогресс не собьётся. */

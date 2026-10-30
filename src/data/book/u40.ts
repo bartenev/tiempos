@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 40,
   title: 'Pronombres reflexivos y con valor recíproco',
   ru: 'Возвратные и взаимные местоимения: me, te, se, nos, os',
-  tags: ['pronombres', 'reflexivos'],
+  section: 'pronombres',
+  tags: ['reflexivos'],
   sets: [
     {
       id: '40.1',

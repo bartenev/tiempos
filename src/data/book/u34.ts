@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 34,
   title: 'Pronombres personales de sujeto',
   ru: 'Личные местоимения-подлежащие: yo, tú, él, usted, nosotros, vosotros, ellos, ustedes',
-  tags: ['pronombres', 'personales'],
+  section: 'pronombres',
+  tags: ['personales'],
   sets: [
     {
       id: '34.1',

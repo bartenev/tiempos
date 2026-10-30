@@ -71,9 +71,11 @@ export interface SessionConfig {
   selectedIrregular: string[]
 }
 
-/** Тема главы. У главы их несколько: по ним выбирают сразу группу глав. */
+/** Раздел учебника: большая тема. У главы он ровно один. */
+export type BookSection = 'pronombres'
+
+/** Подтема внутри раздела. У главы их несколько: по ним выбирают сразу группу глав. */
 export type BookTag =
-  | 'pronombres'
   | 'personales'
   | 'complementos'
   | 'preposiciones'
@@ -149,6 +151,7 @@ export interface Chapter {
   title: string
   /** О чём глава, по-русски. */
   ru: string
+  section: BookSection
   tags: BookTag[]
   sets: BookSet[]
 }
@@ -182,6 +185,20 @@ export type AnyCard = DrillCard | BookCard
 export function isBookCard(card: AnyCard): card is BookCard {
   return card.type === 'book'
 }
+
+/** Тема: весь раздел или подтема внутри него. */
+export interface BookTheme {
+  section: BookSection
+  tag?: BookTag
+}
+
+/**
+ * Что выбрано в учебнике. Тема хранится как тема, а не как список её глав:
+ * новые главы темы подхватываются сами, чужие в неё не попадают.
+ */
+export type BookSelection =
+  | { kind: 'theme'; themes: BookTheme[]; excluded: number[] }
+  | { kind: 'units'; units: number[] }
 
 export interface BookConfig {
   /** Номера выбранных глав. */

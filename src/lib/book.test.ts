@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { CHAPTERS } from '../data/book'
 import type { BookConfig } from '../types'
 import {
   bookWeakCount,
@@ -11,7 +10,6 @@ import {
   chapterSize,
   legacyBookKeys,
   retryBookCard,
-  unitsWithTag,
 } from './book'
 import type { StatsStore } from './stats'
 
@@ -25,16 +23,7 @@ function fresh(ok = 1): { ok: number; bad: number; streak: number; last: number 
 
 const weakStat = { ok: 0, bad: 3, streak: 0, last: 1 }
 
-describe('chapters and tags', () => {
-  it('picks a whole theme by tag', () => {
-    const units = unitsWithTag('imperativo')
-    expect(units).toEqual([39, 77, 78])
-  })
-
-  it('all pronoun chapters come with the main tag', () => {
-    expect(unitsWithTag('pronombres')).toEqual(CHAPTERS.map((c) => c.unit))
-  })
-
+describe('chapters', () => {
   it('a chapter turns into one pool of exercises', () => {
     const chapter = chapterOf(35)!
     const cards = chapterCards(chapter)

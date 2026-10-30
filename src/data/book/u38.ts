@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 38,
   title: 'Confusión entre pronombres personales de complemento',
   ru: 'Lo/la или le: как не путать прямое и косвенное дополнение',
-  tags: ['pronombres', 'personales', 'complementos'],
+  section: 'pronombres',
+  tags: ['personales', 'complementos'],
   sets: [
     {
       id: '38.1',

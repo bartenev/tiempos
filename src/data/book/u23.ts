@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 23,
   title: 'Indefinidos (4)',
   ru: 'Неопределённые (4): alguien, nadie, algo, nada',
-  tags: ['pronombres', 'indefinidos'],
+  section: 'pronombres',
+  tags: ['indefinidos'],
   sets: [
     {
       id: '23.1',

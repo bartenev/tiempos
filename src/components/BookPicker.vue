@@ -1,29 +1,49 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { CHAPTERS, TAGS } from '../data/book'
-import { chapterProgress, chapterSize, unitsWithTag } from '../lib/book'
-import { selectedUnitList } from '../lib/settings'
+import { CHAPTERS, SECTIONS } from '../data/book'
+import { chapterProgress, chapterSize } from '../lib/book'
+import {
+  defaultSelection,
+  isThemeActive,
+  onlyUnits,
+  selectedUnits,
+  toggleTheme,
+  toggleUnit,
+} from '../lib/bookSelection'
 import { settings } from '../lib/settingsState'
 import { loadBookStats } from '../lib/stats'
-import type { BookTag, Chapter } from '../types'
+import type { BookSection, BookTheme, Chapter } from '../types'
 
 const stats = loadBookStats()
 
-/** Тема подсвечена, когда отмечены ровно её главы. */
-const activeTag = computed<BookTag | undefined>(() => {
-  const picked = selectedUnitList(settings.selectedUnits)
-  return TAGS.find(({ tag }) => {
-    const units = unitsWithTag(tag)
-    return units.length === picked.length && units.every((u) => picked.includes(u))
-  })?.tag
-})
+const picked = computed(() => selectedUnits(settings.bookSelection))
+
+function chaptersOf(section: BookSection): Chapter[] {
+  return CHAPTERS.filter((c) => c.section === section)
+}
+
+function pickedOf(section: BookSection): number {
+  return chaptersOf(section).filter((c) => picked.value.includes(c.unit)).length
+}
+
+function isActive(theme: BookTheme): boolean {
+  return isThemeActive(settings.bookSelection, theme)
+}
+
+function pickTheme(theme: BookTheme) {
+  settings.bookSelection = toggleTheme(settings.bookSelection, theme)
+}
+
+function pickUnit(unit: number) {
+  settings.bookSelection = toggleUnit(settings.bookSelection, unit)
+}
 
 function selectUnits(units: number[]) {
-  for (const { unit } of CHAPTERS) settings.selectedUnits[unit] = units.includes(unit)
+  settings.bookSelection = onlyUnits(units)
 }
 
 function selectAll() {
-  selectUnits(CHAPTERS.map((c) => c.unit))
+  settings.bookSelection = defaultSelection()
 }
 
 function chapterMeta(chapter: Chapter): string {
@@ -38,21 +58,33 @@ function chapterMeta(chapter: Chapter): string {
 <template>
   <fieldset class="group book-picker__themes">
     <legend class="group__legend book-picker__themes-legend">Тема</legend>
-    <div class="book-picker__tags">
-      <button
-        v-for="{ tag, label } in TAGS"
-        :key="tag"
-        class="book-picker__tag"
-        :class="{ 'book-picker__tag--active': activeTag === tag }"
-        type="button"
-        :aria-pressed="activeTag === tag"
-        @click="selectUnits(unitsWithTag(tag))"
-      >
-        {{ label }}
-      </button>
+    <div v-for="s in SECTIONS" :key="s.section" class="book-picker__section">
+      <p v-if="SECTIONS.length > 1" class="book-picker__section-title">{{ s.title }}</p>
+      <div class="book-picker__tags">
+        <button
+          class="book-picker__tag"
+          :class="{ 'book-picker__tag--active': isActive({ section: s.section }) }"
+          type="button"
+          :aria-pressed="isActive({ section: s.section })"
+          @click="pickTheme({ section: s.section })"
+        >
+          {{ s.all }}
+        </button>
+        <button
+          v-for="{ tag, label } in s.tags"
+          :key="tag"
+          class="book-picker__tag"
+          :class="{ 'book-picker__tag--active': isActive({ section: s.section, tag }) }"
+          type="button"
+          :aria-pressed="isActive({ section: s.section, tag })"
+          @click="pickTheme({ section: s.section, tag })"
+        >
+          {{ label }}
+        </button>
+      </div>
     </div>
     <p class="group__note book-picker__themes-note">
-      Тема отмечает все свои главы. Ниже можно снять лишние.
+      Можно отметить несколько тем. Лишние главы снимаются в списке ниже.
     </p>
   </fieldset>
 
@@ -66,32 +98,50 @@ function chapterMeta(chapter: Chapter): string {
         Отключить все
       </button>
     </div>
-    <div v-for="chapter in CHAPTERS" :key="chapter.unit" class="book-picker__chapter">
-      <label class="choice book-picker__choice">
-        <input
-          v-model="settings.selectedUnits[chapter.unit]"
-          class="choice__input book-picker__input"
-          type="checkbox"
-        />
-        <span class="choice__label book-picker__label">
-          <b class="book-picker__number">{{ chapter.unit }}</b>
-          {{ chapter.ru }}
-          <span class="book-picker__meta">{{ chapterMeta(chapter) }}</span>
-        </span>
-      </label>
-      <button
-        class="link-button book-picker__only"
-        type="button"
-        @click="selectUnits([chapter.unit])"
-      >
-        только
-      </button>
-    </div>
+    <details v-for="s in SECTIONS" :key="s.section" class="book-picker__group">
+      <summary class="book-picker__group-title">
+        {{ s.title }}
+        <span class="book-picker__group-count">{{ pickedOf(s.section) }} из {{ chaptersOf(s.section).length }}</span>
+      </summary>
+      <div v-for="chapter in chaptersOf(s.section)" :key="chapter.unit" class="book-picker__chapter">
+        <label class="choice book-picker__choice">
+          <input
+            class="choice__input book-picker__input"
+            type="checkbox"
+            :checked="picked.includes(chapter.unit)"
+            @change="pickUnit(chapter.unit)"
+          />
+          <span class="choice__label book-picker__label">
+            <b class="book-picker__number">{{ chapter.unit }}</b>
+            {{ chapter.ru }}
+            <span class="book-picker__meta">{{ chapterMeta(chapter) }}</span>
+          </span>
+        </label>
+        <button
+          class="link-button book-picker__only"
+          type="button"
+          @click="selectUnits([chapter.unit])"
+        >
+          только
+        </button>
+      </div>
+    </details>
   </fieldset>
 </template>
 
 <style scoped lang="scss">
 /* ===== book-picker: выбор темы и глав учебника ===== */
+
+.book-picker__section + .book-picker__section {
+  margin-top: var(--space-3);
+}
+
+.book-picker__section-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--ink);
+}
 
 .book-picker__tags {
   display: flex;
@@ -123,6 +173,25 @@ function chapterMeta(chapter: Chapter): string {
   justify-content: flex-end;
   gap: var(--space-4);
   margin-bottom: var(--space-1);
+}
+
+.book-picker__group + .book-picker__group {
+  margin-top: var(--space-2);
+}
+
+.book-picker__group-title {
+  min-height: var(--tap);
+  padding: var(--space-2) 0;
+  font-weight: var(--weight-semibold);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.book-picker__group-count {
+  margin-left: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  color: var(--muted);
 }
 
 .book-picker__chapter {

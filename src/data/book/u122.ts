@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 122,
   title: 'Oraciones impersonales',
   ru: 'Безличные предложения: se vive mejor, uno se divierte, es fácil equivocarse, hace frío',
-  tags: ['pronombres', 'impersonales'],
+  section: 'pronombres',
+  tags: ['impersonales'],
   sets: [
     {
       id: '122.1',

@@ -1,4 +1,4 @@
-import type { BookTag, Chapter } from '../../types'
+import type { BookSection, BookTag, Chapter } from '../../types'
 import u12 from './u12'
 import u18 from './u18'
 import u19 from './u19'
@@ -26,21 +26,33 @@ import u78 from './u78'
 import u109 from './u109'
 import u122 from './u122'
 
-/** Темы в том порядке, в каком показываем их при выборе. */
-export const TAGS: { tag: BookTag; label: string }[] = [
-  { tag: 'pronombres', label: 'Все местоимения' },
-  { tag: 'personales', label: 'Личные' },
-  { tag: 'complementos', label: 'Дополнения' },
-  { tag: 'reflexivos', label: 'С se' },
-  { tag: 'gustar', label: 'Me gusta' },
-  { tag: 'imperativo', label: 'С императивом' },
-  { tag: 'preposiciones', label: 'С предлогами' },
-  { tag: 'impersonales', label: 'Безличные' },
-  { tag: 'demostrativos', label: 'Указательные' },
-  { tag: 'posesivos', label: 'Притяжательные' },
-  { tag: 'indefinidos', label: 'Неопределённые' },
-  { tag: 'relativos', label: 'Относительные' },
-  { tag: 'interrogativos', label: 'Вопросительные' },
+/** Разделы и их подтемы в том порядке, в каком показываем их при выборе. */
+export const SECTIONS: {
+  section: BookSection
+  title: string
+  /** Подпись темы «весь раздел». */
+  all: string
+  tags: { tag: BookTag; label: string }[]
+}[] = [
+  {
+    section: 'pronombres',
+    title: 'Местоимения',
+    all: 'Все местоимения',
+    tags: [
+      { tag: 'personales', label: 'Личные' },
+      { tag: 'complementos', label: 'Дополнения' },
+      { tag: 'reflexivos', label: 'С se' },
+      { tag: 'gustar', label: 'Me gusta' },
+      { tag: 'imperativo', label: 'С императивом' },
+      { tag: 'preposiciones', label: 'С предлогами' },
+      { tag: 'impersonales', label: 'Безличные' },
+      { tag: 'demostrativos', label: 'Указательные' },
+      { tag: 'posesivos', label: 'Притяжательные' },
+      { tag: 'indefinidos', label: 'Неопределённые' },
+      { tag: 'relativos', label: 'Относительные' },
+      { tag: 'interrogativos', label: 'Вопросительные' },
+    ],
+  },
 ]
 
 /**

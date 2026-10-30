@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 39,
   title: 'Pronombres de complemento con el imperativo, el infinitivo y el gerundio',
   ru: 'Местоимения с императивом, инфинитивом и герундием: ámalo, comprarlo, dándomelo',
-  tags: ['pronombres', 'personales', 'complementos', 'imperativo'],
+  section: 'pronombres',
+  tags: ['personales', 'complementos', 'imperativo'],
   sets: [
     {
       id: '39.1',

@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 35,
   title: 'Pronombres personales de complemento directo',
   ru: 'Местоимения прямого дополнения: me, te, lo, la, nos, os, los, las',
-  tags: ['pronombres', 'personales', 'complementos'],
+  section: 'pronombres',
+  tags: ['personales', 'complementos'],
   sets: [
     {
       id: '35.1',

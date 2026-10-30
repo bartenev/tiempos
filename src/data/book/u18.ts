@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 18,
   title: 'Posesivos (1)',
   ru: 'Притяжательные (1): mi, tu, su, nuestro, vuestro',
-  tags: ['pronombres', 'posesivos'],
+  section: 'pronombres',
+  tags: ['posesivos'],
   sets: [
     {
       id: '18.1',

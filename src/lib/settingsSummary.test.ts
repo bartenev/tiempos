@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { CHAPTERS } from '../data/book'
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
-import { DEFAULT_SETTINGS, defaultSelectedIrregular, defaultSelectedUnits } from './settings'
+import { onlyUnits } from './bookSelection'
+import { DEFAULT_SETTINGS, defaultSelectedIrregular } from './settings'
 import type { SetupSettings } from './settings'
 import { describeBook, describeSettings, irregularLabel } from './settingsSummary'
 
@@ -77,12 +78,31 @@ describe('irregularLabel', () => {
 
 describe('describeBook', () => {
   function withUnits(units: number[]): SetupSettings {
-    return make({ selectedUnits: Object.fromEntries(CHAPTERS.map((c) => [c.unit, units.includes(c.unit)])) })
+    return make({ bookSelection: onlyUnits(units) })
   }
 
-  it('names the theme when exactly its chapters are selected', () => {
-    expect(describeBook(make({ selectedUnits: defaultSelectedUnits() })).theme).toBe('Все местоимения')
-    expect(describeBook(withUnits([39, 77, 78])).theme).toBe('С императивом')
+  function withThemes(excluded: number[] = []): SetupSettings {
+    return make({
+      bookSelection: {
+        kind: 'theme',
+        themes: [
+          { section: 'pronombres', tag: 'imperativo' },
+          { section: 'pronombres', tag: 'gustar' },
+        ],
+        excluded,
+      },
+    })
+  }
+
+  it('names the themes', () => {
+    expect(describeBook(make()).theme).toBe('Все местоимения')
+    expect(describeBook(withThemes()).theme).toBe('С императивом, Me gusta')
+  })
+
+  it('tells how many chapters are taken out of a theme', () => {
+    expect(describeBook(withThemes([39])).theme).toBe('С императивом, Me gusta, без 1 гл.')
+    // снятая глава вне темы ни на что не влияет
+    expect(describeBook(withThemes([12])).theme).toBe('С императивом, Me gusta')
   })
 
   it('names a single chapter or a custom pick', () => {

@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 22,
   title: 'Indefinidos (3)',
   ru: 'Неопределённые (3): mucho, poco, bastante, demasiado, suficiente',
-  tags: ['pronombres', 'indefinidos'],
+  section: 'pronombres',
+  tags: ['indefinidos'],
   sets: [
     {
       id: '22.1',

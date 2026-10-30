@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 36,
   title: 'Pronombres personales de complemento indirecto',
   ru: 'Местоимения косвенного дополнения: me, te, le, nos, os, les',
-  tags: ['pronombres', 'personales', 'complementos'],
+  section: 'pronombres',
+  tags: ['personales', 'complementos'],
   sets: [
     {
       id: '36.1',

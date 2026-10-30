@@ -1,11 +1,12 @@
-import { CHAPTERS, TAGS } from '../data/book'
+import { CHAPTERS, SECTIONS } from '../data/book'
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
-import type { Tense } from '../types'
+import type { BookSelection, BookTheme, Tense } from '../types'
 import { PERSONS, TENSES, VERB_GROUPS } from '../types'
-import { chapterSize, unitsWithTag } from './book'
+import { chapterSize } from './book'
+import { selectedUnits } from './bookSelection'
 import { pluralRu } from './plural'
 import type { SetupSettings } from './settings'
-import { selectedIrregularList, selectedUnitList } from './settings'
+import { selectedIrregularList } from './settings'
 
 /** Короткие названия времён для сводки на главной. */
 export const TENSE_SHORT_NAMES: Record<Tense, string> = {
@@ -78,24 +79,30 @@ export interface BookSummary {
   size: string
 }
 
-/** Название выбора: тема, если отмечены ровно её главы, иначе номера глав или «своя подборка». */
-function describeTheme(units: number[]): string {
+function themeLabel({ section, tag }: BookTheme): string {
+  const known = SECTIONS.find((s) => s.section === section)
+  return known?.tags.find((t) => t.tag === tag)?.label ?? known?.all ?? section
+}
+
+/** Название выбора: темы (и сколько глав из них снято) или номер главы / «своя подборка». */
+function describeTheme(selection: BookSelection, units: number[]): string {
   if (units.length === 0) return NOTHING
-  const same = (other: number[]) =>
-    other.length === units.length && other.every((u) => units.includes(u))
-  const theme = TAGS.find(({ tag }) => same(unitsWithTag(tag)))
-  if (theme) return theme.label
-  return units.length === 1 ? `Глава ${units[0]}` : 'своя подборка'
+  if (selection.kind === 'units') {
+    return units.length === 1 ? `Глава ${units[0]}` : 'своя подборка'
+  }
+  const names = selection.themes.map(themeLabel).join(', ')
+  const removed = selectedUnits({ ...selection, excluded: [] }).length - units.length
+  return removed > 0 ? `${names}, без ${removed} гл.` : names
 }
 
 export function describeBook(settings: SetupSettings): BookSummary {
-  const units = selectedUnitList(settings.selectedUnits)
+  const units = selectedUnits(settings.bookSelection)
   const exercises = CHAPTERS.filter((c) => units.includes(c.unit)).reduce(
     (sum, c) => sum + chapterSize(c),
     0,
   )
   return {
-    theme: describeTheme(units),
+    theme: describeTheme(settings.bookSelection, units),
     chapters: units.length === 0 ? NOTHING : `${units.length} из ${CHAPTERS.length}`,
     exercises: String(exercises),
     size: `${settings.size} карточек`,

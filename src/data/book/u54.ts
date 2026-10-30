@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 54,
   title: 'Contraste entre verbos con y sin me, te, se…',
   ru: 'Один глагол с se и без se: lavar / lavarse, llamar / llamarse, ir / irse',
-  tags: ['pronombres', 'reflexivos'],
+  section: 'pronombres',
+  tags: ['reflexivos'],
   sets: [
     {
       id: '54.1',

@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 41,
   title: 'Pronombres personales con preposiciones',
   ru: 'Местоимения после предлогов: para mí, con él, conmigo, contigo, según tú',
-  tags: ['pronombres', 'personales', 'preposiciones'],
+  section: 'pronombres',
+  tags: ['personales', 'preposiciones'],
   sets: [
     {
       id: '41.1',

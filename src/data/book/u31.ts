@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 31,
   title: 'Interrogativos (2)',
   ru: 'Вопросительные (2): cuál, cuáles, cuál de, qué',
-  tags: ['pronombres', 'interrogativos'],
+  section: 'pronombres',
+  tags: ['interrogativos'],
   sets: [
     {
       id: '31.1',

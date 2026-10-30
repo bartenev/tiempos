@@ -4,7 +4,8 @@ const chapter: Chapter = {
   unit: 29,
   title: 'Relativos (2)',
   ru: 'Относительные (2): cuyo, donde, adonde, cuando',
-  tags: ['pronombres', 'relativos'],
+  section: 'pronombres',
+  tags: ['relativos'],
   sets: [
     {
       id: '29.1',
