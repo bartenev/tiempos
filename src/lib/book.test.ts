@@ -117,6 +117,20 @@ describe('buildBookSession', () => {
     expect(cards.filter((c) => keys.has(c.key))).toHaveLength(3)
   })
 
+  it('smart mode brings exercises back when their review is due', () => {
+    const now = 100 * 24 * 60 * 60 * 1000
+    const old = cardsForUnits([36]).slice(0, 4)
+    const recent = cardsForUnits([36]).slice(4, 12)
+    const stats: StatsStore = {
+      ...Object.fromEntries(old.map((c) => [c.key, { ...fresh(3), last: 0 }])),
+      ...Object.fromEntries(recent.map((c) => [c.key, { ...fresh(3), last: now }])),
+    }
+    const cards = buildBookSession(config({ size: 9 }), stats, now)
+    const keys = new Set(old.map((c) => c.key))
+    expect(cards.filter((c) => keys.has(c.key))).toHaveLength(3)
+    expect(new Set(cards.map((c) => c.key)).size).toBe(cards.length)
+  })
+
   it('smart mode fills the session when there is nothing new left', () => {
     const all = cardsForUnits([35, 36])
     const stats: StatsStore = Object.fromEntries(all.map((c) => [c.key, fresh()]))

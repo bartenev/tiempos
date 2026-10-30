@@ -54,7 +54,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 /* ===== zoom-image: картинка упражнения, по тапу — на весь экран ===== */
 
 .zoom-image {
-  margin: 0 auto var(--space-3);
+  margin: var(--space-3) auto;
 }
 
 .zoom-image__open {

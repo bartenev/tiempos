@@ -8,11 +8,12 @@ import type {
 } from '../types'
 import { shuffle } from './session'
 import type { Mastery, StatsStore } from './stats'
-import { cellWeight, isWeak, loadBookStats, masteryOf } from './stats'
+import { cellWeight, isDue, isWeak, loadBookStats, masteryOf } from './stats'
 
-/** Умная очередь: доля новых упражнений и места, гарантированные слабым. */
+/** Умная очередь: доля новых упражнений и места, гарантированные слабым и повторению. */
 const NEW_SHARE = 0.6
 const WEAK_SHARE = 1 / 3
+const DUE_SHARE = 1 / 3
 
 export function chapterOf(unit: number): Chapter | undefined {
   return CHAPTERS.find((c) => c.unit === unit)
@@ -131,23 +132,33 @@ function pickWeighted(cards: BookCard[], stats: StatsStore, size: number): BookC
 
 /**
  * Умная очередь: слабым — до трети сессии (сначала с большим числом ошибок),
+ * тем, у кого подошёл срок повторения, — ещё до трети,
  * новое — по порядку глав, так что глава проходится целиком,
  * остальное — повторение, выученное всё реже.
  */
-function smartCards(cards: BookCard[], stats: StatsStore, size: number): BookCard[] {
+function smartCards(
+  cards: BookCard[],
+  stats: StatsStore,
+  size: number,
+  now: number,
+): BookCard[] {
   const fresh = cards.filter((c) => !stats[c.key])
   const weak = shuffle(cards.filter((c) => isWeak(stats[c.key]))).sort(
     (a, b) => stats[b.key]!.bad - stats[a.key]!.bad,
   )
   const seen = cards.filter((c) => stats[c.key] && !isWeak(stats[c.key]))
+  const due = seen.filter((c) => isDue(stats[c.key]!, now))
 
   const picked = weak.slice(0, Math.ceil(size * WEAK_SHARE))
+  picked.push(...pickWeighted(due, stats, Math.ceil(size * DUE_SHARE)))
   // внутри главы упражнения вперемешку, сами главы — по порядку
   const units = [...new Set(fresh.map((c) => c.unit))]
   const ordered = units.flatMap((unit) => shuffle(fresh.filter((c) => c.unit === unit)))
   const newSlots = Math.min(size - picked.length, Math.ceil(size * NEW_SHARE))
   picked.push(...ordered.slice(0, newSlots))
-  picked.push(...pickWeighted(seen, stats, size - picked.length))
+  const repeated = new Set(picked.map((c) => c.key))
+  const later = seen.filter((c) => !repeated.has(c.key))
+  picked.push(...pickWeighted(later, stats, size - picked.length))
 
   // не хватило повторения — добираем тем, что осталось
   if (picked.length < size) {
@@ -161,6 +172,7 @@ function smartCards(cards: BookCard[], stats: StatsStore, size: number): BookCar
 export function buildBookSession(
   config: BookConfig,
   stats: StatsStore = loadBookStats(),
+  now: number = Date.now(),
 ): BookCard[] {
   if (config.units.length === 0) throw new Error('Выберите хотя бы одну главу')
   const cards = cardsForUnits(config.units)
@@ -170,7 +182,7 @@ export function buildBookSession(
     return shuffle(weak).slice(0, config.size)
   }
   if (config.mode === 'random') return shuffle(cards).slice(0, config.size)
-  return smartCards(cards, stats, config.size)
+  return smartCards(cards, stats, config.size, now)
 }
 
 /** Та же карточка ещё раз — повтор после ошибки. */

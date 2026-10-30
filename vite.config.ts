@@ -15,7 +15,8 @@ function listFiles(dir: string, root = dir): string[] {
 
 /**
  * Офлайн-режим без зависимостей: после сборки кладём в dist sw.js
- * со списком всех файлов (хэш списка = версия кэша).
+ * со списком всех файлов (хэш списка кода = версия кэша). Картинки учебника
+ * лежат в своём постоянном кэше: они не меняются от сборки к сборке.
  */
 function serviceWorker(): Plugin {
   return {
@@ -28,7 +29,8 @@ function serviceWorker(): Plugin {
       ]
         .filter((f) => f !== 'index.html' && !f.endsWith('.map'))
         .sort()
-      const precache = ['./', ...files]
+      const isImage = (f: string) => f.startsWith('book/')
+      const precache = ['./', ...files.filter((f) => !isImage(f))]
       const version = createHash('sha256')
         .update(precache.join('\n'))
         .digest('hex')
@@ -38,11 +40,30 @@ function serviceWorker(): Plugin {
         type: 'asset',
         fileName: 'sw.js',
         source: `const CACHE = 'tiempos-${version}'
+const IMAGES = 'tiempos-images'
 const PRECACHE = ${JSON.stringify(precache)}
+const IMAGE_FILES = ${JSON.stringify(files.filter(isImage))}
+
+// Докачиваем только новые картинки; неудача не мешает установке — догрузится при показе.
+async function syncImages() {
+  const cache = await caches.open(IMAGES)
+  const wanted = IMAGE_FILES.map((file) => new URL(file, self.registration.scope).href)
+  const stale = (await cache.keys()).filter((request) => !wanted.includes(request.url))
+  await Promise.all(stale.map((request) => cache.delete(request)))
+  await Promise.all(
+    wanted.map(async (url) => {
+      if (!(await cache.match(url))) await cache.add(url).catch(() => {})
+    }),
+  )
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting()),
+    caches
+      .open(CACHE)
+      .then((cache) => cache.addAll(PRECACHE))
+      .then(syncImages)
+      .then(() => self.skipWaiting()),
   )
 })
 
@@ -50,7 +71,9 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) =>
+        Promise.all(keys.filter((k) => k !== CACHE && k !== IMAGES).map((k) => caches.delete(k))),
+      )
       .then(() => self.clients.claim()),
   )
 })
@@ -82,7 +105,8 @@ self.addEventListener('fetch', (event) => {
         fetch(request).then((response) => {
           if (response.ok) {
             const copy = response.clone()
-            caches.open(CACHE).then((cache) => cache.put(request, copy))
+            const name = new URL(request.url).pathname.includes('/book/') ? IMAGES : CACHE
+            caches.open(name).then((cache) => cache.put(request, copy))
           }
           return response
         }),

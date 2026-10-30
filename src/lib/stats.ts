@@ -46,6 +46,16 @@ export function solidStreak(bad: number): number {
   return Math.max(SOLID_STREAK, recoveryStreak(bad) + 1)
 }
 
+/** Предел паузы перед повторением, дней. */
+export const MAX_REVIEW_DAYS = 60
+
+const DAY_MS = 24 * 60 * 60 * 1000
+
+/** Через сколько дней вернуться к форме: каждый верный ответ подряд удваивает срок. */
+export function reviewDays(streak: number): number {
+  return Math.min(MAX_REVIEW_DAYS, 2 ** streak)
+}
+
 export type Mastery = 'new' | 'weak' | 'learning' | 'solid'
 
 export function cellKey(infinitive: string, tense: Tense, person: Person): string {
@@ -178,13 +188,19 @@ export function masteryOf(stat: CellStat | undefined): Mastery {
   return stat.streak >= solidStreak(stat.bad) ? 'solid' : 'learning'
 }
 
+/** Пора повторить: с последнего ответа прошло больше reviewDays(streak) дней. */
+export function isDue(stat: CellStat, now: number = Date.now()): boolean {
+  return now - stat.last >= reviewDays(stat.streak) * DAY_MS
+}
+
 /**
  * Вес формы для смарт-очереди: слабые ×~4 чаще новых,
- * выученные — всё реже с ростом серии.
+ * выученные — всё реже с ростом серии, пока не подойдёт срок повторения.
  */
-export function cellWeight(stat: CellStat | undefined): number {
+export function cellWeight(stat: CellStat | undefined, now: number = Date.now()): number {
   if (!stat) return 2.5
   if (isWeak(stat)) return 8 + Math.min(stat.bad, 5)
+  if (isDue(stat, now)) return 2.5
   return Math.max(0.4, 2.5 / (1 + stat.streak * 0.5))
 }
 

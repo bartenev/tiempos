@@ -5,6 +5,7 @@ import {
   STATS_KEY,
   cellKey,
   cellWeight,
+  isDue,
   isWeak,
   loadBookStats,
   loadStats,
@@ -13,6 +14,7 @@ import {
   recordAttempt,
   recoveryStreak,
   restoreStat,
+  reviewDays,
 } from './stats'
 
 beforeEach(() => {
@@ -72,10 +74,28 @@ describe('stats', () => {
   it('weak forms weigh more than new, new more than solid', () => {
     const weak = cellWeight({ ok: 0, bad: 2, streak: 0, last: 0 })
     const fresh = cellWeight(undefined)
-    const solid = cellWeight({ ok: 8, bad: 0, streak: 8, last: 0 })
+    const solid = cellWeight({ ok: 8, bad: 0, streak: 8, last: 0 }, 0)
     expect(weak).toBeGreaterThan(fresh)
     expect(fresh).toBeGreaterThan(solid)
     expect(masteryOf({ ok: 8, bad: 0, streak: 8, last: 0 })).toBe('solid')
+  })
+
+  it('the pause before a review doubles with the streak, up to a limit', () => {
+    expect([1, 2, 3, 5, 6, 20].map(reviewDays)).toEqual([2, 4, 8, 32, 60, 60])
+  })
+
+  it('a learned form comes back when its review is due', () => {
+    const stat = { ok: 3, bad: 0, streak: 3, last: 0 }
+    const day = 24 * 60 * 60 * 1000
+    expect(isDue(stat, 7 * day)).toBe(false)
+    expect(isDue(stat, 8 * day)).toBe(true)
+    expect(cellWeight(stat, 7 * day)).toBeLessThan(cellWeight(undefined))
+    expect(cellWeight(stat, 8 * day)).toBe(cellWeight(undefined))
+  })
+
+  it('a weak form stays above any review', () => {
+    const weak = { ok: 0, bad: 1, streak: 0, last: 0 }
+    expect(cellWeight(weak, 1e12)).toBeGreaterThan(cellWeight({ ok: 9, bad: 0, streak: 9, last: 0 }, 1e12))
   })
 
   it('ignores corrupt entries', () => {
