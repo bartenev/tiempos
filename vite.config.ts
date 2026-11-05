@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { readdirSync, statSync } from 'node:fs'
+import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import vue from '@vitejs/plugin-vue'
 import type { Plugin } from 'vite'
@@ -15,8 +15,9 @@ function listFiles(dir: string, root = dir): string[] {
 
 /**
  * Офлайн-режим без зависимостей: после сборки кладём в dist sw.js
- * со списком всех файлов (хэш списка кода = версия кэша). Картинки учебника
- * лежат в своём постоянном кэше: они не меняются от сборки к сборке.
+ * со списком всех файлов. Версия кэша — хэш списка файлов и содержимого тех, у кого
+ * имя не меняется от сборки к сборке (index.html, файлы из public вроде articulos/):
+ * иначе их правка не обновила бы кэш. Картинки учебника лежат в своём постоянном кэше.
  */
 function serviceWorker(): Plugin {
   return {
@@ -31,10 +32,14 @@ function serviceWorker(): Plugin {
         .sort()
       const isImage = (f: string) => f.startsWith('book/')
       const precache = ['./', ...files.filter((f) => !isImage(f))]
-      const version = createHash('sha256')
-        .update(precache.join('\n'))
-        .digest('hex')
-        .slice(0, 12)
+      const hash = createHash('sha256').update(precache.join('\n'))
+      const page = bundle['index.html']
+      if (page?.type === 'asset') hash.update(page.source)
+      const publicDir = join(import.meta.dirname, 'public')
+      for (const f of precache) {
+        if (f !== './' && !(f in bundle)) hash.update(readFileSync(join(publicDir, f)))
+      }
+      const version = hash.digest('hex').slice(0, 12)
 
       this.emitFile({
         type: 'asset',
@@ -61,7 +66,9 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(CACHE)
-      .then((cache) => cache.addAll(PRECACHE))
+      // cache: 'reload' — мимо HTTP-кэша браузера (GitHub Pages отдаёт max-age=600),
+      // иначе в новый кэш могла бы попасть старая копия файла с тем же именем
+      .then((cache) => cache.addAll(PRECACHE.map((url) => new Request(url, { cache: 'reload' }))))
       .then(syncImages)
       .then(() => self.skipWaiting()),
   )
@@ -88,14 +95,15 @@ self.addEventListener('fetch', (event) => {
   if (request.mode === 'navigate' && new URL(request.url).pathname !== root) {
     const file = new URL(request.url)
     if (file.pathname.endsWith('/')) file.pathname += 'index.html'
-    event.respondWith(fetch(request).catch(() => caches.match(file.href, { ignoreVary: true })))
+    event.respondWith(fetch(request, { cache: 'no-cache' }).catch(() => caches.match(file.href, { ignoreVary: true })))
     return
   }
 
   // Страница: сначала сеть (свежая версия), офлайн — из кэша.
+  // no-cache: сверяемся с сервером (короткий ответ 304, если не менялось), а не берём HTTP-кэш.
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
+      fetch(request, { cache: 'no-cache' })
         .then((response) => {
           const copy = response.clone()
           caches.open(CACHE).then((cache) => cache.put('./', copy))
