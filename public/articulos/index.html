@@ -44,6 +44,8 @@
   --warn: #e2b04f; --warn-soft: #362a12; color-scheme: dark;
 }
 * { box-sizing: border-box; }
+/* вкладки прячутся атрибутом hidden; без !important его перебивает .wrap { display: grid } */
+[hidden] { display: none !important; }
 body {
   background: var(--bg); color: var(--ink); font-family: var(--f-ui); font-size: 17px; line-height: 1.5;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
@@ -160,12 +162,12 @@ footer { color: var(--muted); font-size: 0.85rem; }
       <p class="sub">Алгоритм v2 по двум учебникам: Gramática básica del estudiante и Gramática de uso A1-B2</p>
     </div>
     <nav class="tabs" role="tablist" aria-label="Режим">
-      <button id="tab-trainer" role="tab" aria-selected="true" data-tab="trainer">Тренажёр</button>
-      <button id="tab-scheme" role="tab" aria-selected="false" data-tab="scheme">Схема</button>
+      <button id="tab-trainer" role="tab" aria-selected="true" aria-controls="view-trainer" data-tab="trainer">Тренажёр</button>
+      <button id="tab-scheme" role="tab" aria-selected="false" aria-controls="view-scheme" data-tab="scheme">Схема</button>
     </nav>
   </header>
 
-  <section id="view-trainer" aria-labelledby="tab-trainer" class="wrap" style="gap:14px">
+  <section id="view-trainer" role="tabpanel" aria-labelledby="tab-trainer" class="wrap" style="gap:14px">
     <div class="filters">
       <span class="seg" id="f-book" role="group" aria-label="Учебник"></span>
       <label for="f-cat">Тема <select id="f-cat"></select></label>
@@ -180,7 +182,7 @@ footer { color: var(--muted); font-size: 0.85rem; }
     <article class="card" id="card"></article>
   </section>
 
-  <section id="view-scheme" aria-labelledby="tab-scheme" class="wrap" style="gap:14px" hidden>
+  <section id="view-scheme" role="tabpanel" aria-labelledby="tab-scheme" class="wrap" style="gap:14px" hidden>
     <p class="sub" style="margin:0">Возьмите своё предложение и отвечайте на вопросы по порядку. Сначала идут особые случаи (имена, время, профессии, устойчивые сочетания), потом общее ядро, в конце — форма.</p>
     <div class="card">
       <div class="trail" id="trail"></div>
