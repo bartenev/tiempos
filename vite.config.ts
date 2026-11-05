@@ -82,6 +82,16 @@ self.addEventListener('fetch', (event) => {
   const { request } = event
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return
 
+  // Отдельные страницы из public (например, articulos/) — сеть, офлайн — их собственный файл из кэша.
+  // Главную ('./') ими не подменяем.
+  const root = new URL('./', self.registration.scope).pathname
+  if (request.mode === 'navigate' && new URL(request.url).pathname !== root) {
+    const file = new URL(request.url)
+    if (file.pathname.endsWith('/')) file.pathname += 'index.html'
+    event.respondWith(fetch(request).catch(() => caches.match(file.href, { ignoreVary: true })))
+    return
+  }
+
   // Страница: сначала сеть (свежая версия), офлайн — из кэша.
   if (request.mode === 'navigate') {
     event.respondWith(

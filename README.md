@@ -116,6 +116,18 @@ npm run build
   (из него же считаются цвета в «Таблицах»: верные − ошибки); `tiempos.book.v2` — то же по
   упражнениям учебника; `tiempos.daily.v1` — серия дней.
 
+## Артикли (отдельная страница)
+
+Кнопка «Артикли» на главной ведёт на `articulos/` — тренажёр и пошаговую схему выбора el / un / Ø
+по двум учебникам, плюс схема в PDF. Это готовая статическая страница в `public/articulos/`,
+к Vue-приложению она не относится. Собирается в проекте `espanol`:
+
+```bash
+cd ../espanol
+node scripts/build-trainer.mjs ../tiempos/public/articulos/index.html --standalone
+cp docs/algorithm-v2.pdf ../tiempos/public/articulos/
+```
+
 ## Установка на телефон (PWA)
 
 Откройте сайт в Safari / Chrome → «На экран Домой» / «Установить приложение».

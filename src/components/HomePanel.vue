@@ -42,6 +42,9 @@ const MODES: { mode: SessionMode; label: string; hint: string; bookHint?: string
 
 const days = currentStreak(loadDaily())
 
+/** Тренажёр артиклей — статическая страница из public/articulos (собрана в проекте espanol). */
+const articlesUrl = `${import.meta.env.BASE_URL}articulos/`
+
 const isBook = computed(() => settings.track === 'book')
 
 const config = computed(() => configFromSettings(settings))
@@ -86,6 +89,8 @@ function start() {
   <section class="home">
     <header class="home__header">
       <h1 class="screen__title home__title">Tiempos</h1>
+      <!-- отдельная статическая страница из public/articulos: тренажёр и схема артиклей -->
+      <a class="home__articles" :href="articlesUrl">Артикли<Icon name="forward" /></a>
     </header>
     <p class="screen__lead home__lead">
       {{ isBook ? 'Упражнения по главам учебника.' : 'Тренажёр спряжения испанских глаголов.' }}
@@ -250,6 +255,27 @@ function start() {
 
 .home__title {
   margin: 0;
+}
+
+.home__articles {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap);
+  padding: 0 var(--space-3) 0 var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  color: var(--accent);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.home__articles:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
 }
 
 .home__daily {
