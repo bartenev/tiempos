@@ -109,12 +109,12 @@ function start() {
           <span class="home__filter-value">{{ bookSummary.mode }}<template v-if="settings.mode === 'weak'"> · {{ weak }}</template></span>
         </span>
         <span class="home__filter">
-          <span class="home__filter-name">Ответ</span>
-          <span class="home__filter-value">{{ bookSummary.answer }}</span>
-        </span>
-        <span class="home__filter">
           <span class="home__filter-name">Сессия</span>
           <span class="home__filter-value">{{ bookSummary.size }}</span>
+        </span>
+        <span class="home__filter">
+          <span class="home__filter-name">Ответ</span>
+          <span class="home__filter-value">{{ bookSummary.answer }}</span>
         </span>
         <span class="home__filters-edit">Изменить<Icon name="forward" /></span>
       </button>
@@ -140,12 +140,12 @@ function start() {
           <span class="home__filter-value">{{ summary.mode }}<template v-if="settings.mode === 'weak'"> · {{ weak }}</template></span>
         </span>
         <span class="home__filter">
-          <span class="home__filter-name">Ответ</span>
-          <span class="home__filter-value">{{ summary.answer }}</span>
-        </span>
-        <span class="home__filter">
           <span class="home__filter-name">Сессия</span>
           <span class="home__filter-value">{{ summary.size }}</span>
+        </span>
+        <span class="home__filter">
+          <span class="home__filter-name">Ответ</span>
+          <span class="home__filter-value">{{ summary.answer }}</span>
         </span>
         <span class="home__filters-edit">Изменить<Icon name="forward" /></span>
       </button>

@@ -154,24 +154,6 @@ function setAllIrregular(value: boolean) {
 
     </template>
 
-    <fieldset class="group settings__size">
-      <legend class="group__legend settings__size-legend">Длина сессии</legend>
-      <div class="segmented settings__size-switch" role="radiogroup" aria-label="Длина сессии">
-        <button
-          v-for="n in SIZES"
-          :key="n"
-          class="segmented__item settings__size-item"
-          :class="{ 'segmented__item--active': settings.size === n }"
-          type="button"
-          role="radio"
-          :aria-checked="settings.size === n"
-          @click="settings.size = n"
-        >
-          {{ n }}
-        </button>
-      </div>
-    </fieldset>
-
     <fieldset class="group settings__mode">
       <legend class="group__legend settings__mode-legend">Режим</legend>
       <div class="segmented settings__mode-switch" role="radiogroup" aria-label="Режим">
@@ -194,6 +176,24 @@ function setAllIrregular(value: boolean) {
         </button>
       </div>
       <p class="group__note settings__mode-note">{{ modeHint }}</p>
+    </fieldset>
+
+    <fieldset class="group settings__size">
+      <legend class="group__legend settings__size-legend">Длина сессии</legend>
+      <div class="segmented settings__size-switch" role="radiogroup" aria-label="Длина сессии">
+        <button
+          v-for="n in SIZES"
+          :key="n"
+          class="segmented__item settings__size-item"
+          :class="{ 'segmented__item--active': settings.size === n }"
+          type="button"
+          role="radio"
+          :aria-checked="settings.size === n"
+          @click="settings.size = n"
+        >
+          {{ n }}
+        </button>
+      </div>
     </fieldset>
 
     <fieldset class="group settings__answer">
