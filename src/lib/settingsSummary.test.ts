@@ -28,8 +28,14 @@ describe('describeSettings', () => {
       persons: 'все',
       groups: 'все',
       verbs: 'все',
+      answer: 'текстом',
       size: '20 карточек',
     })
+  })
+
+  it('names the answer mode', () => {
+    expect(describeSettings(make({ answer: 'oral' })).answer).toBe('устно')
+    expect(describeBook(make({ answer: 'oral' })).answer).toBe('устно')
   })
 
   it('lists partial picks', () => {

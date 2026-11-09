@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { IRREGULAR_INFINITIVES, findVerb } from '../data/verbs'
 import { settings } from '../lib/settingsState'
 import { setTheme, theme } from '../lib/theme'
@@ -10,6 +11,16 @@ import Icon from './Icon.vue'
 const irregularList = IRREGULAR_INFINITIVES
 
 const SIZES = [10, 20, 30]
+
+const answerNote = computed(() => {
+  const isBook = settings.track === 'book'
+  if (settings.answer === 'oral') {
+    return isBook
+      ? 'Скажите ответ вслух, откройте его и отметьте себя.'
+      : 'Скажите форму вслух, откройте её и отметьте себя.'
+  }
+  return isBook ? 'Впишите ответ в пропуск или выберите вариант.' : 'Впишите форму глагола в пропуск.'
+})
 
 /** Подписи чекбоксов; usted / ustedes тренируются вместе с él / ellos. */
 const PERSON_CHOICES: Record<Person, string> = {
@@ -127,6 +138,33 @@ function setAllIrregular(value: boolean) {
           {{ n }}
         </button>
       </div>
+    </fieldset>
+
+    <fieldset class="group settings__answer">
+      <legend class="group__legend settings__answer-legend">Ответ</legend>
+      <div class="segmented settings__answer-switch" role="radiogroup" aria-label="Как отвечать">
+        <button
+          class="segmented__item settings__answer-text"
+          :class="{ 'segmented__item--active': settings.answer === 'text' }"
+          type="button"
+          role="radio"
+          :aria-checked="settings.answer === 'text'"
+          @click="settings.answer = 'text'"
+        >
+          <Icon name="keyboard" />Текст
+        </button>
+        <button
+          class="segmented__item settings__answer-oral"
+          :class="{ 'segmented__item--active': settings.answer === 'oral' }"
+          type="button"
+          role="radio"
+          :aria-checked="settings.answer === 'oral'"
+          @click="settings.answer = 'oral'"
+        >
+          <Icon name="speech" />Устно
+        </button>
+      </div>
+      <p class="group__note settings__answer-note">{{ answerNote }}</p>
     </fieldset>
 
     <fieldset class="group settings__theme">

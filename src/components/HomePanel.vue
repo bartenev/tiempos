@@ -109,41 +109,6 @@ function start() {
       </button>
     </div>
 
-    <fieldset class="group home__answer">
-      <legend class="group__legend home__answer-legend">Ответ</legend>
-      <div class="segmented home__answer-switch" role="radiogroup" aria-label="Как отвечать">
-        <button
-          class="segmented__item home__answer-text"
-          :class="{ 'segmented__item--active': settings.answer === 'text' }"
-          type="button"
-          role="radio"
-          :aria-checked="settings.answer === 'text'"
-          @click="settings.answer = 'text'"
-        >
-          <Icon name="keyboard" />Текст
-        </button>
-        <button
-          class="segmented__item home__answer-oral"
-          :class="{ 'segmented__item--active': settings.answer === 'oral' }"
-          type="button"
-          role="radio"
-          :aria-checked="settings.answer === 'oral'"
-          @click="settings.answer = 'oral'"
-        >
-          <Icon name="speech" />Устно
-        </button>
-      </div>
-      <p class="group__note home__answer-note">
-        {{
-          settings.answer === 'oral'
-            ? `Скажите ${isBook ? 'ответ' : 'форму'} вслух, откройте его и отметьте себя.`
-            : isBook
-              ? 'Впишите ответ в пропуск или выберите вариант.'
-              : 'Впишите форму глагола в пропуск.'
-        }}
-      </p>
-    </fieldset>
-
     <fieldset class="group home__mode">
       <legend class="group__legend home__mode-legend">Режим</legend>
       <div class="segmented home__mode-switch" role="radiogroup" aria-label="Режим">
@@ -185,6 +150,10 @@ function start() {
           <span class="home__filter-value">{{ bookSummary.exercises }}</span>
         </span>
         <span class="home__filter">
+          <span class="home__filter-name">Ответ</span>
+          <span class="home__filter-value">{{ bookSummary.answer }}</span>
+        </span>
+        <span class="home__filter">
           <span class="home__filter-name">Сессия</span>
           <span class="home__filter-value">{{ bookSummary.size }}</span>
         </span>
@@ -206,6 +175,10 @@ function start() {
         <span class="home__filter">
           <span class="home__filter-name">Глаголы</span>
           <span class="home__filter-value">{{ summary.verbs }}</span>
+        </span>
+        <span class="home__filter">
+          <span class="home__filter-name">Ответ</span>
+          <span class="home__filter-value">{{ summary.answer }}</span>
         </span>
         <span class="home__filter">
           <span class="home__filter-name">Сессия</span>
