@@ -1,6 +1,6 @@
 import { framesFor } from '../data/frames'
 import { buildVerbSentence } from '../data/sentences'
-import { VERBS, isRegularIn, isRegularVerb } from '../data/verbs'
+import { REGULAR_VERBS, VERBS, isRegularIn, isRegularVerb } from '../data/verbs'
 import type { DrillCard, Person, SessionConfig, Tense, Verb } from '../types'
 import { personsFor } from '../types'
 import { conjugate, hasTense } from './conjugate'
@@ -45,6 +45,23 @@ function makeCard(verb: Verb, tense: Tense, person: Person): DrillCard {
   }
 }
 
+/**
+ * После ошибки в правильном глаголе — та же клетка «Таблиц», другой глагол:
+ * проверить правило, а не запомненную форму. Глагол — по той же очереди, что и
+ * в доводке клеток (сначала с ошибками, потом невиденные и давно не виденные).
+ * У неправильного глагола правила нет — null.
+ */
+export function siblingCard(card: DrillCard, stats: StatsStore = loadStats()): DrillCard | null {
+  // карточка из реактивной очереди: verb — прокси, сравниваем по инфинитиву
+  const { verb, tense, person } = card
+  if (!isRegularIn(verb, tense)) return null
+  const forms = REGULAR_VERBS.filter(
+    (v) => v.infinitive !== verb.infinitive && v.group === verb.group && isRegularIn(v, tense) && hasTense(v, tense),
+  ).map((v) => toCell(v, tense, person, stats))
+  const next = formsInTurn(forms)[0]
+  return next ? { ...makeCard(next.verb, tense, person), retry: true } : null
+}
+
 /** Новая карточка той же формы (с другим предложением) — для повтора после ошибки. */
 export function retryCard(card: DrillCard): DrillCard {
   return { ...makeCard(card.verb, card.tense, card.person), retry: true }
@@ -69,6 +86,11 @@ export interface Cell {
   weak: boolean
 }
 
+function toCell(verb: Verb, tense: Tense, person: Person, stats: StatsStore): Cell {
+  const stat = stats[cellKey(verb.infinitive, tense, person)]
+  return { verb, tense, person, stat, weight: cellWeight(stat), weak: isWeak(stat) }
+}
+
 /** Лица времени, отмеченные в настройках (в императиве нет yo). */
 function personsOf(config: SessionConfig, tense: Tense): Person[] {
   return personsFor(tense).filter((p) => config.persons.includes(p))
@@ -84,15 +106,7 @@ export function cellsForConfig(
     for (const tense of config.tenses) {
       if (!hasTense(verb, tense)) continue
       for (const person of personsOf(config, tense)) {
-        const stat = stats[cellKey(verb.infinitive, tense, person)]
-        cells.push({
-          verb,
-          tense,
-          person,
-          stat,
-          weight: cellWeight(stat),
-          weak: isWeak(stat),
-        })
+        cells.push(toCell(verb, tense, person, stats))
       }
     }
   }

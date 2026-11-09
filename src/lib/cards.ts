@@ -2,7 +2,7 @@ import type { AnyCard, SessionMistake } from '../types'
 import { TENSE_SHORT, isBookCard, personLabel } from '../types'
 import { retryBookCard } from './book'
 import { recordRun, restoreRun, runOf } from './runs'
-import { retryCard } from './session'
+import { retryCard, siblingCard } from './session'
 import type { CellStat } from './stats'
 import {
   cellKey,
@@ -72,4 +72,9 @@ export function cardMistake(card: AnyCard, given: string): SessionMistake {
 
 export function retryOf(card: AnyCard): AnyCard {
   return isBookCard(card) ? retryBookCard(card) : retryCard(card)
+}
+
+/** Карточка на то же правило с другим глаголом; у неправильных и в учебнике — null. */
+export function siblingOf(card: AnyCard): AnyCard | null {
+  return isBookCard(card) ? null : siblingCard(card)
 }

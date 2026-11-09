@@ -10,7 +10,7 @@ import BookProgress from './components/BookProgress.vue'
 import TablesPanel from './components/TablesPanel.vue'
 import { CHAPTERS } from './data/book'
 import { buildBookSession } from './lib/book'
-import { cardMistake, cardRun, cardStat, recordCard, restoreCard, retryOf } from './lib/cards'
+import { cardMistake, cardRun, cardStat, recordCard, restoreCard, retryOf, siblingOf } from './lib/cards'
 import { IRREGULAR_INFINITIVES } from './data/verbs'
 import { buildSession } from './lib/session'
 import { bookConfigFromSettings, configFromSettings } from './lib/settings'
@@ -33,6 +33,9 @@ initTheme()
 
 /** Через сколько карточек вернуть форму, на которой ошиблись. */
 const RETRY_GAP = 3
+
+/** Через сколько карточек после повтора — другой глагол той же клетки (правильные глаголы). */
+const SIBLING_GAP = 2
 
 /** Запуск сессии: как отвечаем и как собрать карточки (для «Ещё раз» — заново). */
 interface Run {
@@ -196,10 +199,13 @@ function onWrong(given: string) {
   if (!card) return
   recordCard(card, false)
   mistakes.value.push(cardMistake(card, given))
-  // Смарт-режимы: вернуть ошибочную форму ещё раз через пару карточек.
+  // Смарт-режимы: вернуть ошибочную форму ещё раз через пару карточек,
+  // а у правильного глагола потом — то же правило на другом глаголе.
   if (run.value?.mode !== 'random' && !card.retry) {
     const at = Math.min(index.value + 1 + RETRY_GAP, cards.value.length)
     cards.value.splice(at, 0, retryOf(card))
+    const sibling = siblingOf(card)
+    if (sibling) cards.value.splice(Math.min(at + 1 + SIBLING_GAP, cards.value.length), 0, sibling)
   }
 }
 

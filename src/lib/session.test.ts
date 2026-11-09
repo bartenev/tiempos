@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { IRREGULAR_INFINITIVES, findVerb, isRegularVerb } from '../data/verbs'
-import { buildCard, buildSession, cellsForConfig } from './session'
+import { buildCard, buildSession, cellsForConfig, siblingCard } from './session'
 import type { SessionConfig } from '../types'
 import { PERSONS, VERB_GROUPS } from '../types'
 
@@ -361,5 +361,52 @@ describe('smart mode: non-green table cells', () => {
     const cards = buildSession(narrow, {}, { 'er|presente|yo': 0 })
     expect(cards).toHaveLength(10)
     expect(cards.every((c) => c.verb.infinitive === 'tener')).toBe(true)
+  })
+})
+
+describe('siblingCard: the same rule on another verb after a mistake', () => {
+  const card = (infinitive: string, tense: 'presente' | 'perfecto' = 'presente') =>
+    buildCard(findVerb(infinitive)!, tense, 'yo')
+
+  it('takes another regular verb of the same group, tense and person', () => {
+    for (let run = 0; run < 50; run++) {
+      const next = siblingCard(card('hablar'), {})!
+      expect(next.verb.infinitive).not.toBe('hablar')
+      expect(next.verb.group).toBe('ar')
+      expect(isRegularVerb(next.verb)).toBe(true)
+      expect(next.tense).toBe('presente')
+      expect(next.person).toBe('yo')
+      expect(next.retry).toBe(true)
+    }
+  })
+
+  it('prefers a verb with mistakes, then one never seen', () => {
+    const weak = { 'comprar|presente|yo': { ok: 0, bad: 2, streak: 0, last: 0 } }
+    expect(siblingCard(card('hablar'), weak)!.verb.infinitive).toBe('comprar')
+
+    const seenAllBut = Object.fromEntries(
+      ['estudiar', 'trabajar', 'caminar', 'comprar', 'mirar', 'escuchar', 'cantar', 'bailar', 'cocinar', 'llegar', 'buscar', 'tomar']
+        .map((v) => [`${v}|presente|yo`, { ok: 3, bad: 0, streak: 3, last: 1000 }]),
+    )
+    expect(siblingCard(card('hablar'), seenAllBut)!.verb.infinitive).toBe('necesitar')
+  })
+
+  it('works with a copied verb object (cards live in a reactive queue)', () => {
+    const copy = { ...card('hablar'), verb: { ...findVerb('hablar')! } }
+    for (let run = 0; run < 50; run++) {
+      expect(siblingCard(copy, {})!.verb.infinitive).not.toBe('hablar')
+    }
+  })
+
+  it('irregular verbs and irregular participles have no sibling', () => {
+    expect(siblingCard(card('tener'), {})).toBeNull()
+    expect(siblingCard(card('escribir', 'perfecto'), {})).toBeNull()
+  })
+
+  it('a regular perfecto sibling skips verbs with irregular participles', () => {
+    for (let run = 0; run < 50; run++) {
+      const next = siblingCard(card('vivir', 'perfecto'), {})!
+      expect(['escribir', 'abrir']).not.toContain(next.verb.infinitive)
+    }
   })
 })
