@@ -1,6 +1,6 @@
 import { CHAPTERS, SECTIONS } from '../data/book'
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
-import type { AnswerMode, BookSelection, BookTheme, Tense } from '../types'
+import type { AnswerMode, BookSelection, BookTheme, SessionMode, Tense } from '../types'
 import { PERSONS, TENSES, VERB_GROUPS } from '../types'
 import { chapterSize } from './book'
 import { selectedUnits } from './bookSelection'
@@ -22,11 +22,19 @@ export interface SettingsSummary {
   persons: string
   groups: string
   verbs: string
+  mode: string
   answer: string
   size: string
 }
 
 const NOTHING = '—'
+
+/** Режим очереди — строка «Режим» в сводке. */
+export const MODE_SUMMARY: Record<SessionMode, string> = {
+  smart: 'умная очередь',
+  weak: 'только слабые',
+  random: 'случайно',
+}
 
 /** Как отвечаем — строка «Ответ» в сводке. */
 export const ANSWER_SUMMARY: Record<AnswerMode, string> = {
@@ -76,6 +84,7 @@ export function describeSettings(settings: SetupSettings): SettingsSummary {
       VERB_GROUPS.length,
     ),
     verbs: describeVerbs(settings),
+    mode: MODE_SUMMARY[settings.mode],
     answer: ANSWER_SUMMARY[settings.answer],
     size: `${settings.size} карточек`,
   }
@@ -85,6 +94,7 @@ export interface BookSummary {
   theme: string
   chapters: string
   exercises: string
+  mode: string
   answer: string
   size: string
 }
@@ -115,6 +125,7 @@ export function describeBook(settings: SetupSettings): BookSummary {
     theme: describeTheme(settings.bookSelection, units),
     chapters: units.length === 0 ? NOTHING : `${units.length} из ${CHAPTERS.length}`,
     exercises: String(exercises),
+    mode: MODE_SUMMARY[settings.mode],
     answer: ANSWER_SUMMARY[settings.answer],
     size: `${settings.size} карточек`,
   }

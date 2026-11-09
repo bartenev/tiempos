@@ -5,7 +5,7 @@ import { cellsForConfig, weakCount } from '../lib/session'
 import { bookConfigFromSettings, configFromSettings } from '../lib/settings'
 import { settings } from '../lib/settingsState'
 import { describeBook, describeSettings } from '../lib/settingsSummary'
-import type { BookConfig, SessionConfig, SessionMode, Track } from '../types'
+import type { BookConfig, SessionConfig, Track } from '../types'
 import Icon from './Icon.vue'
 
 defineProps<{
@@ -21,22 +21,6 @@ const emit = defineEmits<{
 const TRACKS: { track: Track; label: string }[] = [
   { track: 'verbs', label: 'Глаголы' },
   { track: 'book', label: 'Учебник' },
-]
-
-const MODES: { mode: SessionMode; label: string; hint: string; bookHint?: string }[] = [
-  {
-    mode: 'smart',
-    label: 'Умная',
-    hint: 'Новое — порциями, ошибки — всегда, выученное — реже.',
-    bookHint: 'Новое — глава за главой, ошибки — всегда, выученное — реже.',
-  },
-  {
-    mode: 'weak',
-    label: 'Слабые',
-    hint: 'Только формы, где были ошибки.',
-    bookHint: 'Только упражнения, где были ошибки.',
-  },
-  { mode: 'random', label: 'Случайно', hint: 'Равномерно, без учёта прогресса.' },
 ]
 
 /** Тренажёр артиклей — статическая страница из public/articulos (собрана в проекте espanol). */
@@ -63,11 +47,6 @@ const formsCount = computed(() => {
 const summary = computed(() => describeSettings(settings))
 
 const bookSummary = computed(() => describeBook(settings))
-
-const modeHint = computed(() => {
-  const mode = MODES.find((m) => m.mode === settings.mode)!
-  return isBook.value ? mode.bookHint ?? mode.hint : mode.hint
-})
 
 const canStart = computed(() => {
   if (formsCount.value === 0) return false
@@ -109,30 +88,6 @@ function start() {
       </button>
     </div>
 
-    <fieldset class="group home__mode">
-      <legend class="group__legend home__mode-legend">Режим</legend>
-      <div class="segmented home__mode-switch" role="radiogroup" aria-label="Режим">
-        <button
-          v-for="m in MODES"
-          :key="m.mode"
-          class="segmented__item home__mode-item"
-          :class="{ 'segmented__item--active': settings.mode === m.mode }"
-          type="button"
-          role="radio"
-          :aria-checked="settings.mode === m.mode"
-          @click="settings.mode = m.mode"
-        >
-          {{ m.label }}
-          <span
-            v-if="m.mode === 'weak'"
-            class="badge home__weak-count"
-            :class="{ 'badge--hot': weak > 0 }"
-          >{{ weak }}</span>
-        </button>
-      </div>
-      <p class="group__note home__mode-note">{{ modeHint }}</p>
-    </fieldset>
-
     <fieldset class="group home__filters">
       <legend class="group__legend home__filters-legend">Что тренируем</legend>
       <!-- вся карточка — одна кнопка в настройки -->
@@ -148,6 +103,10 @@ function start() {
         <span class="home__filter">
           <span class="home__filter-name">Упражнений</span>
           <span class="home__filter-value">{{ bookSummary.exercises }}</span>
+        </span>
+        <span class="home__filter">
+          <span class="home__filter-name">Режим</span>
+          <span class="home__filter-value">{{ bookSummary.mode }}<template v-if="settings.mode === 'weak'"> · {{ weak }}</template></span>
         </span>
         <span class="home__filter">
           <span class="home__filter-name">Ответ</span>
@@ -177,6 +136,10 @@ function start() {
           <span class="home__filter-value">{{ summary.verbs }}</span>
         </span>
         <span class="home__filter">
+          <span class="home__filter-name">Режим</span>
+          <span class="home__filter-value">{{ summary.mode }}<template v-if="settings.mode === 'weak'"> · {{ weak }}</template></span>
+        </span>
+        <span class="home__filter">
           <span class="home__filter-name">Ответ</span>
           <span class="home__filter-value">{{ summary.answer }}</span>
         </span>
@@ -196,7 +159,7 @@ function start() {
       (и что в imperativo нет yo).
     </p>
     <p v-else-if="settings.mode === 'weak' && weak === 0" class="notice notice--muted home__weak-empty">
-      Слабых {{ isBook ? 'упражнений' : 'форм' }} в выбранном нет — начните с умной очереди.
+      Слабых {{ isBook ? 'упражнений' : 'форм' }} в выбранном нет — выберите другой режим в настройках.
     </p>
     <p v-if="error" class="notice notice--bad home__error">{{ error }}</p>
 

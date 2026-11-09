@@ -28,9 +28,15 @@ describe('describeSettings', () => {
       persons: 'все',
       groups: 'все',
       verbs: 'все',
+      mode: 'умная очередь',
       answer: 'текстом',
       size: '20 карточек',
     })
+  })
+
+  it('names the queue mode', () => {
+    expect(describeSettings(make({ mode: 'weak' })).mode).toBe('только слабые')
+    expect(describeBook(make({ mode: 'random' })).mode).toBe('случайно')
   })
 
   it('names the answer mode', () => {

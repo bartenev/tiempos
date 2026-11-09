@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { IRREGULAR_INFINITIVES, findVerb } from '../data/verbs'
+import { bookWeakCount } from '../lib/book'
+import { weakCount } from '../lib/session'
+import { bookConfigFromSettings, configFromSettings } from '../lib/settings'
 import { settings } from '../lib/settingsState'
 import { setTheme, theme } from '../lib/theme'
-import type { Person } from '../types'
+import type { Person, SessionMode } from '../types'
 import { PERSONS, TENSES, TENSE_LABELS, VERB_GROUPS } from '../types'
 import BookPicker from './BookPicker.vue'
 import Icon from './Icon.vue'
@@ -12,14 +15,43 @@ const irregularList = IRREGULAR_INFINITIVES
 
 const SIZES = [10, 20, 30]
 
+const MODES: { mode: SessionMode; label: string; hint: string; bookHint?: string }[] = [
+  {
+    mode: 'smart',
+    label: 'Умная',
+    hint: 'Новое — порциями, ошибки — всегда, выученное — реже.',
+    bookHint: 'Новое — глава за главой, ошибки — всегда, выученное — реже.',
+  },
+  {
+    mode: 'weak',
+    label: 'Слабые',
+    hint: 'Только формы, где были ошибки.',
+    bookHint: 'Только упражнения, где были ошибки.',
+  },
+  { mode: 'random', label: 'Случайно', hint: 'Равномерно, без учёта прогресса.' },
+]
+
+const isBook = computed(() => settings.track === 'book')
+
+/** Сколько слабых в выбранном — бейдж у «Слабых». */
+const weak = computed(() =>
+  isBook.value
+    ? bookWeakCount(bookConfigFromSettings(settings).units)
+    : weakCount(configFromSettings(settings)),
+)
+
+const modeHint = computed(() => {
+  const mode = MODES.find((m) => m.mode === settings.mode)!
+  return isBook.value ? mode.bookHint ?? mode.hint : mode.hint
+})
+
 const answerNote = computed(() => {
-  const isBook = settings.track === 'book'
   if (settings.answer === 'oral') {
-    return isBook
+    return isBook.value
       ? 'Скажите ответ вслух, откройте его и отметьте себя.'
       : 'Скажите форму вслух, откройте её и отметьте себя.'
   }
-  return isBook ? 'Впишите ответ в пропуск или выберите вариант.' : 'Впишите форму глагола в пропуск.'
+  return isBook.value ? 'Впишите ответ в пропуск или выберите вариант.' : 'Впишите форму глагола в пропуск.'
 })
 
 /** Подписи чекбоксов; usted / ustedes тренируются вместе с él / ellos. */
@@ -138,6 +170,30 @@ function setAllIrregular(value: boolean) {
           {{ n }}
         </button>
       </div>
+    </fieldset>
+
+    <fieldset class="group settings__mode">
+      <legend class="group__legend settings__mode-legend">Режим</legend>
+      <div class="segmented settings__mode-switch" role="radiogroup" aria-label="Режим">
+        <button
+          v-for="m in MODES"
+          :key="m.mode"
+          class="segmented__item settings__mode-item"
+          :class="{ 'segmented__item--active': settings.mode === m.mode }"
+          type="button"
+          role="radio"
+          :aria-checked="settings.mode === m.mode"
+          @click="settings.mode = m.mode"
+        >
+          {{ m.label }}
+          <span
+            v-if="m.mode === 'weak'"
+            class="badge settings__weak-count"
+            :class="{ 'badge--hot': weak > 0 }"
+          >{{ weak }}</span>
+        </button>
+      </div>
+      <p class="group__note settings__mode-note">{{ modeHint }}</p>
     </fieldset>
 
     <fieldset class="group settings__answer">
