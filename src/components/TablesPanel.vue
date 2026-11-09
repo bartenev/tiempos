@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { TenseHeat } from '../lib/heat'
-import { heatByCell, sumByTensePerson } from '../lib/heat'
+import { heatByCell, repsToGreen, sumByTensePerson } from '../lib/heat'
+import { pluralRu } from '../lib/plural'
 import { loadStats } from '../lib/stats'
 import { endingsRow } from '../lib/tables'
 import { theme } from '../lib/theme'
@@ -37,6 +38,17 @@ const heat = computed(() => {
   return map
 })
 
+/** Сколько верных ответов осталось до полностью зелёной таблицы времени. */
+const remaining = computed(() => {
+  const map = {} as Record<Tense, number>
+  for (const tense of TENSES) map[tense] = repsToGreen(heat.value[tense])
+  return map
+})
+
+function remainingText(n: number): string {
+  return `ещё ${n} ${pluralRu(n, 'верный ответ', 'верных ответа', 'верных ответов')} до зелёной таблицы`
+}
+
 /** Цвет ячейки — по своей группе (-ar / -er / -ir), а не по всей строке. */
 function cellStyle(tense: Tense, person: Person, verb: Verb): { backgroundColor: string } {
   return { backgroundColor: heat.value[tense][person]![verb.group].color }
@@ -70,7 +82,16 @@ function rowSum(tense: Tense, person: Person): number {
     </p>
 
     <section v-for="tense in TENSES" :key="tense" class="tables__tense">
-      <h2 class="tables__tense-title">{{ TENSE_LABELS[tense] }}</h2>
+      <header class="tables__tense-head">
+        <h2 class="tables__tense-title">{{ TENSE_LABELS[tense] }}</h2>
+        <span
+          class="tables__goal"
+          :class="{ 'tables__goal--done': remaining[tense] === 0 }"
+          title="Верный ответ в правильном глаголе на -ar / -er / -ir даёт ячейке +1. Таблица зелёная, когда каждая ячейка дотянута до лучшей."
+        >
+          {{ remaining[tense] === 0 ? 'вся таблица зелёная ✓' : remainingText(remaining[tense]) }}
+        </span>
+      </header>
       <div class="tables__wrap">
         <table class="tables__table">
           <thead class="tables__thead">
@@ -155,14 +176,39 @@ function rowSum(tense: Tense, person: Person): number {
   color: var(--muted);
 }
 
-.tables__tense-title {
+.tables__tense-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
   margin: var(--space-6) 0 var(--space-3);
+}
+
+.tables__tense:first-of-type .tables__tense-head {
+  margin-top: var(--space-2);
+}
+
+.tables__tense-title {
+  margin: 0;
   font-size: var(--text-lg);
   font-weight: var(--weight-semibold);
 }
 
-.tables__tense:first-of-type .tables__tense-title {
-  margin-top: var(--space-2);
+.tables__goal {
+  padding: 0.125rem var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.tables__goal--done {
+  border-color: transparent;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: var(--weight-semibold);
 }
 
 .tables__wrap {

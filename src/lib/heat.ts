@@ -65,11 +65,25 @@ export function heatByCell(stats: StatsStore, tense: Tense): TenseHeat {
   return result
 }
 
-/** t=1 (max) → зелёный, t=0 (min) → красный. */
+/**
+ * Сколько ещё верных ответов нужно, чтобы позеленела вся таблица времени:
+ * каждую ячейку дотянуть до лучшей (но хотя бы до +1 — пустая таблица не зелёная).
+ * Верный ответ в правильном глаголе группы даёт ячейке +1.
+ */
+export function repsToGreen(heat: TenseHeat): number {
+  const sums = Object.values(heat).flatMap((row) => VERB_GROUPS.map((group) => row![group].sum))
+  const target = Math.max(1, ...sums)
+  return sums.reduce((total, sum) => total + Math.max(0, target - sum), 0)
+}
+
+/**
+ * t=1 (max) → зелёный, t=0 (min) → красный.
+ * Все ячейки равны: в плюсе — вся таблица зелёная, иначе нейтральный цвет.
+ */
 export function heatColor(score: number, min: number, max: number): string {
   const dark = isDarkTheme()
-  if (max <= min) return dark ? 'hsl(60 18% 22%)' : 'hsl(60 35% 92%)'
-  const t = (score - min) / (max - min)
+  if (max <= min && score <= 0) return dark ? 'hsl(60 18% 22%)' : 'hsl(60 35% 92%)'
+  const t = max <= min ? 1 : (score - min) / (max - min)
   // hue: 0 (red, плохо) → 120 (green, хорошо)
   const hue = 120 * t
   return dark
