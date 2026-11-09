@@ -30,6 +30,21 @@ export const IMPERATIVE_ENDINGS: Record<VerbGroup, string[]> = {
   ir: ['', 'e', 'a', 'amos', 'id', 'an'],
 }
 
+/** Presente de haber — вспомогательный глагол pretérito perfecto. */
+export const HABER_PRESENT = ['he', 'has', 'ha', 'hemos', 'habéis', 'han']
+
+/** Окончание правильного participio: -ar → -ado, -er / -ir → -ido. */
+export function participleEnding(verb: Verb): string {
+  if (verb.group === 'ar') return 'ado'
+  // После гласной основы -ído с тильдой: leído, traído, oído, creído.
+  return /[aeo]$/.test(infinitiveStem(verb)) ? 'ído' : 'ido'
+}
+
+/** Participio: неправильный из банка или основа + -ado / -ido. */
+export function participleOf(verb: Verb): string {
+  return verb.participle ?? infinitiveStem(verb) + participleEnding(verb)
+}
+
 /** Endings for irregular pretérito stems (tuv-, pus-, …). */
 export const INDEFINIDO_IRREGULAR = ['e', 'iste', 'o', 'imos', 'isteis', 'ieron']
 
@@ -184,9 +199,18 @@ function conjugateIndefinido(verb: Verb, person: Person): string {
   return stem + ending
 }
 
+/** Pretérito perfecto: presente de haber + participio (he hablado, has comido). */
+function conjugatePerfecto(verb: Verb, person: Person): string {
+  const override = verb.forms?.perfecto?.[person]
+  if (override) return override
+  return `${HABER_PRESENT[personIndex(person)]} ${participleOf(verb)}`
+}
+
 /** Есть ли у глагола это время в тренажёре. */
 export function hasTense(verb: Verb, tense: Tense): boolean {
-  return tense !== 'imperativo' || !verb.noImperative
+  if (tense === 'imperativo') return !verb.noImperative
+  if (tense === 'perfecto') return !verb.noPerfecto
+  return true
 }
 
 /** Все формы времени (в императиве — 5, без yo). */
@@ -202,6 +226,8 @@ export function conjugate(verb: Verb, tense: Tense, person: Person): string {
       return conjugateImperfecto(verb, person)
     case 'indefinido':
       return conjugateIndefinido(verb, person)
+    case 'perfecto':
+      return conjugatePerfecto(verb, person)
     case 'imperativo':
       return conjugateImperativo(verb, person)
   }

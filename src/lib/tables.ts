@@ -16,9 +16,13 @@ export interface EndingCell {
 export function endingsRow(verbs: Verb[], tense: Tense, person: Person): EndingCell[] {
   const split = verbs.map((verb) => {
     const form = conjugate(verb, tense, person)
+    // Составная форма (he hablado): вспомогательный глагол идёт к основе.
+    const space = form.lastIndexOf(' ') + 1
+    const aux = form.slice(0, space)
+    const word = form.slice(space)
     const stem = infinitiveStem(verb)
-    return form.startsWith(stem)
-      ? { stem, ending: form.slice(stem.length) }
+    return word.startsWith(stem)
+      ? { stem: aux + stem, ending: word.slice(stem.length) }
       : { stem: '', ending: form }
   })
   return split.map((cell, i) => ({

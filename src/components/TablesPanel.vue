@@ -121,6 +121,7 @@ function rowSum(tense: Tense, person: Person): number {
                 v-for="(cell, i) in endingsRow(EXAMPLES, tense, person)"
                 :key="EXAMPLES[i]!.infinitive + person"
                 class="tables__cell tables__form"
+                :class="{ 'tables__form--compound': cell.stem.includes(' ') }"
                 :style="cellStyle(tense, person, EXAMPLES[i]!)"
                 :title="cellTitle(tense, person, EXAMPLES[i]!)"
               >
@@ -265,6 +266,11 @@ function rowSum(tense: Tense, person: Person): number {
   font-size: var(--text-xs);
   font-weight: var(--weight-regular);
   color: var(--muted);
+}
+
+/* he hablado: на узком экране haber переносится на свою строку, таблица влезает без прокрутки. */
+.tables__form--compound {
+  white-space: normal;
 }
 
 .tables__row:last-child .tables__cell {

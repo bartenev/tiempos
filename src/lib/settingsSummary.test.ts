@@ -35,7 +35,7 @@ describe('describeSettings', () => {
   it('lists partial picks', () => {
     const summary = describeSettings(
       make({
-        selected: { presente: true, indefinido: false, imperfecto: true, imperativo: false },
+        selected: { presente: true, indefinido: false, imperfecto: true, perfecto: false, imperativo: false },
         persons: { yo: true, tú: true, él: false, nosotros: false, vosotros: false, ellos: false },
         groups: { ar: true, er: false, ir: true },
         size: 10,
@@ -61,7 +61,7 @@ describe('describeSettings', () => {
 
   it('shows a dash when nothing is picked', () => {
     const summary = describeSettings(
-      make({ selected: { presente: false, indefinido: false, imperfecto: false, imperativo: false } }),
+      make({ selected: { presente: false, indefinido: false, imperfecto: false, perfecto: false, imperativo: false } }),
     )
     expect(summary.tenses).toBe('—')
   })

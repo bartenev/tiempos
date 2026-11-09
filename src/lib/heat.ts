@@ -1,4 +1,4 @@
-import { REGULAR_INFINITIVES } from '../data/verbs'
+import { REGULAR_VERBS, isRegularIn } from '../data/verbs'
 import type { Person, Tense, VerbGroup } from '../types'
 import { VERB_GROUPS, personsFor } from '../types'
 import type { StatsStore } from './stats'
@@ -9,12 +9,14 @@ import { isDarkTheme } from './theme'
 
 /**
  * Счёт пары время × местоимение: Σ (верные − ошибки).
- * Учитываются только правильные (регулярные) глаголы — таблицы про окончания.
+ * Учитываются только правильные формы — таблицы про окончания
+ * (в perfecto без неправильных participios: escrito, abierto).
  */
 export function sumByTensePerson(stats: StatsStore, tense: Tense, person: Person): number {
   let total = 0
-  for (const inf of REGULAR_INFINITIVES) {
-    const stat = stats[cellKey(inf, tense, person)]
+  for (const verb of REGULAR_VERBS) {
+    if (!isRegularIn(verb, tense)) continue
+    const stat = stats[cellKey(verb.infinitive, tense, person)]
     if (stat) total += stat.ok - stat.bad
   }
   return total

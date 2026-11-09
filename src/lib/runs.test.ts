@@ -46,3 +46,17 @@ describe('table runs', () => {
     expect(loadRuns()).toEqual({})
   })
 })
+
+describe('table runs — perfecto', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('skips regular verbs with an irregular participle', () => {
+    recordRun(findVerb('escribir')!, 'perfecto', 'yo', true)
+    expect(loadRuns()).toEqual({})
+    recordRun(findVerb('escribir')!, 'presente', 'yo', true)
+    recordRun(findVerb('vivir')!, 'perfecto', 'yo', true)
+    expect(loadRuns()).toEqual({ 'ir|presente|yo': 1, 'ir|perfecto|yo': 1 })
+  })
+})

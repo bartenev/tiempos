@@ -28,6 +28,8 @@ export type Pattern =
   | 'di-vi'
   // imperfecto
   | 'era-iba-veia'
+  // perfecto
+  | 'participle'
   // imperativo
   | 'vowel'
   | 'from-yo'
@@ -50,6 +52,7 @@ export const PATTERNS_BY_TENSE: Record<Tense, Pattern[]> = {
   ],
   indefinido: ['stem-u', 'stem-i', 'stem-j', 'shift-3', 'y', 'fui', 'di-vi'],
   imperfecto: ['era-iba-veia'],
+  perfecto: ['participle'],
   imperativo: ['vowel', 'from-yo', 'short-tu', 'special'],
 }
 
@@ -124,6 +127,8 @@ export function patternOf(verb: Verb, tense: Tense, person: Person): Pattern | n
       return indefinidoPattern(verb)
     case 'imperfecto':
       return 'era-iba-veia'
+    case 'perfecto':
+      return 'participle'
     case 'imperativo':
       return imperativoPattern(verb, person)
   }

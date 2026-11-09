@@ -1,4 +1,4 @@
-export type Tense = 'presente' | 'indefinido' | 'imperfecto' | 'imperativo'
+export type Tense = 'presente' | 'indefinido' | 'imperfecto' | 'perfecto' | 'imperativo'
 
 export type Person = 'yo' | 'tú' | 'él' | 'nosotros' | 'vosotros' | 'ellos'
 
@@ -24,6 +24,10 @@ export interface Verb {
   forms?: Partial<Record<Tense, Partial<Record<Person, string>>>>
   /** Императив неестественен (haber, poder…) — не тренируем. */
   noImperative?: boolean
+  /** Неправильный participio (hecho, escrito, vuelto…) для pretérito perfecto. */
+  participle?: string
+  /** Pretérito perfecto неестественен (haber: «he habido») — не тренируем. */
+  noPerfecto?: boolean
 }
 
 export interface DrillCard {
@@ -241,7 +245,7 @@ export const PERSONS: Person[] = ['yo', 'tú', 'él', 'nosotros', 'vosotros', 'e
 
 export const VERB_GROUPS: VerbGroup[] = ['ar', 'er', 'ir']
 
-export const TENSES: Tense[] = ['presente', 'indefinido', 'imperfecto', 'imperativo']
+export const TENSES: Tense[] = ['presente', 'indefinido', 'imperfecto', 'perfecto', 'imperativo']
 
 /**
  * Imperativo afirmativo: tú, usted, nosotros, vosotros, ustedes.
@@ -267,6 +271,7 @@ export const TENSE_LABELS: Record<Tense, string> = {
   presente: 'Presente',
   indefinido: 'Pretérito indefinido',
   imperfecto: 'Pretérito imperfecto',
+  perfecto: 'Pretérito perfecto compuesto',
   imperativo: 'Imperativo',
 }
 
@@ -275,6 +280,7 @@ export const TENSE_RU: Record<Tense, string> = {
   presente: 'настоящее время',
   indefinido: 'прошедшее законченное',
   imperfecto: 'прошедшее незаконченное',
+  perfecto: 'прошедшее, связанное с настоящим',
   imperativo: 'повелительное наклонение',
 }
 
@@ -282,6 +288,7 @@ export const TENSE_SHORT: Record<Tense, string> = {
   presente: 'pres.',
   indefinido: 'indef.',
   imperfecto: 'imperf.',
+  perfecto: 'perf.',
   imperativo: 'imperat.',
 }
 

@@ -57,6 +57,20 @@ export const FRAMES: SentenceFrame[] = [
   { tense: 'imperfecto', person: 'ellos', template: 'Antes ellos ___ en el pueblo.', translation: 'Раньше они … в деревне.' },
   { tense: 'imperfecto', person: 'ellos', template: 'Mis abuelos ___ cada domingo.', translation: 'Мои бабушка и дедушка … каждое воскресенье.' },
 
+  // —— Perfecto compuesto (haber + participio) ——
+  { tense: 'perfecto', person: 'yo', template: 'Esta mañana yo ___ en casa.', translation: 'Сегодня утром я … дома.' },
+  { tense: 'perfecto', person: 'yo', template: 'Esta semana yo ___ con Ana.', translation: 'На этой неделе я … с Аной.' },
+  { tense: 'perfecto', person: 'tú', template: '¿Tú ___ esta semana?', translation: 'Ты … на этой неделе?' },
+  { tense: 'perfecto', person: 'tú', template: 'Este año tú ___ mucho.', translation: 'В этом году ты … много.' },
+  { tense: 'perfecto', person: 'él', template: 'Él ___ esta mañana.', translation: 'Он … сегодня утром.' },
+  { tense: 'perfecto', person: 'él', template: 'Este mes Ana ___ poco.', translation: 'В этом месяце Ана … мало.' },
+  { tense: 'perfecto', person: 'nosotros', template: 'Este año nosotros ___ juntos.', translation: 'В этом году мы … вместе.' },
+  { tense: 'perfecto', person: 'nosotros', template: 'Esta semana nosotros ___ mucho.', translation: 'На этой неделе мы … много.' },
+  { tense: 'perfecto', person: 'vosotros', template: '¿Vosotros ___ esta mañana?', translation: 'Вы (vosotros) … сегодня утром?' },
+  { tense: 'perfecto', person: 'vosotros', template: 'Este mes vosotros ___ aquí.', translation: 'В этом месяце вы (vosotros) … здесь.' },
+  { tense: 'perfecto', person: 'ellos', template: 'Ellos ___ esta semana.', translation: 'Они … на этой неделе.' },
+  { tense: 'perfecto', person: 'ellos', template: 'Este año mis amigos ___ en Madrid.', translation: 'В этом году мои друзья … в Мадриде.' },
+
   // —— Imperativo (yo нет; él / ellos = usted / ustedes) ——
   { tense: 'imperativo', person: 'tú', template: '(tú) ¡___ ahora!', translation: '(ты) … сейчас!' },
   { tense: 'imperativo', person: 'él', template: '(usted) ¡___ ahora, por favor!', translation: '(вы — usted) … сейчас, пожалуйста!' },

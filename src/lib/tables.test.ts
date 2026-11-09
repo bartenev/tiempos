@@ -45,3 +45,13 @@ describe('endingsRow', () => {
     }
   })
 })
+
+describe('endingsRow — perfecto', () => {
+  it('keeps haber with the stem and highlights the participle ending', () => {
+    expect(endingsRow(EXAMPLES, 'perfecto', 'nosotros')).toEqual([
+      { stem: 'hemos habl', ending: 'ado', shared: false },
+      { stem: 'hemos com', ending: 'ido', shared: true },
+      { stem: 'hemos viv', ending: 'ido', shared: true },
+    ])
+  })
+})

@@ -77,7 +77,17 @@ const TAB_LABELS: Record<Tense, string> = {
   presente: 'Presente',
   indefinido: 'Indefinido',
   imperfecto: 'Imperfecto',
+  perfecto: 'Perfecto',
   imperativo: 'Imperativo',
+}
+
+/** На узком экране пять полных названий не помещаются в строку вкладок. */
+const TAB_SHORT: Record<Tense, string> = {
+  presente: 'Pres.',
+  indefinido: 'Indef.',
+  imperfecto: 'Imperf.',
+  perfecto: 'Perf.',
+  imperativo: 'Imper.',
 }
 
 /** Короткие заголовки колонок сетки. */
@@ -202,7 +212,8 @@ function statLine(c: CellInfo): string {
         :aria-selected="tense === t"
         @click="tense = t; selectedKey = null"
       >
-        {{ TAB_LABELS[t] }}
+        <span class="progress__tab-full">{{ TAB_LABELS[t] }}</span>
+        <span class="progress__tab-short" aria-hidden="true">{{ TAB_SHORT[t] }}</span>
       </button>
     </div>
 
@@ -253,6 +264,25 @@ function statLine(c: CellInfo): string {
 </template>
 
 <style scoped lang="scss">
+.progress__tab-short {
+  display: none;
+}
+
+@media (max-width: 30rem) {
+  .progress__tab-full {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .progress__tab-short {
+    display: inline;
+  }
+}
+
 /* ===== progress ===== */
 
 .progress__weak-empty {

@@ -1,4 +1,4 @@
-import { REGULAR_INFINITIVES } from '../data/verbs'
+import { isRegularIn } from '../data/verbs'
 import type { Person, Tense, Verb, VerbGroup } from '../types'
 
 /**
@@ -42,15 +42,15 @@ function saveRuns(store: RunStore): void {
   }
 }
 
-/** Серия ячейки, в которую попадает форма; null — форма не из таблиц (неправильный глагол). */
+/** Серия ячейки, в которую попадает форма; null — форма не из таблиц (неправильная). */
 export function runOf(verb: Verb, tense: Tense, person: Person): number | undefined | null {
-  if (!REGULAR_INFINITIVES.has(verb.infinitive)) return null
+  if (!isRegularIn(verb, tense)) return null
   return loadRuns()[runKey(verb.group, tense, person)]
 }
 
 /** Ответ в правильном глаголе: верный продлевает серию ячейки, ошибка обнуляет. */
 export function recordRun(verb: Verb, tense: Tense, person: Person, correct: boolean): void {
-  if (!REGULAR_INFINITIVES.has(verb.infinitive)) return
+  if (!isRegularIn(verb, tense)) return
   const store = loadRuns()
   const key = runKey(verb.group, tense, person)
   store[key] = correct ? (store[key] ?? 0) + 1 : 0
@@ -59,7 +59,7 @@ export function recordRun(verb: Verb, tense: Tense, person: Person, correct: boo
 
 /** Отмена ответа: вернуть ячейке прежнюю серию (undefined — ответов не было). */
 export function restoreRun(verb: Verb, tense: Tense, person: Person, previous: number | undefined | null): void {
-  if (previous === null || !REGULAR_INFINITIVES.has(verb.infinitive)) return
+  if (previous === null || !isRegularIn(verb, tense)) return
   const store = loadRuns()
   const key = runKey(verb.group, tense, person)
   if (previous === undefined) delete store[key]

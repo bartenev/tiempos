@@ -1,4 +1,4 @@
-import type { Verb } from '../types'
+import type { Tense, Verb } from '../types'
 
 /** Банк глаголов для тренажёра (~80). */
 export const VERBS: Verb[] = [
@@ -29,8 +29,8 @@ export const VERBS: Verb[] = [
 
   // Regular -ir
   { infinitive: 'vivir', group: 'ir' },
-  { infinitive: 'escribir', group: 'ir' },
-  { infinitive: 'abrir', group: 'ir' },
+  { infinitive: 'escribir', group: 'ir', participle: 'escrito' },
+  { infinitive: 'abrir', group: 'ir', participle: 'abierto' },
   { infinitive: 'subir', group: 'ir' },
   { infinitive: 'decidir', group: 'ir' },
   { infinitive: 'recibir', group: 'ir' },
@@ -40,7 +40,7 @@ export const VERBS: Verb[] = [
   { infinitive: 'pensar', group: 'ar', stemChange: 'e>ie' },
   { infinitive: 'empezar', group: 'ar', stemChange: 'e>ie' },
   { infinitive: 'encontrar', group: 'ar', stemChange: 'o>ue' },
-  { infinitive: 'volver', group: 'er', stemChange: 'o>ue' },
+  { infinitive: 'volver', group: 'er', stemChange: 'o>ue', participle: 'vuelto' },
   { infinitive: 'jugar', group: 'ar', stemChange: 'u>ue' },
   { infinitive: 'pedir', group: 'ir', stemChange: 'e>i' },
   { infinitive: 'servir', group: 'ir', stemChange: 'e>i' },
@@ -59,8 +59,8 @@ export const VERBS: Verb[] = [
   { infinitive: 'colgar', group: 'ar', stemChange: 'o>ue' },
   { infinitive: 'almorzar', group: 'ar', stemChange: 'o>ue' },
   { infinitive: 'mover', group: 'er', stemChange: 'o>ue' },
-  { infinitive: 'devolver', group: 'er', stemChange: 'o>ue' },
-  { infinitive: 'resolver', group: 'er', stemChange: 'o>ue' },
+  { infinitive: 'devolver', group: 'er', stemChange: 'o>ue', participle: 'devuelto' },
+  { infinitive: 'resolver', group: 'er', stemChange: 'o>ue', participle: 'resuelto' },
   { infinitive: 'repetir', group: 'ir', stemChange: 'e>i' },
   { infinitive: 'conseguir', group: 'ir', stemChange: 'e>i' },
 
@@ -145,6 +145,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'haber',
+    noPerfecto: true,
     group: 'er',
     noImperative: true,
     forms: {
@@ -171,6 +172,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'hacer',
+    participle: 'hecho',
     group: 'er',
     presentYo: 'hago',
     indefinidoStem: 'hic',
@@ -195,6 +197,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'decir',
+    participle: 'dicho',
     group: 'ir',
     stemChange: 'e>i',
     presentYo: 'digo',
@@ -229,6 +232,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'poner',
+    participle: 'puesto',
     group: 'er',
     presentYo: 'pongo',
     indefinidoStem: 'pus',
@@ -238,6 +242,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'ver',
+    participle: 'visto',
     group: 'er',
     forms: {
       presente: {
@@ -369,6 +374,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'proponer',
+    participle: 'propuesto',
     group: 'er',
     presentYo: 'propongo',
     indefinidoStem: 'propus',
@@ -412,6 +418,14 @@ export const VERBS: Verb[] = [
 
 export function findVerb(infinitive: string): Verb | undefined {
   return VERBS.find((v) => v.infinitive === infinitive)
+}
+
+/**
+ * Форма времени правильная: глагол правильный и, в pretérito perfecto,
+ * participio тоже по правилу (escribir — правильный, но escrito — нет).
+ */
+export function isRegularIn(verb: Verb, tense: Tense): boolean {
+  return isRegularVerb(verb) && !(tense === 'perfecto' && verb.participle)
 }
 
 /**

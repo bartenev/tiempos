@@ -1,6 +1,7 @@
 import type { Person, StemChange, Tense, Verb } from '../types'
 import { PERSONS, personLabel, personsFor } from '../types'
 import {
+  HABER_PRESENT,
   IMPERATIVE_ENDINGS,
   IMPERFECT_ENDINGS,
   INDEFINIDO_IRREGULAR,
@@ -13,6 +14,8 @@ import {
   indefinidoShift,
   infinitiveStem,
   paradigmOf,
+  participleEnding,
+  participleOf,
 } from './conjugate'
 
 /**
@@ -50,6 +53,7 @@ const TENSE_NAME: Record<Tense, string> = {
   presente: 'Presente',
   indefinido: 'Indefinido',
   imperfecto: 'Imperfecto',
+  perfecto: 'Perfecto',
   imperativo: 'Imperativo',
 }
 
@@ -96,6 +100,8 @@ function regularEndings(verb: Verb, tense: Tense): string[] {
       return IMPERFECT_ENDINGS[verb.group]
     case 'indefinido':
       return INDEFINIDO_REGULAR[verb.group]
+    case 'perfecto':
+      return PERSONS.map(() => (verb.participle ? '' : participleEnding(verb)))
     case 'imperativo':
       return IMPERATIVE_ENDINGS[verb.group]
   }
@@ -165,12 +171,30 @@ function accentNote(tense: Tense, verb: Verb, person: Person): string | undefine
   return undefined
 }
 
+function explainPerfecto(verb: Verb, person: Person): FormHint {
+  const haber = HABER_PRESENT.join(', ')
+  const participle = participleOf(verb)
+  let rule: string
+  let note: string | undefined
+  if (verb.participle) {
+    rule = `haber (${haber}) + неправильный participio: ${participle} — запомните.`
+    note = 'Неправильные participios: hecho, dicho, escrito, visto, puesto, vuelto, abierto…'
+  } else {
+    const ending = participleEnding(verb)
+    rule = `haber (${haber}) + participio: ${infinitiveStem(verb)}- + -${ending}.`
+    if (ending === 'ído') note = 'После гласной основы -ído с тильдой: leído, traído, oído, creído.'
+    else note = 'Participio не меняется по лицам — меняется только haber.'
+  }
+  return withRow({ rule, note }, verb, 'perfecto', person, regularEndings(verb, 'perfecto'))
+}
+
 /**
  * Объяснить, как строится форма. Для полностью неправильных форм
  * показываем всю парадигму — её нужно запомнить.
  */
 export function explainForm(verb: Verb, tense: Tense, person: Person): FormHint {
   if (tense === 'imperativo') return explainImperative(verb, person)
+  if (tense === 'perfecto') return explainPerfecto(verb, person)
 
   const endings = regularEndings(verb, tense)
 

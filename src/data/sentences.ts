@@ -43,6 +43,13 @@ export const TIME_MARKERS: Record<Exclude<Tense, 'imperativo'>, Phrase[]> = {
     { es: 'En aquella época', ru: 'В то время' },
     { es: 'De pequeños,', ru: 'В детстве' },
   ],
+  // Период, который ещё не закончился. «Hoy» не берём — он уже подсказывает presente.
+  perfecto: [
+    { es: 'Esta mañana', ru: 'Сегодня утром' },
+    { es: 'Esta semana', ru: 'На этой неделе' },
+    { es: 'Este mes', ru: 'В этом месяце' },
+    { es: 'Este año', ru: 'В этом году' },
+  ],
 }
 
 export const SUBJECTS: Record<Person, Phrase[]> = {
@@ -161,7 +168,7 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
     // «Ayer viví en Madrid» — бессмыслица: место жительства не про один день.
     { es: 'en Madrid', ru: 'в Мадриде', tenses: ['presente', 'imperfecto'] },
     { es: 'cerca del mar', ru: 'у моря', tenses: ['presente', 'imperfecto'] },
-    { es: 'una gran aventura', ru: 'большое приключение', tenses: ['indefinido'] },
+    { es: 'una gran aventura', ru: 'большое приключение', tenses: ['indefinido', 'perfecto'] },
   ],
   escribir: [
     { es: 'una carta', ru: 'письмо' },

@@ -104,3 +104,24 @@ describe('explainForm', () => {
     }
   })
 })
+
+describe('explainForm — perfecto', () => {
+  it('explains haber + regular participle and highlights -ado', () => {
+    const hint = explainForm(findVerb('hablar')!, 'perfecto', 'tú')
+    expect(hint.rule).toContain('he, has, ha, hemos, habéis, han')
+    expect(hint.rule).toContain('-ado')
+    expect(current(hint)).toMatchObject({ stem: 'has habl', ending: 'ado' })
+  })
+
+  it('marks irregular participles as forms to memorise', () => {
+    const hint = explainForm(findVerb('escribir')!, 'perfecto', 'yo')
+    expect(hint.rule).toContain('escrito')
+    expect(current(hint)).toMatchObject({ stem: 'he escrito', ending: '' })
+  })
+
+  it('notes the accent in -ído', () => {
+    const hint = explainForm(findVerb('leer')!, 'perfecto', 'yo')
+    expect(hint.note).toContain('-ído')
+    expect(current(hint)).toMatchObject({ stem: 'he le', ending: 'ído' })
+  })
+})

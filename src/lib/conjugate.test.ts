@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { findVerb } from '../data/verbs'
 import type { Person, Tense, Verb } from '../types'
 import { PERSONS } from '../types'
-import { conjugate } from './conjugate'
+import { conjugate, hasTense } from './conjugate'
 
 function mustFind(infinitive: string): Verb {
   const v = findVerb(infinitive)
@@ -180,5 +180,32 @@ describe('-ir stem shift in indefinido', () => {
   it('ver vosotros presente has no accent', () => {
     expect(conjugate(mustFind('ver'), 'presente', 'vosotros')).toBe('veis')
     expect(conjugate(mustFind('ver'), 'presente', 'yo')).toBe('veo')
+  })
+})
+
+describe('pretérito perfecto compuesto', () => {
+  it('is haber in presente + participio', () => {
+    expect(PERSONS.map((p) => conjugate(mustFind('hablar'), 'perfecto', p))).toEqual([
+      'he hablado', 'has hablado', 'ha hablado', 'hemos hablado', 'habéis hablado', 'han hablado',
+    ])
+    expect(conjugate(mustFind('comer'), 'perfecto', 'nosotros')).toBe('hemos comido')
+    expect(conjugate(mustFind('ir'), 'perfecto', 'ellos')).toBe('han ido')
+  })
+
+  it('puts an accent on -ído after a vowel stem', () => {
+    expect(conjugate(mustFind('leer'), 'perfecto', 'yo')).toBe('he leído')
+    expect(conjugate(mustFind('oír'), 'perfecto', 'tú')).toBe('has oído')
+    expect(conjugate(mustFind('traer'), 'perfecto', 'él')).toBe('ha traído')
+  })
+
+  it('uses irregular participles from the bank', () => {
+    expect(conjugate(mustFind('escribir'), 'perfecto', 'yo')).toBe('he escrito')
+    expect(conjugate(mustFind('volver'), 'perfecto', 'él')).toBe('ha vuelto')
+    expect(conjugate(mustFind('hacer'), 'perfecto', 'vosotros')).toBe('habéis hecho')
+  })
+
+  it('haber has no perfecto in the drill', () => {
+    expect(hasTense(mustFind('haber'), 'perfecto')).toBe(false)
+    expect(hasTense(mustFind('hablar'), 'perfecto')).toBe(true)
   })
 })
