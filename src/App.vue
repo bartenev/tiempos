@@ -10,7 +10,7 @@ import BookProgress from './components/BookProgress.vue'
 import TablesPanel from './components/TablesPanel.vue'
 import { CHAPTERS } from './data/book'
 import { buildBookSession } from './lib/book'
-import { cardMistake, cardStat, recordCard, restoreCard, retryOf } from './lib/cards'
+import { cardMistake, cardRun, cardStat, recordCard, restoreCard, retryOf } from './lib/cards'
 import { markPracticed } from './lib/daily'
 import { IRREGULAR_INFINITIVES } from './data/verbs'
 import { buildSession } from './lib/session'
@@ -67,6 +67,8 @@ interface GradeSnapshot {
   cards: AnyCard[]
   card: AnyCard
   stat: CellStat | undefined
+  /** Серия ячейки «Таблиц» до ответа; null — карточка не из таблиц. */
+  run: number | undefined | null
 }
 const lastGrade = ref<GradeSnapshot | null>(null)
 /** Карточка, к которой вернулись отменой: ответ на ней сразу открыт. */
@@ -149,6 +151,7 @@ function rememberGrade(card: AnyCard) {
     cards: [...cards.value],
     card,
     stat: cardStat(card),
+    run: cardRun(card),
   }
 }
 
@@ -160,7 +163,7 @@ function restoreGrade(snap: GradeSnapshot) {
   bestStreak.value = snap.bestStreak
   mistakes.value = snap.mistakes
   cards.value = snap.cards
-  restoreCard(snap.card, snap.stat)
+  restoreCard(snap.card, snap.stat, snap.run)
   lastGrade.value = null
 }
 

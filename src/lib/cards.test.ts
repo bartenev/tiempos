@@ -26,9 +26,9 @@ describe('cards', () => {
     recordCard(bookCard, true)
     const before = cardStat(bookCard)
     recordCard(bookCard, false)
-    restoreCard(bookCard, before)
+    restoreCard(bookCard, before, null)
     expect(cardStat(bookCard)).toEqual(before)
-    restoreCard(bookCard, undefined)
+    restoreCard(bookCard, undefined, null)
     expect(cardStat(bookCard)).toBeUndefined()
   })
 

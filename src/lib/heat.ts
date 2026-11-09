@@ -1,38 +1,28 @@
-import { REGULAR_INFINITIVES, REGULAR_VERBS } from '../data/verbs'
+import { REGULAR_INFINITIVES } from '../data/verbs'
 import type { Person, Tense, VerbGroup } from '../types'
 import { VERB_GROUPS, personsFor } from '../types'
 import type { StatsStore } from './stats'
 import { cellKey } from './stats'
+import type { RunStore } from './runs'
+import { GREEN_RUN, runKey } from './runs'
 import { isDarkTheme } from './theme'
 
 /**
  * Счёт пары время × местоимение: Σ (верные − ошибки).
- * Учитываются только правильные (регулярные) глаголы — таблицы про окончания;
- * infinitives сужает до одной группы (-ar / -er / -ir) для ячейки.
+ * Учитываются только правильные (регулярные) глаголы — таблицы про окончания.
  */
-export function sumByTensePerson(
-  stats: StatsStore,
-  tense: Tense,
-  person: Person,
-  infinitives: ReadonlySet<string> = REGULAR_INFINITIVES,
-): number {
+export function sumByTensePerson(stats: StatsStore, tense: Tense, person: Person): number {
   let total = 0
-  for (const inf of infinitives) {
+  for (const inf of REGULAR_INFINITIVES) {
     const stat = stats[cellKey(inf, tense, person)]
     if (stat) total += stat.ok - stat.bad
   }
   return total
 }
 
-/** Правильные глаголы каждой группы — для счёта по ячейке таблицы. */
-const REGULAR_BY_GROUP: Record<VerbGroup, ReadonlySet<string>> = {
-  ar: new Set(REGULAR_VERBS.filter((v) => v.group === 'ar').map((v) => v.infinitive)),
-  er: new Set(REGULAR_VERBS.filter((v) => v.group === 'er').map((v) => v.infinitive)),
-  ir: new Set(REGULAR_VERBS.filter((v) => v.group === 'ir').map((v) => v.infinitive)),
-}
-
 export interface CellHeat {
-  sum: number
+  /** Верных подряд в ячейке; undefined — ответов ещё не было. */
+  run: number | undefined
   color: string
 }
 
@@ -40,50 +30,36 @@ export interface CellHeat {
 export type TenseHeat = Partial<Record<Person, Record<VerbGroup, CellHeat>>>
 
 /**
- * Цвет каждой ячейки — по ответам в правильных глаголах её группы
- * для этого времени и лица: зелёный = лучше знаю, красный = хуже.
- * Нормализация по всем ячейкам одного времени.
+ * Цвет каждой ячейки — по серии верных подряд в правильных глаголах её группы
+ * для этого времени и лица: GREEN_RUN подряд — зелёная, ошибка — красная.
  */
-export function heatByCell(stats: StatsStore, tense: Tense): TenseHeat {
-  const persons = personsFor(tense)
-  const sums = persons.map((person) =>
-    VERB_GROUPS.map((group) => sumByTensePerson(stats, tense, person, REGULAR_BY_GROUP[group])),
-  )
-  const values = sums.flat()
-  const min = Math.min(...values)
-  const max = Math.max(...values)
-
+export function heatByCell(runs: RunStore, tense: Tense): TenseHeat {
   const result: TenseHeat = {}
-  persons.forEach((person, i) => {
+  for (const person of personsFor(tense)) {
     result[person] = Object.fromEntries(
-      VERB_GROUPS.map((group, j) => {
-        const sum = sums[i]![j]!
-        return [group, { sum, color: heatColor(sum, min, max) }]
+      VERB_GROUPS.map((group) => {
+        const run = runs[runKey(group, tense, person)]
+        return [group, { run, color: runColor(run) }]
       }),
     ) as Record<VerbGroup, CellHeat>
-  })
+  }
   return result
 }
 
-/**
- * Сколько ещё верных ответов нужно, чтобы позеленела вся таблица времени:
- * каждую ячейку дотянуть до лучшей (но хотя бы до +1 — пустая таблица не зелёная).
- * Верный ответ в правильном глаголе группы даёт ячейке +1.
- */
+/** Сколько ещё верных ответов нужно, чтобы позеленела вся таблица времени. */
 export function repsToGreen(heat: TenseHeat): number {
-  const sums = Object.values(heat).flatMap((row) => VERB_GROUPS.map((group) => row![group].sum))
-  const target = Math.max(1, ...sums)
-  return sums.reduce((total, sum) => total + Math.max(0, target - sum), 0)
+  return Object.values(heat).reduce(
+    (total, row) =>
+      total + VERB_GROUPS.reduce((sum, group) => sum + Math.max(0, GREEN_RUN - (row![group].run ?? 0)), 0),
+    0,
+  )
 }
 
-/**
- * t=1 (max) → зелёный, t=0 (min) → красный.
- * Все ячейки равны: в плюсе — вся таблица зелёная, иначе нейтральный цвет.
- */
-export function heatColor(score: number, min: number, max: number): string {
+/** Нет ответов — нейтральный; 0 (последний ответ — ошибка) → красный; GREEN_RUN и больше → зелёный. */
+export function runColor(run: number | undefined): string {
   const dark = isDarkTheme()
-  if (max <= min && score <= 0) return dark ? 'hsl(60 18% 22%)' : 'hsl(60 35% 92%)'
-  const t = max <= min ? 1 : (score - min) / (max - min)
+  if (run === undefined) return dark ? 'hsl(60 18% 22%)' : 'hsl(60 35% 92%)'
+  const t = Math.min(run, GREEN_RUN) / GREEN_RUN
   // hue: 0 (red, плохо) → 120 (green, хорошо)
   const hue = 120 * t
   return dark

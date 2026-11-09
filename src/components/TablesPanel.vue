@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import type { TenseHeat } from '../lib/heat'
 import { heatByCell, repsToGreen, sumByTensePerson } from '../lib/heat'
 import { pluralRu } from '../lib/plural'
+import { GREEN_RUN, loadRuns } from '../lib/runs'
 import { loadStats } from '../lib/stats'
 import { endingsRow } from '../lib/tables'
 import { theme } from '../lib/theme'
@@ -24,16 +25,16 @@ const PERSON_SHORT: Record<Person, string> = {
   ellos: 'ellos',
 }
 
-const stats = computed(() => {
-  // theme — пересчёт оттенков; loadStats — свежие счётчики
-  void theme.value
-  return loadStats()
-})
+// Панель создаётся заново при каждом открытии вкладки — счётчики свежие.
+const stats = loadStats()
+const runs = loadRuns()
 
 const heat = computed(() => {
+  // theme — пересчёт оттенков
+  void theme.value
   const map = {} as Record<Tense, TenseHeat>
   for (const tense of TENSES) {
-    map[tense] = heatByCell(stats.value, tense)
+    map[tense] = heatByCell(runs, tense)
   }
   return map
 })
@@ -54,9 +55,16 @@ function cellStyle(tense: Tense, person: Person, verb: Verb): { backgroundColor:
   return { backgroundColor: heat.value[tense][person]![verb.group].color }
 }
 
+function cellTitle(tense: Tense, person: Person, verb: Verb): string {
+  const run = heat.value[tense][person]![verb.group].run
+  if (run === undefined) return 'Ответов ещё не было'
+  if (run === 0) return 'Последний ответ — ошибка'
+  return `${Math.min(run, GREEN_RUN)} из ${GREEN_RUN} верных подряд`
+}
+
 /** Итог строки под местоимением: верные минус ошибки по всем трём группам. */
 function rowSum(tense: Tense, person: Person): number {
-  return sumByTensePerson(stats.value, tense, person)
+  return sumByTensePerson(stats, tense, person)
 }
 </script>
 
@@ -68,12 +76,12 @@ function rowSum(tense: Tense, person: Person): number {
       <b class="tables__example">hablar</b>, <b class="tables__example">comer</b>, <b class="tables__example">vivir</b>.
     </p>
     <p class="tables__legend">
-      <span class="tables__swatch tables__swatch--cold" /> знаю лучше
+      <span class="tables__swatch tables__swatch--hot" /> ошибка
       <span class="tables__legend-sep">→</span>
-      <span class="tables__swatch tables__swatch--hot" /> знаю хуже
+      <span class="tables__swatch tables__swatch--cold" /> {{ GREEN_RUN }} верных подряд
       <span class="tables__legend-note">
-        Цвет ячейки — ваши ответы в правильных глаголах на -ar / -er / -ir
-        для этого времени и лица; число под лицом — верные минус ошибки по строке.
+        Цвет ячейки — серия верных ответов подряд в правильных глаголах на -ar / -er / -ir
+        для этого времени и лица; ошибка обнуляет серию. Число под лицом — верные минус ошибки по строке.
       </span>
     </p>
     <p class="tables__shared-note">
@@ -87,7 +95,7 @@ function rowSum(tense: Tense, person: Person): number {
         <span
           class="tables__goal"
           :class="{ 'tables__goal--done': remaining[tense] === 0 }"
-          title="Верный ответ в правильном глаголе на -ar / -er / -ir даёт ячейке +1. Таблица зелёная, когда каждая ячейка дотянута до лучшей."
+          :title="`Каждой ячейке нужно ${GREEN_RUN} верных ответов подряд в правильных глаголах её группы; ошибка обнуляет серию ячейки.`"
         >
           {{ remaining[tense] === 0 ? 'вся таблица зелёная ✓' : remainingText(remaining[tense]) }}
         </span>
@@ -114,6 +122,7 @@ function rowSum(tense: Tense, person: Person): number {
                 :key="EXAMPLES[i]!.infinitive + person"
                 class="tables__cell tables__form"
                 :style="cellStyle(tense, person, EXAMPLES[i]!)"
+                :title="cellTitle(tense, person, EXAMPLES[i]!)"
               >
                 <span class="tables__form-stem">{{ cell.stem }}</span><span
                   class="tables__form-ending"

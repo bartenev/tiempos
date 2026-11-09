@@ -1,6 +1,7 @@
 import type { AnyCard, SessionMistake } from '../types'
 import { TENSE_SHORT, isBookCard, personLabel } from '../types'
 import { retryBookCard } from './book'
+import { recordRun, restoreRun, runOf } from './runs'
 import { retryCard } from './session'
 import type { CellStat } from './stats'
 import {
@@ -21,14 +22,32 @@ export function cardStat(card: AnyCard): CellStat | undefined {
     : loadStats()[cellKey(card.verb.infinitive, card.tense, card.person)]
 }
 
-export function recordCard(card: AnyCard, correct: boolean): void {
-  if (isBookCard(card)) recordBookAttempt(card.key, correct)
-  else recordAttempt(card.verb.infinitive, card.tense, card.person, correct)
+/** Серия ячейки «Таблиц» до ответа — для отмены; null — карточка не из таблиц. */
+export function cardRun(card: AnyCard): number | undefined | null {
+  return isBookCard(card) ? null : runOf(card.verb, card.tense, card.person)
 }
 
-export function restoreCard(card: AnyCard, previous: CellStat | undefined): void {
-  if (isBookCard(card)) restoreBookStat(card.key, previous)
-  else restoreStat(card.verb.infinitive, card.tense, card.person, previous)
+export function recordCard(card: AnyCard, correct: boolean): void {
+  if (isBookCard(card)) {
+    recordBookAttempt(card.key, correct)
+    return
+  }
+  recordAttempt(card.verb.infinitive, card.tense, card.person, correct)
+  recordRun(card.verb, card.tense, card.person, correct)
+}
+
+export function restoreCard(
+  card: AnyCard,
+  previous: CellStat | undefined,
+  /** Серия ячейки «Таблиц» до ответа (cardRun); undefined — ответов не было. */
+  previousRun: number | undefined | null,
+): void {
+  if (isBookCard(card)) {
+    restoreBookStat(card.key, previous)
+    return
+  }
+  restoreStat(card.verb.infinitive, card.tense, card.person, previous)
+  restoreRun(card.verb, card.tense, card.person, previousRun)
 }
 
 /** Верные варианты по полям ввода: у глагола поле одно. */
