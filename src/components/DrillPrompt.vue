@@ -2,6 +2,8 @@
 import { computed } from 'vue'
 import { cardBlanks } from '../lib/cards'
 import type { AnswerCheck } from '../lib/normalize'
+import { settings } from '../lib/settingsState'
+import { simplePrompt } from '../lib/simple'
 import type { AnyCard } from '../types'
 import { TENSE_LABELS, isBookCard } from '../types'
 import ZoomImage from './ZoomImage.vue'
@@ -35,6 +37,16 @@ const label = computed(() => {
   return isBookCard(card) ? `Глава ${card.unit}` : TENSE_LABELS[card.tense]
 })
 
+/** Упрощённая карточка глагола из «Лаборатории»: без предложения. */
+const simple = computed(() => {
+  const { card } = props
+  return settings.labs.simpleDrill && !isBookCard(card) ? simplePrompt(card) : null
+})
+
+const sentence = computed(() => simple.value?.sentence ?? props.card.sentence)
+
+const translation = computed(() => simple.value?.translation ?? props.card.translation)
+
 /** Подсказка в скобках у пропуска; устно варианты уходят сюда с кнопок. */
 const cue = computed(() => {
   const { card } = props
@@ -43,7 +55,7 @@ const cue = computed(() => {
 })
 
 /** Части предложения вокруг пропусков `___`. */
-const parts = computed(() => props.card.sentence.split('___'))
+const parts = computed(() => sentence.value.split('___'))
 
 const blankCount = computed(() => parts.value.length - 1)
 
@@ -89,7 +101,7 @@ function blankClass(i: number): string | undefined {
       </template>
       <span v-if="cue && blankCount !== 1" class="drill__infinitive">({{ cue }})</span>
     </p>
-    <p class="drill__translation">{{ card.translation }}</p>
+    <p class="drill__translation">{{ translation }}</p>
   </div>
 </template>
 
@@ -205,6 +217,7 @@ function blankClass(i: number): string | undefined {
 }
 
 .drill__infinitive {
+  margin-left: 0.3em;
   font-weight: var(--weight-regular);
   color: var(--muted);
   white-space: nowrap;

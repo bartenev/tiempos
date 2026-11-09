@@ -26,6 +26,8 @@ export interface LabsSettings {
   book: boolean
   /** Ссылка на тренажёр артиклей на главной. */
   articles: boolean
+  /** Упрощённые карточки глаголов: местоимение + глагол, без предложения. */
+  simpleDrill: boolean
 }
 
 export interface SetupSettings {
@@ -83,7 +85,7 @@ export const DEFAULT_SETTINGS: SetupSettings = {
   size: 20,
   mode: 'smart',
   answer: 'text',
-  labs: { book: false, articles: false },
+  labs: { book: false, articles: false, simpleDrill: false },
 }
 
 const SIZES = new Set([10, 20, 30])

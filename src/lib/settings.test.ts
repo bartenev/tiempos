@@ -44,11 +44,11 @@ describe('settings', () => {
       size: 30,
       mode: 'weak',
       answer: 'oral',
-      labs: { book: true, articles: false },
+      labs: { book: true, articles: false, simpleDrill: true },
     })
     const loaded = loadSettings()
     expect(loaded.track).toBe('book')
-    expect(loaded.labs).toEqual({ book: true, articles: false })
+    expect(loaded.labs).toEqual({ book: true, articles: false, simpleDrill: true })
     expect(selectedUnits(loaded.bookSelection)).not.toContain(35)
     expect(selectedUnits(loaded.bookSelection)).toContain(36)
     expect(loaded.selected.indefinido).toBe(false)
@@ -154,9 +154,9 @@ describe('textbook settings', () => {
   })
 
   it('keeps textbook and articles hidden until turned on in Лаборатория', () => {
-    expect(loadSettings().labs).toEqual({ book: false, articles: false })
+    expect(loadSettings().labs).toEqual({ book: false, articles: false, simpleDrill: false })
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({ size: 10, labs: { articles: true, junk: 1 } }))
-    expect(loadSettings().labs).toEqual({ book: false, articles: true })
+    expect(loadSettings().labs).toEqual({ book: false, articles: true, simpleDrill: false })
   })
 
   it('falls back to verbs when the textbook is off', () => {

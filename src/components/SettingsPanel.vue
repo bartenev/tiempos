@@ -174,6 +174,13 @@ function setAllIrregular(value: boolean) {
           <span class="settings__lab-hint">тренажёр артиклей на отдельной странице</span>
         </span>
       </label>
+      <label class="choice settings__lab">
+        <input v-model="settings.labs.simpleDrill" class="choice__input settings__lab-input" type="checkbox" />
+        <span class="choice__label settings__lab-label">
+          Упрощённые карточки
+          <span class="settings__lab-hint">в глаголах — только местоимение и глагол с переводом, без предложения</span>
+        </span>
+      </label>
     </fieldset>
   </section>
 </template>
