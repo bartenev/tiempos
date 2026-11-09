@@ -43,9 +43,10 @@ export const TIME_MARKERS: Record<Exclude<Tense, 'imperativo'>, Phrase[]> = {
     { es: 'En aquella época', ru: 'В то время' },
     { es: 'De pequeños,', ru: 'В детстве' },
   ],
-  // Период, который ещё не закончился. «Hoy» не берём — он уже подсказывает presente.
+  // Период, который ещё не закончился. «Hoy» есть и в presente — время подписано на карточке.
+  // «Esta mañana» не берём: «Esta mañana he almorzado / he dormido ocho horas».
   perfecto: [
-    { es: 'Esta mañana', ru: 'Сегодня утром' },
+    { es: 'Hoy', ru: 'Сегодня' },
     { es: 'Esta semana', ru: 'На этой неделе' },
     { es: 'Este mes', ru: 'В этом месяце' },
     { es: 'Este año', ru: 'В этом году' },
@@ -225,7 +226,8 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
     { es: 'el vino', ru: 'вино' },
   ],
   dormir: [
-    { es: 'ocho horas', ru: 'восемь часов' },
+    // «Este año he dormido ocho horas» — бессмыслица.
+    { es: 'ocho horas', ru: 'восемь часов', tenses: ['presente', 'indefinido', 'imperfecto'] },
     { es: 'en el sofá', ru: 'на диване' },
   ],
   preferir: [
@@ -344,7 +346,8 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
   ],
   saber: [
     { es: 'la respuesta', ru: 'ответ' },
-    { es: 'nadar', ru: 'плавать' },
+    // «Esta semana he sabido nadar» — уметь плавать не начинают на этой неделе.
+    { es: 'nadar', ru: 'плавать', tenses: ['presente', 'indefinido', 'imperfecto'] },
   ],
   poner: [
     { es: 'la mesa', ru: 'на стол' },
@@ -368,7 +371,7 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
   ],
   conocer: [
     { es: 'a mucha gente', ru: 'много людей' },
-    { es: 'bien la ciudad', ru: 'хорошо город' },
+    { es: 'bien la ciudad', ru: 'город хорошо' },
   ],
   parecer: [
     { es: 'cansado', esPl: 'cansados', ru: 'усталым', ruPl: 'усталыми' },
