@@ -37,10 +37,10 @@ const label = computed(() => {
   return isBookCard(card) ? `Глава ${card.unit}` : TENSE_LABELS[card.tense]
 })
 
-/** Упрощённая карточка глагола из «Лаборатории»: без предложения. */
+/** Карточка глагола без предложения (настройка «Ответ»). */
 const simple = computed(() => {
   const { card } = props
-  return settings.labs.simpleDrill && !isBookCard(card) ? simplePrompt(card) : null
+  return settings.simpleCards && !isBookCard(card) ? simplePrompt(card) : null
 })
 
 const sentence = computed(() => simple.value?.sentence ?? props.card.sentence)

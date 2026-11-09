@@ -221,6 +221,14 @@ function setAllIrregular(value: boolean) {
         </button>
       </div>
       <p class="group__note settings__answer-note">{{ answerNote }}</p>
+      <!-- только глаголы: упражнения учебника без предложения не имеют смысла -->
+      <label v-if="settings.track !== 'book'" class="choice settings__simple">
+        <input v-model="settings.simpleCards" class="choice__input settings__simple-input" type="checkbox" />
+        <span class="choice__label settings__simple-label">
+          Без предложений
+          <span class="settings__simple-hint">только местоимение и глагол с переводом</span>
+        </span>
+      </label>
     </fieldset>
 
     <fieldset class="group settings__theme">
@@ -268,13 +276,6 @@ function setAllIrregular(value: boolean) {
           <span class="settings__lab-hint">тренажёр артиклей на отдельной странице</span>
         </span>
       </label>
-      <label class="choice settings__lab">
-        <input v-model="settings.labs.simpleDrill" class="choice__input settings__lab-input" type="checkbox" />
-        <span class="choice__label settings__lab-label">
-          Упрощённые карточки
-          <span class="settings__lab-hint">в глаголах — только местоимение и глагол с переводом, без предложения</span>
-        </span>
-      </label>
     </fieldset>
   </section>
 </template>
@@ -294,7 +295,13 @@ function setAllIrregular(value: boolean) {
   padding: var(--space-1) 0;
 }
 
-.settings__lab-hint {
+.settings__simple {
+  margin-top: var(--space-2);
+  padding: var(--space-1) 0;
+}
+
+.settings__lab-hint,
+.settings__simple-hint {
   display: block;
   font-size: var(--text-sm);
   line-height: 1.4;

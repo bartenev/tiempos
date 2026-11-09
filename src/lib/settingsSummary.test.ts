@@ -42,6 +42,9 @@ describe('describeSettings', () => {
   it('names the answer mode', () => {
     expect(describeSettings(make({ answer: 'oral' })).answer).toBe('устно')
     expect(describeBook(make({ answer: 'oral' })).answer).toBe('устно')
+    // в учебнике предложения остаются — приписки нет
+    expect(describeSettings(make({ answer: 'oral', simpleCards: true })).answer).toBe('устно, без предложений')
+    expect(describeBook(make({ simpleCards: true })).answer).toBe('текстом')
   })
 
   it('lists partial picks', () => {

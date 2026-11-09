@@ -26,8 +26,6 @@ export interface LabsSettings {
   book: boolean
   /** Ссылка на тренажёр артиклей на главной. */
   articles: boolean
-  /** Упрощённые карточки глаголов: местоимение + глагол, без предложения. */
-  simpleDrill: boolean
 }
 
 export interface SetupSettings {
@@ -47,6 +45,8 @@ export interface SetupSettings {
   size: number
   mode: SessionMode
   answer: AnswerMode
+  /** Карточки глаголов без предложения: только местоимение и глагол с переводом. */
+  simpleCards: boolean
   labs: LabsSettings
 }
 
@@ -85,7 +85,8 @@ export const DEFAULT_SETTINGS: SetupSettings = {
   size: 20,
   mode: 'smart',
   answer: 'text',
-  labs: { book: false, articles: false, simpleDrill: false },
+  simpleCards: false,
+  labs: { book: false, articles: false },
 }
 
 const SIZES = new Set([10, 20, 30])
@@ -175,6 +176,8 @@ export function loadSettings(): SetupSettings {
     if (!raw) return cloneDefaults()
     const parsed = JSON.parse(raw) as Partial<SetupSettings> & { selectedUnits?: unknown }
     const labs = parseLabs(parsed.labs)
+    // раньше флаг жил в «Лаборатории» как labs.simpleDrill
+    const legacySimple = (parsed.labs as { simpleDrill?: unknown } | undefined)?.simpleDrill
     return {
       // Учебник выключен в «Лаборатории» — тренируем глаголы.
       track:
@@ -207,6 +210,11 @@ export function loadSettings(): SetupSettings {
         typeof parsed.answer === 'string' && ANSWERS.has(parsed.answer)
           ? parsed.answer
           : DEFAULT_SETTINGS.answer,
+      simpleCards: isBool(parsed.simpleCards)
+        ? parsed.simpleCards
+        : isBool(legacySimple)
+          ? legacySimple
+          : DEFAULT_SETTINGS.simpleCards,
       labs,
     }
   } catch {

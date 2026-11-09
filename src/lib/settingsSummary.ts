@@ -85,7 +85,9 @@ export function describeSettings(settings: SetupSettings): SettingsSummary {
     ),
     verbs: describeVerbs(settings),
     mode: MODE_SUMMARY[settings.mode],
-    answer: ANSWER_SUMMARY[settings.answer],
+    answer: settings.simpleCards
+      ? `${ANSWER_SUMMARY[settings.answer]}, без предложений`
+      : ANSWER_SUMMARY[settings.answer],
     size: `${settings.size} карточек`,
   }
 }
