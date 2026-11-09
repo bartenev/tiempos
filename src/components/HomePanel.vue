@@ -23,6 +23,9 @@ const TRACKS: { track: Track; label: string }[] = [
   { track: 'book', label: 'Учебник' },
 ]
 
+/** Версия приложения — мелко внизу главной (повышать по правилам из README). */
+const version = __APP_VERSION__
+
 /** Тренажёр артиклей — статическая страница из public/articulos (собрана в проекте espanol). */
 const articlesUrl = `${import.meta.env.BASE_URL}articulos/`
 
@@ -168,11 +171,21 @@ function start() {
         Начать
       </button>
     </div>
+
+    <p class="home__version">версия {{ version }}</p>
   </section>
 </template>
 
 <style scoped lang="scss">
 /* ===== home: главная ===== */
+
+.home__version {
+  margin: var(--space-2) 0 0;
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--muted);
+  opacity: 0.7;
+}
 
 .home__track {
   margin-bottom: var(--space-4);

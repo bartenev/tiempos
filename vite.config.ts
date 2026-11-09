@@ -137,8 +137,16 @@ self.addEventListener('fetch', (event) => {
   }
 }
 
+/** Версия приложения — из package.json; правила повышения — в README («Версия»). */
+const { version } = JSON.parse(readFileSync(join(import.meta.dirname, 'package.json'), 'utf8')) as {
+  version: string
+}
+
 export default defineConfig({
   base: '/tiempos/',
+  define: {
+    __APP_VERSION__: JSON.stringify(version),
+  },
   plugins: [vue(), serviceWorker()],
   test: {
     environment: 'happy-dom',
