@@ -11,7 +11,6 @@ import TablesPanel from './components/TablesPanel.vue'
 import { CHAPTERS } from './data/book'
 import { buildBookSession } from './lib/book'
 import { cardMistake, cardRun, cardStat, recordCard, restoreCard, retryOf } from './lib/cards'
-import { markPracticed } from './lib/daily'
 import { IRREGULAR_INFINITIVES } from './data/verbs'
 import { buildSession } from './lib/session'
 import { bookConfigFromSettings, configFromSettings } from './lib/settings'
@@ -127,7 +126,6 @@ function startBook(cfg: BookConfig) {
 
 function finish() {
   finishedAt.value = Date.now()
-  if (correct.value + wrong.value > 0) markPracticed()
   screen.value = 'summary'
 }
 

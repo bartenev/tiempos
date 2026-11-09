@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { bookWeakCount } from '../lib/book'
-import { currentStreak, daysLabel, loadDaily } from '../lib/daily'
 import { cellsForConfig, weakCount } from '../lib/session'
 import { bookConfigFromSettings, configFromSettings } from '../lib/settings'
 import { settings } from '../lib/settingsState'
@@ -39,8 +38,6 @@ const MODES: { mode: SessionMode; label: string; hint: string; bookHint?: string
   },
   { mode: 'random', label: 'Случайно', hint: 'Равномерно, без учёта прогресса.' },
 ]
-
-const days = currentStreak(loadDaily())
 
 /** Тренажёр артиклей — статическая страница из public/articulos (собрана в проекте espanol). */
 const articlesUrl = `${import.meta.env.BASE_URL}articulos/`
@@ -94,7 +91,6 @@ function start() {
     </header>
     <p class="screen__lead home__lead">
       {{ isBook ? 'Упражнения по главам учебника.' : 'Тренажёр спряжения испанских глаголов.' }}
-      <span v-if="days > 0" class="home__daily"><Icon name="flame" />{{ daysLabel(days) }} подряд</span>
     </p>
 
     <!-- Учебник — в «Лаборатории» настроек; выключен — тренируем только глаголы. -->
@@ -277,16 +273,6 @@ function start() {
 .home__articles:hover {
   border-color: var(--accent);
   color: var(--accent-hover);
-}
-
-.home__daily {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  margin-top: var(--space-1);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--ink);
 }
 
 .home__filters-body {

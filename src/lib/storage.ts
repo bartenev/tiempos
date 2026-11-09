@@ -1,8 +1,9 @@
 /**
  * Ключи localStorage, которые приложение больше не читает.
- * progress.v2 — счёт старого модуля «Прогресс», его заменил stats.v1.
+ * progress.v2 — счёт старого модуля «Прогресс», его заменил stats.v1;
+ * daily.v1 — счётчик «N дней подряд», его убрали.
  */
-export const OBSOLETE_KEYS = ['tiempos.progress.v2']
+export const OBSOLETE_KEYS = ['tiempos.progress.v2', 'tiempos.daily.v1']
 
 /**
  * Попросить браузер не стирать хранилище: Safari иначе может удалить данные сайта,

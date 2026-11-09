@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { currentStreak, daysLabel, loadDaily } from '../lib/daily'
 import { pluralRu } from '../lib/plural'
 import type { SessionResult } from '../types'
-import Icon from './Icon.vue'
 
 const props = defineProps<{
   result: SessionResult
@@ -25,7 +23,6 @@ const duration = computed(() => {
   return m > 0 ? `${m} мин ${s % 60} с` : `${s} с`
 })
 
-const days = currentStreak(loadDaily())
 
 /** Ошибки без дублей (повтор той же формы). */
 const uniqueMistakes = computed(() => {
@@ -42,7 +39,7 @@ const uniqueMistakes = computed(() => {
   <section class="summary">
     <h1 class="screen__title summary__title">¡Listo!</h1>
     <p class="screen__lead summary__lead">
-      Сессия завершена<template v-if="days > 0"> · <Icon name="flame" />{{ daysLabel(days) }} подряд</template>.
+      Сессия завершена.
     </p>
 
     <div class="stat-tiles summary__tiles">

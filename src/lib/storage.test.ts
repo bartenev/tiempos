@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { DAILY_KEY } from './daily'
 import { SETTINGS_KEY } from './settings'
 import { STATS_KEY } from './stats'
 import { OBSOLETE_KEYS, removeObsoleteKeys, requestPersistentStorage } from './storage'
@@ -10,14 +9,16 @@ beforeEach(() => {
 })
 
 describe('removeObsoleteKeys', () => {
-  it('removes the old progress store', () => {
+  it('removes the old progress store and the day streak', () => {
     localStorage.setItem('tiempos.progress.v2', '{}')
+    localStorage.setItem('tiempos.daily.v1', '{}')
     removeObsoleteKeys()
     expect(localStorage.getItem('tiempos.progress.v2')).toBeNull()
+    expect(localStorage.getItem('tiempos.daily.v1')).toBeNull()
   })
 
   it('keeps every key the app still uses', () => {
-    const live = [STATS_KEY, DAILY_KEY, SETTINGS_KEY, THEME_KEY]
+    const live = [STATS_KEY, SETTINGS_KEY, THEME_KEY]
     for (const key of live) localStorage.setItem(key, 'x')
     removeObsoleteKeys()
     for (const key of live) expect(localStorage.getItem(key)).toBe('x')
