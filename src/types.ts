@@ -271,7 +271,7 @@ export const TENSE_LABELS: Record<Tense, string> = {
   presente: 'Presente',
   indefinido: 'Pretérito indefinido',
   imperfecto: 'Pretérito imperfecto',
-  perfecto: 'Pretérito perfecto compuesto',
+  perfecto: 'Pretérito perfecto',
   imperativo: 'Imperativo',
 }
 

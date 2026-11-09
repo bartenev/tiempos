@@ -183,7 +183,7 @@ describe('-ir stem shift in indefinido', () => {
   })
 })
 
-describe('pretérito perfecto compuesto', () => {
+describe('pretérito perfecto', () => {
   it('is haber in presente + participio', () => {
     expect(PERSONS.map((p) => conjugate(mustFind('hablar'), 'perfecto', p))).toEqual([
       'he hablado', 'has hablado', 'ha hablado', 'hemos hablado', 'habéis hablado', 'han hablado',

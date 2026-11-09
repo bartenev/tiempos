@@ -57,7 +57,7 @@ export const FRAMES: SentenceFrame[] = [
   { tense: 'imperfecto', person: 'ellos', template: 'Antes ellos ___ en el pueblo.', translation: 'Раньше они … в деревне.' },
   { tense: 'imperfecto', person: 'ellos', template: 'Mis abuelos ___ cada domingo.', translation: 'Мои бабушка и дедушка … каждое воскресенье.' },
 
-  // —— Perfecto compuesto (haber + participio) ——
+  // —— Perfecto (haber + participio) ——
   { tense: 'perfecto', person: 'yo', template: 'Esta mañana yo ___ en casa.', translation: 'Сегодня утром я … дома.' },
   { tense: 'perfecto', person: 'yo', template: 'Esta semana yo ___ con Ana.', translation: 'На этой неделе я … с Аной.' },
   { tense: 'perfecto', person: 'tú', template: '¿Tú ___ esta semana?', translation: 'Ты … на этой неделе?' },
