@@ -8,3 +8,11 @@ import { loadSettings, saveSettings } from './settings'
 export const settings = reactive(loadSettings())
 
 watch(settings, (value) => saveSettings(value), { deep: true })
+
+// Учебник выключили в «Лаборатории» — переключателя на главной больше нет, тренируем глаголы.
+watch(
+  () => settings.labs.book,
+  (on) => {
+    if (!on) settings.track = 'verbs'
+  },
+)

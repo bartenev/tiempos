@@ -20,6 +20,14 @@ import {
 
 export const SETTINGS_KEY = 'tiempos.settings.v1'
 
+/** «Лаборатория»: функции в разработке, которые включают вручную. */
+export interface LabsSettings {
+  /** Упражнения по главам учебника (переключатель «Учебник» на главной). */
+  book: boolean
+  /** Ссылка на тренажёр артиклей на главной. */
+  articles: boolean
+}
+
 export interface SetupSettings {
   /** Что тренируем: глаголы или главы учебника. */
   track: Track
@@ -37,6 +45,7 @@ export interface SetupSettings {
   size: number
   mode: SessionMode
   answer: AnswerMode
+  labs: LabsSettings
 }
 
 export function defaultSelectedIrregular(
@@ -74,6 +83,7 @@ export const DEFAULT_SETTINGS: SetupSettings = {
   size: 20,
   mode: 'smart',
   answer: 'text',
+  labs: { book: false, articles: false },
 }
 
 const SIZES = new Set([10, 20, 30])
@@ -104,6 +114,16 @@ function parsePersons(raw: unknown): Record<Person, boolean> {
   const obj = raw as Record<string, unknown>
   for (const person of PERSONS) {
     if (isBool(obj[person])) base[person] = obj[person]
+  }
+  return base
+}
+
+function parseLabs(raw: unknown): LabsSettings {
+  const base = { ...DEFAULT_SETTINGS.labs }
+  if (!raw || typeof raw !== 'object') return base
+  const obj = raw as Record<string, unknown>
+  for (const key of Object.keys(base) as (keyof LabsSettings)[]) {
+    if (isBool(obj[key])) base[key] = obj[key]
   }
   return base
 }
@@ -143,6 +163,7 @@ function cloneDefaults(): SetupSettings {
     persons: { ...DEFAULT_SETTINGS.persons },
     groups: { ...DEFAULT_SETTINGS.groups },
     selectedIrregular: defaultSelectedIrregular(),
+    labs: { ...DEFAULT_SETTINGS.labs },
   }
 }
 
@@ -151,9 +172,11 @@ export function loadSettings(): SetupSettings {
     const raw = localStorage.getItem(SETTINGS_KEY)
     if (!raw) return cloneDefaults()
     const parsed = JSON.parse(raw) as Partial<SetupSettings> & { selectedUnits?: unknown }
+    const labs = parseLabs(parsed.labs)
     return {
+      // Учебник выключен в «Лаборатории» — тренируем глаголы.
       track:
-        typeof parsed.track === 'string' && TRACKS.has(parsed.track)
+        typeof parsed.track === 'string' && TRACKS.has(parsed.track) && (parsed.track !== 'book' || labs.book)
           ? parsed.track
           : DEFAULT_SETTINGS.track,
       bookSelection:
@@ -182,6 +205,7 @@ export function loadSettings(): SetupSettings {
         typeof parsed.answer === 'string' && ANSWERS.has(parsed.answer)
           ? parsed.answer
           : DEFAULT_SETTINGS.answer,
+      labs,
     }
   } catch {
     return cloneDefaults()

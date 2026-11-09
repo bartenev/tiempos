@@ -44,9 +44,11 @@ describe('settings', () => {
       size: 30,
       mode: 'weak',
       answer: 'oral',
+      labs: { book: true, articles: false },
     })
     const loaded = loadSettings()
     expect(loaded.track).toBe('book')
+    expect(loaded.labs).toEqual({ book: true, articles: false })
     expect(selectedUnits(loaded.bookSelection)).not.toContain(35)
     expect(selectedUnits(loaded.bookSelection)).toContain(36)
     expect(loaded.selected.indefinido).toBe(false)
@@ -149,5 +151,18 @@ describe('textbook settings', () => {
     const config = bookConfigFromSettings(settings, { mode: 'weak' })
     expect(config.units).toEqual([35, 36])
     expect(config).toMatchObject({ size: 10, mode: 'weak', answer: 'text' })
+  })
+
+  it('keeps textbook and articles hidden until turned on in Лаборатория', () => {
+    expect(loadSettings().labs).toEqual({ book: false, articles: false })
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ size: 10, labs: { articles: true, junk: 1 } }))
+    expect(loadSettings().labs).toEqual({ book: false, articles: true })
+  })
+
+  it('falls back to verbs when the textbook is off', () => {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ track: 'book' }))
+    expect(loadSettings().track).toBe('verbs')
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ track: 'book', labs: { book: true } }))
+    expect(loadSettings().track).toBe('book')
   })
 })

@@ -157,6 +157,27 @@ function setAllIrregular(value: boolean) {
         </button>
       </div>
     </fieldset>
+
+    <fieldset class="group settings__labs">
+      <legend class="group__legend settings__labs-legend">Лаборатория</legend>
+      <p class="group__note settings__labs-note">
+        Функции в разработке: могут меняться и работать неидеально. Включённые появятся на главной.
+      </p>
+      <label class="choice settings__lab">
+        <input v-model="settings.labs.book" class="choice__input settings__lab-input" type="checkbox" />
+        <span class="choice__label settings__lab-label">
+          Учебник
+          <span class="settings__lab-hint">упражнения по главам Gramática de uso</span>
+        </span>
+      </label>
+      <label class="choice settings__lab">
+        <input v-model="settings.labs.articles" class="choice__input settings__lab-input" type="checkbox" />
+        <span class="choice__label settings__lab-label">
+          Артикли
+          <span class="settings__lab-hint">тренажёр артиклей на отдельной странице</span>
+        </span>
+      </label>
+    </fieldset>
   </section>
 </template>
 
@@ -165,6 +186,21 @@ function setAllIrregular(value: boolean) {
 
 .settings__tense {
   padding: var(--space-1) 0;
+}
+
+.settings__labs-note {
+  margin: 0 0 var(--space-2);
+}
+
+.settings__lab {
+  padding: var(--space-1) 0;
+}
+
+.settings__lab-hint {
+  display: block;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--muted);
 }
 
 .settings__tense-ru {

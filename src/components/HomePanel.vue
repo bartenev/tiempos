@@ -90,14 +90,15 @@ function start() {
     <header class="home__header">
       <h1 class="screen__title home__title">Tiempos</h1>
       <!-- отдельная статическая страница из public/articulos: тренажёр и схема артиклей -->
-      <a class="home__articles" :href="articlesUrl">Артикли<Icon name="forward" /></a>
+      <a v-if="settings.labs.articles" class="home__articles" :href="articlesUrl">Артикли<Icon name="forward" /></a>
     </header>
     <p class="screen__lead home__lead">
       {{ isBook ? 'Упражнения по главам учебника.' : 'Тренажёр спряжения испанских глаголов.' }}
       <span v-if="days > 0" class="home__daily"><Icon name="flame" />{{ daysLabel(days) }} подряд</span>
     </p>
 
-    <div class="segmented home__track" role="radiogroup" aria-label="Что тренируем">
+    <!-- Учебник — в «Лаборатории» настроек; выключен — тренируем только глаголы. -->
+    <div v-if="settings.labs.book" class="segmented home__track" role="radiogroup" aria-label="Что тренируем">
       <button
         v-for="t in TRACKS"
         :key="t.track"
