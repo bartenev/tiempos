@@ -1,11 +1,13 @@
 import { framesFor } from '../data/frames'
 import { buildVerbSentence } from '../data/sentences'
-import { VERBS, isRegularVerb } from '../data/verbs'
+import { VERBS, isRegularIn, isRegularVerb } from '../data/verbs'
 import type { DrillCard, Person, SessionConfig, Tense, Verb } from '../types'
 import { personsFor } from '../types'
 import { conjugate, hasTense } from './conjugate'
 import type { PortionStatus } from './portions'
 import { cellPortionKey, portionKey, portionStatuses } from './portions'
+import type { RunStore } from './runs'
+import { GREEN_RUN, loadRuns, runKey } from './runs'
 import type { CellStat, StatsStore } from './stats'
 import { cellKey, cellWeight, isWeak, loadStats } from './stats'
 
@@ -195,17 +197,88 @@ function spread(cells: Cell[]): Cell[] {
   return out
 }
 
-/**
- * Умная сессия: до трети мест — слабым формам (гарантированно), остальное —
- * порции, повторение и новое без слабых, чтобы одна форма не выпадала много раз.
- */
-function smartQueue(cells: Cell[], size: number): Cell[] {
-  const weak = cells.filter((c) => c.weak)
-  const slots = Math.min(Math.floor(size * WEAK_SMART_SHARE), weak.length * WEAK_SMART_REPEATS)
-  const rest = smartPool(cells, size - slots).filter((c) => !c.weak)
-  if (rest.length === 0) return weightedQueue(weak, Math.min(size, weak.length * WEAK_REPEATS))
+/** Доля умной сессии, гарантированная незелёным клеткам «Таблиц» (если они есть). */
+export const TABLE_SMART_SHARE = 1 / 3
 
-  return spread([...weakPicks(weak, slots), ...weightedQueue(rest, size - slots)])
+/** Клетка «Таблиц» в фильтре: время × лицо × группа, все её правильные глаголы. */
+interface TableCell {
+  run: number
+  forms: Cell[]
+}
+
+/**
+ * Незелёные клетки «Таблиц», худшая первой (меньше серия — раньше).
+ * Только начатые: в нетронутые клетки новое вводят порции, а не эта доводка.
+ */
+function unfinishedTables(cells: Cell[], runs: RunStore): TableCell[] {
+  const byKey = new Map<string, Cell[]>()
+  for (const cell of cells) {
+    if (!isRegularIn(cell.verb, cell.tense)) continue
+    const key = runKey(cell.verb.group, cell.tense, cell.person)
+    const list = byKey.get(key)
+    if (list) list.push(cell)
+    else byKey.set(key, [cell])
+  }
+  const tables: TableCell[] = []
+  for (const [key, forms] of byKey) {
+    const run = runs[key]
+    if (run !== undefined && run < GREEN_RUN) tables.push({ run, forms })
+  }
+  return shuffle(tables).sort((a, b) => a.run - b.run)
+}
+
+/**
+ * Глаголы клетки по очереди: сначала слабые формы (больше ошибок — раньше),
+ * потом те, что ещё не попадались или давно не попадались.
+ */
+function formsInTurn(forms: Cell[]): Cell[] {
+  const errors = (c: Cell) => (c.weak ? c.stat!.bad : 0)
+  const seen = (c: Cell) => c.stat?.last ?? -Infinity
+  return shuffle(forms).sort((a, b) => errors(b) - errors(a) || seen(a) - seen(b))
+}
+
+/**
+ * Места для незелёных клеток. У правильных глаголов учим правило, а не глагол:
+ * клетка берёт столько карточек, сколько ей не хватает до зелёной (худшая — первой),
+ * и каждая карточка — другой глагол этой клетки.
+ */
+function tablePicks(tables: TableCell[], slots: number): Cell[] {
+  const picks: Cell[] = []
+  for (const table of tables) {
+    const forms = formsInTurn(table.forms)
+    for (let i = 0; i < GREEN_RUN - table.run && picks.length < slots; i++) {
+      picks.push(forms[i % forms.length]!)
+    }
+    if (picks.length >= slots) break
+  }
+  return picks
+}
+
+/**
+ * Умная сессия:
+ * - до трети мест — незелёным клеткам «Таблиц» (правильные глаголы: учим окончание);
+ * - до трети — слабым формам, которые клетки не покрывают (неправильные глаголы);
+ * - остальное — порции, повторение и новое без слабых, чтобы одна форма не выпадала много раз.
+ */
+function smartQueue(cells: Cell[], size: number, runs: RunStore): Cell[] {
+  const tables = unfinishedTables(cells, runs)
+  const needed = tables.reduce((sum, t) => sum + GREEN_RUN - t.run, 0)
+  const fromTables = tablePicks(tables, Math.min(Math.floor(size * TABLE_SMART_SHARE), needed))
+
+  // слабая форма незелёной клетки придёт через клетку — второй раз её не гарантируем
+  const inTables = new Set(tables.flatMap((t) => t.forms))
+  const weak = cells.filter((c) => c.weak && !inTables.has(c))
+  const left = size - fromTables.length
+  const slots = Math.min(Math.floor(size * WEAK_SMART_SHARE), weak.length * WEAK_SMART_REPEATS, left)
+  const rest = smartPool(cells, left - slots).filter((c) => !c.weak)
+  if (rest.length === 0) {
+    // всё в фильтре слабое — добираем как в режиме «только слабые»
+    const allWeak = cells.filter((c) => c.weak)
+    const fill = Math.min(left, allWeak.length * WEAK_REPEATS)
+    return spread([...fromTables, ...weightedQueue(allWeak, fill)])
+  }
+
+  return spread([...fromTables, ...weakPicks(weak, slots), ...weightedQueue(rest, left - slots)])
 }
 
 /** Новая форма в уже освоенной порции: правило знакомо — это скорее повторение. */
@@ -298,6 +371,7 @@ function smartPool(cells: Cell[], cards: number): Cell[] {
 export function buildSession(
   config: SessionConfig,
   stats: StatsStore = loadStats(),
+  runs: RunStore = loadRuns(),
 ): DrillCard[] {
   validate(config)
 
@@ -328,7 +402,7 @@ export function buildSession(
   }
 
   if (config.mode === 'smart') {
-    return smartQueue(cells, config.size).map((c) => makeCard(c.verb, c.tense, c.person))
+    return smartQueue(cells, config.size, runs).map((c) => makeCard(c.verb, c.tense, c.person))
   }
 
   let size = config.size

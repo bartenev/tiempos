@@ -291,3 +291,75 @@ describe('smart mode: guaranteed slots for weak forms', () => {
     expect(cards.every((c) => key(c) === 'ser|presente|yo')).toBe(true)
   })
 })
+
+describe('smart mode: non-green table cells', () => {
+  const regular: SessionConfig = {
+    ...base,
+    mode: 'smart',
+    size: 10,
+    includeIrregular: false,
+    selectedIrregular: [],
+  }
+  const yoAr = (c: { verb: { group: string }; person: string }) => c.verb.group === 'ar' && c.person === 'yo'
+  const weakHablo = { 'hablar|presente|yo': { ok: 0, bad: 1, streak: 0, last: 0 } }
+
+  it('a started cell gets what it lacks to turn green, each card a different verb', () => {
+    for (let run = 0; run < 100; run++) {
+      const cards = buildSession(regular, {}, { 'ar|presente|yo': 2 })
+      expect(cards).toHaveLength(10)
+      const hits = cards.filter(yoAr)
+      expect(hits.length).toBeGreaterThanOrEqual(3)
+      expect(new Set(hits.map((c) => c.verb.infinitive)).size).toBeGreaterThanOrEqual(3)
+    }
+  })
+
+  it('the weak verb of the cell comes first and is not guaranteed twice', () => {
+    for (let run = 0; run < 100; run++) {
+      const cards = buildSession(regular, weakHablo, { 'ar|presente|yo': 0 })
+      const hablo = cards.filter((c) => yoAr(c) && c.verb.infinitive === 'hablar')
+      expect(hablo).toHaveLength(1)
+      expect(cards.filter(yoAr).length).toBeGreaterThanOrEqual(3)
+    }
+  })
+
+  it('takes at most a third of the session, the worst cell first', () => {
+    const runs = { 'ar|presente|yo': 0, 'er|presente|tú': 4 }
+    let withoutTu = 0
+    for (let run = 0; run < 200; run++) {
+      const cards = buildSession(regular, {}, runs)
+      expect(cards.filter(yoAr).length).toBeGreaterThanOrEqual(3)
+      if (!cards.some((c) => c.verb.group === 'er' && c.person === 'tú')) withoutTu += 1
+    }
+    // три места ушли худшей клетке — er / tú попадает только случайно
+    expect(withoutTu).toBeGreaterThan(0)
+  })
+
+  it('green and untouched cells are not forced', () => {
+    let withoutYoAr = 0
+    for (let run = 0; run < 200; run++) {
+      const cards = buildSession(regular, {}, { 'ar|presente|yo': 5 })
+      if (!cards.some(yoAr)) withoutYoAr += 1
+    }
+    expect(withoutYoAr).toBeGreaterThan(0)
+  })
+
+  it('a weak regular form in a green cell still gets a weak slot', () => {
+    for (let run = 0; run < 100; run++) {
+      const cards = buildSession(regular, weakHablo, { 'ar|presente|yo': 5 })
+      expect(cards.some((c) => yoAr(c) && c.verb.infinitive === 'hablar')).toBe(true)
+    }
+  })
+
+  it('irregular verbs stay outside the tables', () => {
+    const narrow: SessionConfig = {
+      ...base,
+      mode: 'smart',
+      size: 10,
+      includeRegular: false,
+      selectedIrregular: ['tener'],
+    }
+    const cards = buildSession(narrow, {}, { 'er|presente|yo': 0 })
+    expect(cards).toHaveLength(10)
+    expect(cards.every((c) => c.verb.infinitive === 'tener')).toBe(true)
+  })
+})
