@@ -91,8 +91,17 @@ describe('article cards', () => {
 
 describe('article translations and short explanations', () => {
   it('every sentence has a Russian translation', () => {
-    const missing = ARTICLE_ITEMS.filter((i) => translationOf(i) === '').map((i) => i.id)
-    expect(missing).toEqual([])
+    const keys = new Set(Object.keys(translations.sentences).map((es) => es.replace(/\s+/g, ' ').trim().toLowerCase()))
+    expect(ARTICLE_ITEMS.filter((i) => !keys.has(fullSentence(i))).map((i) => i.id)).toEqual([])
+    // пусто — только у одиночных слов, где по-русски нет слова того же рода (flor → цветок)
+    const empty = ARTICLE_ITEMS.filter((i) => translationOf(i) === '')
+    expect(empty.length).toBe(7)
+    for (const item of empty) expect(item.before.trim(), item.id).toBe('')
+  })
+
+  it('keeps the gender of an omitted noun in the translation', () => {
+    expect(translationOf(byId('GDU11-1.3#1'))).toBe('— Тебе нравятся эти шляпы? — Мне нравится чёрный вариант, но не коричневый.')
+    expect(translationOf(byId('GDU11-3.9#1'))).toBe('— Какой автомобиль твой? — Маленький.')
   })
 
   it('no translation is left without a sentence', () => {
