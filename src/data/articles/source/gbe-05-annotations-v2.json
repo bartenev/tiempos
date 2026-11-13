@@ -1,0 +1,9 @@
+{
+  "about": "Дополнительные признаки для алгоритма v2 (src/algorithm-v2.mjs) поверх gbe-05-annotations.json. Только то, что относится к новым правилам из второго учебника (GDU). Слово после пропуска подставляется как noun автоматически.",
+  "blanks": {
+    "GBE5-02.1#1": { "qual": "eval", "gap": null, "why": "«такой голод, что умираю» — оценочное придаточное к существительному (GDU5: un pan buenísimo). Это моё расширение правила GDU5: в учебнике там прилагательные." },
+    "GBE5-10.1#3": { "name": { "kind": "person", "title": true }, "why": "doctor + фамилия (GDU8: la doctora Blanco)" },
+    "GBE5-10.3#4": { "verb": "tocar", "why": "toca en el órgano — tocar + инструмент (GDU10)" },
+    "GBE5-10.4#6": { "name": { "kind": "building" }, "why": "название заведения (GDU8: el Ritz, el Prado)" }
+  }
+}

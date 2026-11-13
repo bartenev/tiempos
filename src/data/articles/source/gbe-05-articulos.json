@@ -1,0 +1,436 @@
+{
+  "source": {
+    "id": "GBE",
+    "book": "Gramática básica del estudiante de español (ed. 2021)",
+    "chapter": "5. Artículos: un, el, ø...",
+    "pages": "30–36",
+    "key_pages": "285–286"
+  },
+  "conventions": {
+    "blank": "{N} в тексте — пропуск номер N; ответ лежит в blanks[N-1].",
+    "accept": "Список допустимых ответов (артикль в нижнем регистре). 'Ø' — без артикля. Несколько значений — ключ допускает варианты.",
+    "key": "Ответ как он напечатан в ключе (с заглавной буквой, слитной формой al/del и т.п.).",
+    "surface": "Если артикль сливается с предлогом (a + el = al, de + el = del), здесь итоговая форма.",
+    "derived": "true — ключ явно не показывает этот пропуск; ответ выведен из исправленного текста ключа (там существительное без артикля).",
+    "example": "true — пример из учебника (→), ответ вписан от руки в образце.",
+    "item_id": "<источник>-<глава>-<упражнение>.<пункт>, например GBE5-04.2; пункт 0 — пример."
+  },
+  "sections": [
+    { "id": "A", "page": 30, "title": "Formas", "summary": "Формы артиклей; un → uno без существительного; a/de + el = al/del (не с именами собственными: a El Cairo); el/un перед ж.р. ед.ч. на ударное a-/ha- (el agua, un águila) — только если артикль стоит вплотную к существительному; во всех остальных случаях женский род: el agua fresca, esa águila, la última águila, una gran aula, las águilas, unas aulas." },
+    { "id": "B", "page": 31, "title": "Usos: Toma una carta / Toma la carta", "summary": "un — предмет не идентифицируем для слушателя (их несколько такого типа; говорим впервые); el — идентифицируем (другого такого нет; уже говорили)." },
+    { "id": "C", "page": 33, "title": "¿Un o el o ø?: Voy en bicicleta. Tengo una bicicleta. Arreglo la bicicleta.", "summary": "Ø — не конкретный предмет, а тип/средство/класс (en bicicleta, clases de guitarra); un/el — отдельные предметы. Ø — неопределённое количество: исчисляемые во мн.ч., неисчисляемые в ед.ч." },
+    { "id": "D", "page": 34, "title": "Generalizar: A los españoles les gusta el café...", "summary": "el/la/los/las — весь класс (исчисл. ед./мн.ч., неисчисл. ед.ч.); un/una — любой представитель класса (unos/unas только для pluralia tantum: gafas, tijeras). Подлежащее-обобщение всегда с артиклем." },
+    { "id": "E", "page": 36, "title": "Uno alto, el de Soria, el que te dije...", "summary": "uno/una/unos/unas — без существительного, когда ясно о чём речь; el/la/los/las без существительного — только перед прилагательным / de + сущ. / que + придаточное." }
+  ],
+  "exercises": [
+    {
+      "id": "GBE5-01",
+      "number": 1,
+      "page": 30,
+      "level": "A1-A2",
+      "section": "A",
+      "type": "fill",
+      "instruction": "El detective Rodrigo Trigo llega a la escena de un robo y ve muchas cosas sospechosas. Va a buscar a la policía y, cuando vuelve, las cosas han cambiado. Completa con las formas adecuadas del artículo.",
+      "items": [
+        { "id": "GBE5-01.0a", "example": true, "context": "Cuando entra en la casa por primera vez ve:", "text": "{1} puerta de {2} dormitorio rota.",
+          "blanks": [ { "accept": ["una"], "key": "Una" }, { "accept": ["un"], "key": "un" } ] },
+        { "id": "GBE5-01.1", "context": "Cuando entra en la casa por primera vez ve:", "text": "{1} llaves de {2} moto debajo de {3} mesa.",
+          "blanks": [ { "accept": ["unas"], "key": "Unas" }, { "accept": ["una"], "key": "una" }, { "accept": ["una"], "key": "una" } ] },
+        { "id": "GBE5-01.2", "context": "Cuando entra en la casa por primera vez ve:", "text": "{1} cartera abierta y vacía junto a {2} ordenador.",
+          "blanks": [ { "accept": ["una"], "key": "Una" }, { "accept": ["un"], "key": "un" } ] },
+        { "id": "GBE5-01.3", "context": "Cuando entra en la casa por primera vez ve:", "text": "{1} juguetes de {2} bebé por el suelo.",
+          "blanks": [ { "accept": ["unos"], "key": "Unos" }, { "accept": ["un"], "key": "un" } ] },
+        { "id": "GBE5-01.4", "context": "Cuando entra en la casa por primera vez ve:", "text": "{1} nota: “Vamos a volver”.",
+          "blanks": [ { "accept": ["una"], "key": "Una" } ] },
+        { "id": "GBE5-01.0b", "example": true, "context": "Cuando vuelve a la casa con la policía ve:", "text": "{1} puerta {2} dormitorio arreglada.",
+          "blanks": [ { "accept": ["la"], "key": "La" }, { "accept": ["el"], "key": "del", "surface": "del", "note": "в тексте нет «de»: пропуск = de + el" } ] },
+        { "id": "GBE5-01.5", "context": "Cuando vuelve a la casa con la policía ve:", "text": "{1} llaves de {2} moto junto a {3} ordenador.",
+          "blanks": [ { "accept": ["las"], "key": "Las" }, { "accept": ["la"], "key": "la" }, { "accept": ["el"], "key": "al", "surface": "al" } ] },
+        { "id": "GBE5-01.6", "context": "Cuando vuelve a la casa con la policía ve:", "text": "{1} cartera cerrada encima de {2} mesa.",
+          "blanks": [ { "accept": ["la"], "key": "La" }, { "accept": ["la"], "key": "la" } ] },
+        { "id": "GBE5-01.7", "context": "Cuando vuelve a la casa con la policía ve:", "text": "{1} juguetes de {2} bebé muy ordenados.",
+          "blanks": [ { "accept": ["los"], "key": "Los" }, { "accept": ["el"], "key": "del", "surface": "del" } ] },
+        { "id": "GBE5-01.8", "context": "Cuando vuelve a la casa con la policía ve:", "text": "{1} nota corregida, con esta frase: “Ya hemos vuelto”.",
+          "blanks": [ { "accept": ["la"], "key": "La" } ] }
+      ]
+    },
+    {
+      "id": "GBE5-02",
+      "number": 2,
+      "page": 31,
+      "level": "A1-A2",
+      "section": "A",
+      "type": "fill",
+      "instruction": "Completa con las formas adecuadas del artículo.",
+      "items": [
+        { "id": "GBE5-02.0", "example": true, "text": "Vamos a buscar {1} aula libre para hacer el examen.", "blanks": [ { "accept": ["un"], "key": "un" } ] },
+        { "id": "GBE5-02.1", "text": "Tengo {1} hambre que me muero.", "blanks": [ { "accept": ["un"], "key": "un" } ] },
+        { "id": "GBE5-02.2", "text": "¿La profesora Lola? Mire en {1} última aula del pasillo. Tiene clase allí ahora.", "blanks": [ { "accept": ["la"], "key": "la" } ] },
+        { "id": "GBE5-02.3", "text": "Papá, ¿{1} hadas existen?", "blanks": [ { "accept": ["las"], "key": "las" } ] },
+        { "id": "GBE5-02.4", "text": "En la puerta de su chalé hay {1} gran águila de piedra feísima.", "blanks": [ { "accept": ["una"], "key": "una" } ] },
+        { "id": "GBE5-02.5", "text": "En mi país están prohibidas {1} armas. ¿Y aquí?", "blanks": [ { "accept": ["las"], "key": "las" } ] },
+        { "id": "GBE5-02.6", "text": "{1} hada buena transformó a la rana fea en un príncipe guapo.", "blanks": [ { "accept": ["el"], "key": "El" } ] },
+        { "id": "GBE5-02.7", "text": "{1} aguas de este balneario son excelentes para la salud.", "blanks": [ { "accept": ["las"], "key": "Las" } ] },
+        { "id": "GBE5-02.8", "text": "Mamá, ¿dónde está {1} agua?", "blanks": [ { "accept": ["el"], "key": "el" } ] },
+        { "id": "GBE5-02.9", "text": "Cuidado, toma la olla por {1} dos asas.", "blanks": [ { "accept": ["las"], "key": "las" } ] }
+      ]
+    },
+    {
+      "id": "GBE5-03",
+      "number": 3,
+      "page": 32,
+      "level": "A1-A2",
+      "section": "B",
+      "type": "match_pair",
+      "instruction": "Carmen y Lucía tienen que hacer un trabajo para clase. ¿Sabes de qué hablan? Lee las frases y relaciona cada una con la situación correspondiente.",
+      "note": "Пары предложений отличаются только артиклем. Для проверки алгоритма в обратную сторону: по ситуации (answer) выбрать артикль (article).",
+      "groups": [
+        { "options": { "a": "Lucía y Carmen ya han hablado del amigo de Julia.", "b": "Lucía y Carmen no han hablado antes de ese chico." },
+          "items": [
+            { "id": "GBE5-03.0a", "example": true, "text": "Carmen: Un amigo de Julia nos puede ayudar.", "target": "Un amigo de Julia", "article": "un", "answer": "b" },
+            { "id": "GBE5-03.0b", "example": true, "text": "Carmen: El amigo de Julia nos puede ayudar.", "target": "El amigo de Julia", "article": "el", "answer": "a" }
+          ] },
+        { "options": { "a": "Carmen ya sabe de qué libros habla Lucía.", "b": "Carmen no sabe de qué libros habla Lucía." },
+          "items": [
+            { "id": "GBE5-03.1", "text": "Lucía: He traído unos libros de casa.", "target": "unos libros", "article": "unos", "answer": "b" },
+            { "id": "GBE5-03.2", "text": "Lucía: He traído los libros de casa.", "target": "los libros", "article": "los", "answer": "a" }
+          ] },
+        { "options": { "a": "Lucía tiene solo un bolígrafo.", "b": "Lucía tiene tres bolígrafos." },
+          "items": [
+            { "id": "GBE5-03.3", "text": "Carmen: ¿Me dejas el bolígrafo?", "target": "el bolígrafo", "article": "el", "answer": "a" },
+            { "id": "GBE5-03.4", "text": "Carmen: ¿Me dejas un bolígrafo?", "target": "un bolígrafo", "article": "un", "answer": "b" }
+          ] },
+        { "options": { "a": "Hablan de otro profesor de Filosofía.", "b": "Hablan de su profesor de Filosofía." },
+          "items": [
+            { "id": "GBE5-03.5", "text": "Lucía: Un profesor de Filosofía me ha recomendado este artículo.", "target": "Un profesor de Filosofía", "article": "un", "answer": "a" },
+            { "id": "GBE5-03.6", "text": "Lucía: El profesor de Filosofía me ha recomendado este artículo.", "target": "El profesor de Filosofía", "article": "el", "answer": "b" }
+          ] },
+        { "options": { "a": "Lucía y Carmen han hablado muchas veces de Luis.", "b": "Carmen no conoce a Luis." },
+          "items": [
+            { "id": "GBE5-03.7", "text": "Lucía: Ha llamado Luis, un chico de Barcelona.", "target": "un chico de Barcelona", "article": "un", "answer": "b" },
+            { "id": "GBE5-03.8", "text": "Lucía: Ha llamado Luis, el chico de Barcelona.", "target": "el chico de Barcelona", "article": "el", "answer": "a" }
+          ] }
+      ]
+    },
+    {
+      "id": "GBE5-04",
+      "number": 4,
+      "page": 32,
+      "level": "A2-B1",
+      "section": "B",
+      "type": "fill",
+      "instruction": "Fíjate en el contexto y escribe el artículo correspondiente.",
+      "items": [
+        { "id": "GBE5-04.0", "example": true, "context": "En el salón de casa de Raquel hay solo un cuadro en la pared.",
+          "text": "Jéssica: Me gusta mucho {1} cuadro del salón. Siempre he querido tener {2} pintura como esa.",
+          "blanks": [ { "accept": ["el"], "key": "el" }, { "accept": ["una"], "key": "una" } ] },
+        { "id": "GBE5-04.1", "context": "Jéssica y Raquel han terminado su trabajo de Historia.",
+          "text": "Raquel: ¿Puedo llevarme {1} trabajo a casa para leerlo otra vez? Si quieres, puedo hacer {2} copia.",
+          "blanks": [ { "accept": ["el"], "key": "el" }, { "accept": ["una"], "key": "una" } ] },
+        { "id": "GBE5-04.2", "context": "Jéssica llega con una tarta. Raquel no sabía nada.",
+          "text": "Jéssica: Mira, he comprado {1} tarta. ¿Te apetece {2} trozo?",
+          "blanks": [ { "accept": ["una"], "key": "una" }, { "accept": ["un"], "key": "un" } ] },
+        { "id": "GBE5-04.3", "context": "Jéssica ha cortado la tarta. Hay un trozo grande y otro pequeño.",
+          "text": "Raquel: A mí dame {1} trozo pequeño.",
+          "blanks": [ { "accept": ["el"], "key": "el" } ] },
+        { "id": "GBE5-04.4", "context": "Las dos chicas conocen a toda la familia de Julia.",
+          "text": "Raquel: Voy a ir al cine con {1} amigos. Bueno, tú los conoces, son Paco y Pepe, {2} hermanos de Julia, ¿te acuerdas?",
+          "blanks": [ { "accept": ["unos"], "key": "unos" }, { "accept": ["los"], "key": "los" } ] },
+        { "id": "GBE5-04.5", "context": "Jéssica no encuentra su reloj. Hay varios relojes por la casa.",
+          "text": "Jéssica: ¿Sabes qué? Pues que he perdido {1} reloj. Raquel: Bueno, yo he visto {2} reloj pequeño encima de la cama, no sé si es {3} tuyo.",
+          "blanks": [ { "accept": ["el"], "key": "el" }, { "accept": ["un"], "key": "un" }, { "accept": ["el"], "key": "el" } ] }
+      ]
+    },
+    {
+      "id": "GBE5-05",
+      "number": 5,
+      "page": 32,
+      "level": "B1-B2",
+      "section": "B",
+      "type": "true_false",
+      "instruction": "Lee el comienzo de este cuento y señala si son adecuadas las siguientes interpretaciones.",
+      "text": "Leopoldo Luis II, un rey de Gantea (→), salió el sábado de paseo en un caballo de la reina (1). En la puerta un soldado lo despidió. Al llegar a un río (2), cruzó por un puente y se encontró con los duendes del agua (3) y estos le dijeron: “Va a venir un príncipe (4) del país vecino (5), se va a enamorar de tu mujer y va a huir con ella”. El rey no creyó nada de las palabras de los duendes, cruzó el puente (6) y volvió a palacio. Pero en la puerta estaba el soldado (7) que, muy nervioso, le dijo: “Majestad, la reina se ha ido”.",
+      "note": "target — фрагмент, к которому относится метка (N) в тексте.",
+      "items": [
+        { "id": "GBE5-05.0", "example": true, "target": "un rey de Gantea", "article": "un", "statement": "En Gantea solo hay y ha habido un rey.", "answer": "no" },
+        { "id": "GBE5-05.1", "target": "un caballo de la reina", "article": "un", "statement": "La reina tiene varios caballos.", "answer": "sí" },
+        { "id": "GBE5-05.2", "target": "un río", "article": "un", "statement": "En Gantea solo hay un río.", "answer": "no" },
+        { "id": "GBE5-05.3", "target": "los duendes del agua", "article": "los", "statement": "Seguramente Leopoldo no había oído hablar de esos duendes.", "answer": "no" },
+        { "id": "GBE5-05.4", "target": "un príncipe", "article": "un", "statement": "Este príncipe viene mucho a Gantea.", "answer": "no" },
+        { "id": "GBE5-05.5", "target": "del país vecino", "article": "el", "statement": "Gantea tiene frontera con cinco países.", "answer": "no" },
+        { "id": "GBE5-05.6", "target": "el puente", "article": "el", "statement": "El mismo puente de antes.", "answer": "sí" },
+        { "id": "GBE5-05.7", "target": "el soldado", "article": "el", "statement": "Es el mismo soldado que lo había despedido.", "answer": "sí" }
+      ]
+    },
+    {
+      "id": "GBE5-06",
+      "number": 6,
+      "page": 33,
+      "level": "A2-B1",
+      "section": "C",
+      "type": "choose",
+      "instruction": "Tacha la opción incorrecta y relaciona.",
+      "note": "options — два варианта из учебника; accept — правильный; match — буква из правого столбца. В ключе к п.10 опечатка «Ø/» — читается как Ø.",
+      "match_options": {
+        "a": "Voy a hacer una ensalada.",
+        "b": "Están de oferta en la tienda de la esquina.",
+        "c": "Ponte unos pantalones y una camisa.",
+        "d": "Está muy soso.",
+        "e": "Hace quince días que no te lo quitas.",
+        "f": "Es casera. La he hecho con aceite de oliva.",
+        "g": "Me he dado un golpe jugando al fútbol.",
+        "h": "Puedes hacerte daño en los dedos.",
+        "i": "No puedo entrar. ¿Puedo quedarme en tu casa?",
+        "j": "Creo que voy a alquilarlo.",
+        "k": "Me gusta. Tiene mucha paciencia.",
+        "l": "Así hacemos ejercicio."
+      },
+      "items": [
+        { "id": "GBE5-06.0", "example": true, "text": "¿Me pasas {1} tomate, por favor?", "blanks": [ { "options": ["Ø", "un"], "accept": ["un"], "key": "un" } ], "match": "a" },
+        { "id": "GBE5-06.1", "text": "¿Le has puesto sal a {1} tomate?", "blanks": [ { "options": ["Ø", "el"], "accept": ["el"], "key": "el" } ], "match": "d" },
+        { "id": "GBE5-06.2", "text": "¿No te gusta la salsa de {1} tomate?", "blanks": [ { "options": ["Ø", "un"], "accept": ["Ø"], "key": "Ø" } ], "match": "f" },
+        { "id": "GBE5-06.3", "text": "Máximo, no puedes recibir a los invitados en {1} pijama.", "blanks": [ { "options": ["Ø", "un"], "accept": ["Ø"], "key": "Ø" } ], "match": "c" },
+        { "id": "GBE5-06.4", "text": "Máximo, pon {1} pijama en la lavadora.", "blanks": [ { "options": ["Ø", "el"], "accept": ["el"], "key": "el" } ], "match": "e" },
+        { "id": "GBE5-06.5", "text": "Máximo, tienes que comprarte {1} pijama.", "blanks": [ { "options": ["Ø", "un"], "accept": ["un"], "key": "un" } ], "match": "b" },
+        { "id": "GBE5-06.6", "text": "Me duele {1} pie derecho.", "blanks": [ { "options": ["Ø", "el"], "accept": ["el"], "key": "el" } ], "match": "g" },
+        { "id": "GBE5-06.7", "text": "Está cerca: vamos a {1} pie.", "blanks": [ { "options": ["Ø", "el"], "accept": ["Ø"], "key": "Ø" } ], "match": "l" },
+        { "id": "GBE5-06.8", "text": "He visto {1} apartamento precioso.", "blanks": [ { "options": ["Ø", "un"], "accept": ["un"], "key": "un" } ], "match": "j" },
+        { "id": "GBE5-06.9", "text": "He perdido la llave de {1} apartamento.", "blanks": [ { "options": ["Ø", "el"], "accept": ["el"], "key": "el" } ], "match": "i" },
+        { "id": "GBE5-06.10", "text": "Tenemos un nuevo profesor de {1} piano.", "blanks": [ { "options": ["Ø", "un"], "accept": ["Ø"], "key": "Ø/" } ], "match": "k" },
+        { "id": "GBE5-06.11", "text": "Cierra {1} piano con cuidado.", "blanks": [ { "options": ["Ø", "el"], "accept": ["el"], "key": "el" } ], "match": "h" }
+      ]
+    },
+    {
+      "id": "GBE5-07",
+      "number": 7,
+      "page": 34,
+      "level": "A2-B1",
+      "section": "C",
+      "type": "fill_word",
+      "instruction": "Completa con las palabras del recuadro. Algunas deben ir en plural.",
+      "word_bank": ["pila", "dinero", "tomate", "aspirina", "agua", "huevo", "café"],
+      "note": "Здесь везде Ø: проверяется «неопределённое количество» — исчисляемые во мн.ч., неисчисляемые в ед.ч. noun/number — какое слово и в каком числе.",
+      "text": "Cariño, tienes que hacer tú la compra. Tienes que traer {0} para el gazpacho, que no hay, y también compra {1} para la tortilla. Necesitamos {2} mineral y {3} descafeinado. Trae {4}, que hacen falta para el mando de la tele. Y tienes que ir a la farmacia. No quedan {5}. Por cierto, saca {6} del banco. Yo no tengo.",
+      "items": [
+        { "id": "GBE5-07.0", "example": true, "blanks": [ { "accept": ["Ø"], "noun": "tomates", "number": "pl", "key": "tomates" } ] },
+        { "id": "GBE5-07.1", "blanks": [ { "accept": ["Ø"], "noun": "huevos", "number": "pl", "key": "huevos" } ] },
+        { "id": "GBE5-07.2", "blanks": [ { "accept": ["Ø"], "noun": "agua", "number": "sg", "key": "agua" } ] },
+        { "id": "GBE5-07.3", "blanks": [ { "accept": ["Ø"], "noun": "café", "number": "sg", "key": "café" } ] },
+        { "id": "GBE5-07.4", "blanks": [ { "accept": ["Ø"], "noun": "pilas", "number": "pl", "key": "pilas" } ] },
+        { "id": "GBE5-07.5", "blanks": [ { "accept": ["Ø"], "noun": "aspirinas", "number": "pl", "key": "aspirinas" } ] },
+        { "id": "GBE5-07.6", "blanks": [ { "accept": ["Ø"], "noun": "dinero", "number": "sg", "key": "dinero" } ] }
+      ]
+    },
+    {
+      "id": "GBE5-08",
+      "number": 8,
+      "page": 35,
+      "level": "A2-B1",
+      "section": "D",
+      "type": "classify",
+      "instruction": "Fíjate en las palabras subrayadas y relaciona cada enunciado con la interpretación más adecuada.",
+      "categories": {
+        "I": "Toda una clase de objetos o personas.",
+        "II": "Cualquier objeto o persona de una clase.",
+        "III": "Una cantidad indeterminada de objetos o personas."
+      },
+      "note": "target — подчёркнутое в учебнике; article — какой артикль там стоит.",
+      "items": [
+        { "id": "GBE5-08.0a", "example": true, "text": "Los colchones de agua son muy relajantes.", "target": "Los colchones", "article": "los", "answer": "I" },
+        { "id": "GBE5-08.0b", "example": true, "text": "Evidentemente, prefiero dormir en un colchón a dormir en el suelo.", "target": "un colchón", "article": "un", "answer": "II" },
+        { "id": "GBE5-08.0c", "example": true, "text": "Tenemos colchones de látex, de algodón y de muelles.", "target": "colchones", "article": "Ø", "answer": "III" },
+        { "id": "GBE5-08.1a", "text": "Se venden y alquilan apartamentos. Teléfono: 031676742.", "target": "apartamentos", "article": "Ø", "answer": "III" },
+        { "id": "GBE5-08.1b", "text": "Los apartamentos en este barrio son muy caros.", "target": "Los apartamentos", "article": "los", "answer": "I" },
+        { "id": "GBE5-08.1c", "text": "Un apartamento suele ser más pequeño que un piso.", "target": "Un apartamento", "article": "un", "answer": "II" },
+        { "id": "GBE5-08.2a", "text": "Los dentistas ganan mucho dinero.", "target": "Los dentistas", "article": "los", "answer": "I" },
+        { "id": "GBE5-08.2b", "text": "Lo conocí en un congreso de dentistas.", "target": "dentistas", "article": "Ø", "answer": "III" },
+        { "id": "GBE5-08.2c", "text": "Un dentista no debe comer ajo antes de la consulta.", "target": "Un dentista", "article": "un", "answer": "II" },
+        { "id": "GBE5-08.3a", "text": "Linus solo bebe infusiones.", "target": "infusiones", "article": "Ø", "answer": "III" },
+        { "id": "GBE5-08.3b", "text": "A estas horas, una infusión es mejor que un café.", "target": "una infusión", "article": "una", "answer": "II" },
+        { "id": "GBE5-08.3c", "text": "Perdona, pero las infusiones calientes sientan mejor que las frías.", "target": "las infusiones", "article": "las", "answer": "I" },
+        { "id": "GBE5-08.4a", "text": "¿Tú sabías que los aguacates tienen vitaminas A, C, D, K y B?", "target": "los aguacates", "article": "los", "answer": "I" },
+        { "id": "GBE5-08.4b", "text": "¿Has comido aguacates alguna vez? Están buenísimos.", "target": "aguacates", "article": "Ø", "answer": "III" },
+        { "id": "GBE5-08.4c", "text": "Prefiero tomarme un aguacate por la mañana que algo dulce. Me sienta mejor.", "target": "un aguacate", "article": "un", "answer": "II" },
+        { "id": "GBE5-08.5a", "text": "No tengo hijos, pero tengo sobrinos.", "target": "hijos", "article": "Ø", "answer": "III" },
+        { "id": "GBE5-08.5b", "text": "Los hijos, a veces, dan muchos problemas.", "target": "Los hijos", "article": "los", "answer": "I" },
+        { "id": "GBE5-08.5c", "text": "Tener un hijo es lo mejor que te puede pasar en esta vida.", "target": "un hijo", "article": "un", "answer": "II" }
+      ]
+    },
+    {
+      "id": "GBE5-09",
+      "number": 9,
+      "page": 35,
+      "level": "A2-B1",
+      "section": "D",
+      "type": "fill_word",
+      "instruction": "Completa con las palabras del recuadro usando, cuando es necesario, el artículo correspondiente.",
+      "word_bank": ["kioscos", "agua", "helados", "carrito", "hormigas", "abanico", "cajeros", "ratón", "té", "café", "carne"],
+      "items": [
+        { "id": "GBE5-09.0", "example": true, "text": "{1} son tiendas en las que se venden periódicos y revistas.", "blanks": [ { "accept": ["los"], "noun": "kioscos", "key": "Los kioscos" } ] },
+        { "id": "GBE5-09.1", "text": "En España, {1} es algo que se usa mucho en verano. Es perfecto para el calor.", "blanks": [ { "accept": ["el"], "noun": "abanico", "key": "el abanico" } ] },
+        { "id": "GBE5-09.2", "text": "{1} automáticos son máquinas para sacar dinero con tarjeta.", "blanks": [ { "accept": ["los"], "noun": "cajeros", "key": "Los cajeros" } ] },
+        { "id": "GBE5-09.3", "text": "¿Ese arroz lleva {1}?", "blanks": [ { "accept": ["Ø"], "noun": "carne", "key": "carne" } ] },
+        { "id": "GBE5-09.4", "text": "Me encantan {1} tanto en verano como en invierno. La pena es que engordan mucho.", "blanks": [ { "accept": ["los"], "noun": "helados", "key": "los helados" } ] },
+        { "id": "GBE5-09.5", "text": "{1} van siempre en fila unas detrás de otras.", "blanks": [ { "accept": ["las"], "noun": "hormigas", "key": "Las hormigas" } ] },
+        { "id": "GBE5-09.6", "text": "{1} es tan excitante como {2}.", "blanks": [ { "accept": ["el", "un"], "noun": "té", "key": "El/Un té" }, { "accept": ["el", "un"], "noun": "café", "key": "el/un café" } ] },
+        { "id": "GBE5-09.7", "text": "Puede estar tranquilo: {1} inalámbrico no da problemas. Es más caro, pero funciona mucho mejor.", "blanks": [ { "accept": ["el", "un"], "noun": "ratón", "key": "el/un ratón" } ] },
+        { "id": "GBE5-09.8", "text": "Pues {1} es una cesta con ruedas para hacer la compra en los supermercados.", "blanks": [ { "accept": ["el", "un"], "noun": "carrito", "key": "el/un carrito" } ] },
+        { "id": "GBE5-09.9", "text": "No te puedes duchar. No hay {1}.", "blanks": [ { "accept": ["Ø"], "noun": "agua", "key": "agua" } ] }
+      ]
+    },
+    {
+      "id": "GBE5-10",
+      "number": 10,
+      "page": 35,
+      "level": "B1-B2",
+      "section": "D",
+      "type": "correct_text",
+      "instruction": "Algunos monstruos famosos del país de Jálogüin están aprendiendo español, pero todavía tienen problemas: a veces olvidan usar los artículos. Corrige sus palabras poniendo el, la, los, las donde son necesarios.",
+      "note": "original — текст как в учебнике (без артиклей); key_text — исправленный текст из ключа. В text пропуски стоят перед каждым существительным без определителя; там, где ключ ничего не добавил, ответ Ø (derived: true).",
+      "items": [
+        { "id": "GBE5-10.0", "example": true,
+          "original": "Cuando noche llega, monstruos salen a pasear y a asustar a los seres humanos. Seres humanos siempre tienen miedo.",
+          "key_text": "la noche llega…; los monstruos salen…; los seres humanos siempre tienen…",
+          "note": "«a los seres humanos» уже напечатано в учебнике с артиклем — это не пропуск",
+          "text": "Cuando {1} noche llega, {2} monstruos salen a pasear y a asustar a los seres humanos. {3} Seres humanos siempre tienen {4} miedo.",
+          "blanks": [
+            { "accept": ["la"], "key": "la" },
+            { "accept": ["los"], "key": "los" },
+            { "accept": ["los"], "key": "los" },
+            { "accept": ["Ø"], "key": "Ø", "derived": true, "note": "рукописная правка заканчивается на «tienen…» — к miedo ничего не добавлено" }
+          ] },
+        { "id": "GBE5-10.1",
+          "original": "Después de una noche de terror nos duele garganta, pero doctor Jek nos da zumo de aspirinas.",
+          "key_text": "Después de una noche de terror nos duele la garganta, pero el doctor Jek nos da zumo de aspirinas.",
+          "text": "Después de una noche de {1} terror nos duele {2} garganta, pero {3} doctor Jek nos da {4} zumo de {5} aspirinas.",
+          "blanks": [
+            { "accept": ["Ø"], "key": "Ø", "derived": true },
+            { "accept": ["la"], "key": "la" },
+            { "accept": ["el"], "key": "el" },
+            { "accept": ["Ø"], "key": "Ø", "derived": true },
+            { "accept": ["Ø"], "key": "Ø", "derived": true }
+          ] },
+        { "id": "GBE5-10.2",
+          "original": "Monstruos quieren ser como seres humanos y respetan naturaleza. En realidad, solo comen plantas y frutos secos.",
+          "key_text": "Los monstruos quieren ser como los seres humanos y respetan la naturaleza. En realidad, solo comen plantas y frutos secos.",
+          "text": "{1} Monstruos quieren ser como {2} seres humanos y respetan {3} naturaleza. En realidad, solo comen {4} plantas y {5} frutos secos.",
+          "blanks": [
+            { "accept": ["los"], "key": "Los" },
+            { "accept": ["los"], "key": "los" },
+            { "accept": ["la"], "key": "la" },
+            { "accept": ["Ø"], "key": "Ø", "derived": true },
+            { "accept": ["Ø"], "key": "Ø", "derived": true }
+          ] },
+        { "id": "GBE5-10.3",
+          "original": "A monstruos les gusta mirar cielo gris mientras viejo vampiro Vlad toca en órgano canciones tristes.",
+          "key_text": "A los monstruos les gusta mirar el cielo gris mientras el viejo vampiro Vlad toca en el órgano canciones tristes.",
+          "text": "A {1} monstruos les gusta mirar {2} cielo gris mientras {3} viejo vampiro Vlad toca en {4} órgano {5} canciones tristes.",
+          "blanks": [
+            { "accept": ["los"], "key": "los" },
+            { "accept": ["el"], "key": "el" },
+            { "accept": ["el"], "key": "el" },
+            { "accept": ["el"], "key": "el" },
+            { "accept": ["Ø"], "key": "Ø", "derived": true }
+          ] },
+        { "id": "GBE5-10.4",
+          "original": "Para monstruos miedo es sentimiento más hermoso, por eso les gusta ver películas de zombis y visitar “Casa Terror”.",
+          "key_text": "Para los monstruos el miedo es el sentimiento más hermoso, por eso ven películas de zombis y visitan la “Casa Terror”.",
+          "note": "в ключе глаголы перефразированы (ven/visitan вместо les gusta ver/visitar) — на артикли не влияет",
+          "text": "Para {1} monstruos {2} miedo es {3} sentimiento más hermoso, por eso les gusta ver {4} películas de {5} zombis y visitar {6} “Casa Terror”.",
+          "blanks": [
+            { "accept": ["los"], "key": "los" },
+            { "accept": ["el"], "key": "el" },
+            { "accept": ["el"], "key": "el" },
+            { "accept": ["Ø"], "key": "Ø", "derived": true },
+            { "accept": ["Ø"], "key": "Ø", "derived": true },
+            { "accept": ["la"], "key": "la" }
+          ] },
+        { "id": "GBE5-10.5",
+          "original": "Monstruos hacen magia negra y bailan danza de muertos vivientes cuando sale luna llena.",
+          "key_text": "Los monstruos hacen magia negra y bailan la danza de los muertos vivientes cuando sale la luna llena.",
+          "text": "{1} Monstruos hacen {2} magia negra y bailan {3} danza de {4} muertos vivientes cuando sale {5} luna llena.",
+          "blanks": [
+            { "accept": ["los"], "key": "Los" },
+            { "accept": ["Ø"], "key": "Ø", "derived": true },
+            { "accept": ["la"], "key": "la" },
+            { "accept": ["los"], "key": "los" },
+            { "accept": ["la"], "key": "la" }
+          ] },
+        { "id": "GBE5-10.6",
+          "original": "Todas noches de tormenta esqueletos salen de tumbas para celebrar gran fiesta del trueno. Monstruos se divierten como locos.",
+          "key_text": "Todas las noches de tormenta los esqueletos salen de las tumbas para celebrar la gran fiesta del trueno. Los monstruos se divierten como locos.",
+          "text": "Todas {1} noches de {2} tormenta {3} esqueletos salen de {4} tumbas para celebrar {5} gran fiesta del trueno. {6} Monstruos se divierten como {7} locos.",
+          "blanks": [
+            { "accept": ["las"], "key": "las" },
+            { "accept": ["Ø"], "key": "Ø", "derived": true },
+            { "accept": ["los"], "key": "los" },
+            { "accept": ["las"], "key": "las" },
+            { "accept": ["la"], "key": "la" },
+            { "accept": ["los"], "key": "Los" },
+            { "accept": ["Ø"], "key": "Ø", "derived": true }
+          ] },
+        { "id": "GBE5-10.7",
+          "original": "Vampiros no se ven en espejo, pero saben que son guapos por selfis.",
+          "key_text": "Los vampiros no se ven en el espejo, pero saben que son guapos por los selfis.",
+          "text": "{1} Vampiros no se ven en {2} espejo, pero saben que son guapos por {3} selfis.",
+          "blanks": [
+            { "accept": ["los"], "key": "Los" },
+            { "accept": ["el"], "key": "el" },
+            { "accept": ["los"], "key": "los" }
+          ] }
+      ]
+    },
+    {
+      "id": "GBE5-11",
+      "number": 11,
+      "page": 36,
+      "level": "A2-B1",
+      "section": "E",
+      "type": "drop_noun",
+      "instruction": "Tacha el sustantivo cuando no es necesario y cambia un por uno si hace falta.",
+      "note": "phrases — словосочетания, в которых нужно решить: убрать ли существительное и в какую форму перейдёт артикль. answer — форма из ключа (существительное убрано).",
+      "items": [
+        { "id": "GBE5-11.0", "example": true, "text": "• Prueba un canapé. ○ Gracias, ya me he comido un canapé.",
+          "phrases": [ { "phrase": "un canapé", "position": 2, "drop_noun": true, "answer": "uno" } ] },
+        { "id": "GBE5-11.1", "text": "¡Qué horror! He olvidado mis gafas de sol. ¿Me prestas unas gafas de sol?",
+          "phrases": [ { "phrase": "unas gafas de sol", "drop_noun": true, "answer": "unas" } ] },
+        { "id": "GBE5-11.2", "text": "Estos sobres son pequeños. Mejor usamos los sobres amarillos, los sobres que están ahí.",
+          "phrases": [ { "phrase": "los sobres amarillos", "drop_noun": true, "answer": "los amarillos" }, { "phrase": "los sobres que están ahí", "drop_noun": true, "answer": "los que están ahí" } ] },
+        { "id": "GBE5-11.3", "text": "• ¿Quieres una cerveza? ○ No, gracias, acabo de tomarme una cerveza.",
+          "phrases": [ { "phrase": "una cerveza", "position": 2, "drop_noun": true, "answer": "una" } ] },
+        { "id": "GBE5-11.4", "text": "• Me han regalado un reloj con cronómetro. ○ Pues yo tengo un reloj que tiene wifi.",
+          "phrases": [ { "phrase": "un reloj que tiene wifi", "drop_noun": true, "answer": "uno que tiene wifi" } ] },
+        { "id": "GBE5-11.5", "text": "• ¿Cuál de esas chicas es tu hermana? ○ La chica de las gafas, la chica alta, la chica que está de pie.",
+          "phrases": [ { "phrase": "La chica de las gafas", "drop_noun": true, "answer": "La de las gafas" }, { "phrase": "la chica alta", "drop_noun": true, "answer": "la alta" }, { "phrase": "la chica que está de pie", "drop_noun": true, "answer": "la que está de pie" } ] },
+        { "id": "GBE5-11.6", "text": "• Han venido unos amigos preguntando por ti. ○ Sí, ya lo sé. Son unos amigos que conocí en la discoteca.",
+          "phrases": [ { "phrase": "unos amigos que conocí en la discoteca", "drop_noun": true, "answer": "unos que conocí en la discoteca" } ] },
+        { "id": "GBE5-11.7", "text": "• ¿Me pasas ese libro, por favor? ○ ¿Cuál? ¿El libro grande? ¿El libro de física?",
+          "phrases": [ { "phrase": "El libro grande", "drop_noun": true, "answer": "El grande" }, { "phrase": "El libro de física", "drop_noun": true, "answer": "El de física" } ] },
+        { "id": "GBE5-11.8", "text": "• ¿Ustedes han pedido un café? ○ Dos: yo un café solo y él un café con leche.",
+          "phrases": [ { "phrase": "un café solo", "drop_noun": true, "answer": "uno solo" }, { "phrase": "un café con leche", "drop_noun": true, "answer": "uno con leche" } ] }
+      ]
+    },
+    {
+      "id": "GBE5-12",
+      "number": 12,
+      "page": 36,
+      "level": "A2-B1",
+      "section": "E",
+      "type": "fill_word",
+      "article_task": false,
+      "instruction": "Estos personajes son los autores de la gramática. Completa y descubrirás quiénes son.",
+      "word_bank": ["llevan gafas", "guapísimas", "delgado", "lleva peluca", "guantes largos", "pistola", "pañuelo de lunares", "está cantando"],
+      "note": "Пропуск — не артикль, а слово из рамки (ответ зависит от картинки). Артикль дан; полезно как образцы конструкций el + прил. / el de + сущ. / el que + глагол.",
+      "items": [
+        { "id": "GBE5-12.0", "example": true, "text": "Los que {1} son Jenaro, Alex y Pablo.", "pattern": "art + que + oración", "blanks": [ { "accept": ["llevan gafas"], "key": "llevan gafas" } ] },
+        { "id": "GBE5-12.1", "text": "El que {1} es Jenaro.", "pattern": "art + que + oración", "blanks": [ { "accept": ["lleva peluca"], "key": "lleva peluca" } ] },
+        { "id": "GBE5-12.2", "text": "La de los {1} es Rosa.", "pattern": "art + de + sustantivo", "blanks": [ { "accept": ["guantes largos"], "key": "guantes largos" } ] },
+        { "id": "GBE5-12.3", "text": "El de la {1} es Alex.", "pattern": "art + de + sustantivo", "blanks": [ { "accept": ["pistola"], "key": "pistola" } ] },
+        { "id": "GBE5-12.4", "text": "El {1} es José Plácido.", "pattern": "art + adjetivo", "blanks": [ { "accept": ["delgado"], "key": "delgado" } ] },
+        { "id": "GBE5-12.5", "text": "El del {1} es Pablo.", "pattern": "art + de + sustantivo", "blanks": [ { "accept": ["pañuelo de lunares"], "key": "pañuelo de lunares" } ] },
+        { "id": "GBE5-12.6", "text": "La que {1} es Lourdes.", "pattern": "art + que + oración", "blanks": [ { "accept": ["está cantando"], "key": "está cantando" } ] },
+        { "id": "GBE5-12.7", "text": "Las {1} son Lourdes y Rosa.", "pattern": "art + adjetivo", "blanks": [ { "accept": ["guapísimas"], "key": "guapísimas" } ] }
+      ]
+    }
+  ]
+}

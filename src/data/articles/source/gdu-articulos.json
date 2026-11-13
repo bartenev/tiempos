@@ -1,0 +1,533 @@
+{
+  "source": {
+    "id": "GDU",
+    "book": "Gramática de uso del español A1-B2 (Aragonés, Palencia)",
+    "chapter": "Unidades 4–11: artículos",
+    "pages": "16–31",
+    "key_pages": "270–271"
+  },
+  "conventions": {
+    "blank": "{N} в тексте — пропуск номер N; ответ лежит в blanks[N-1].",
+    "accept": "Список допустимых ответов (артикль в нижнем регистре). 'Ø' — без артикля. Несколько значений — ключ допускает варианты.",
+    "key": "Ответ как он напечатан в ключе (с заглавной буквой, слитной формой al/del и т.п.).",
+    "surface": "Если артикль сливается с предлогом (a + el = al, de + el = del), здесь итоговая форма. В учебнике в таких местах часто стоит «a ___» / «de ___», а в ключе — al/del; в тексте здесь предлог убран, чтобы пропуск = вся форма.",
+    "noun": "Если упражнение требует вписать и само слово (из рамки / по картинке) — какое.",
+    "example": "true — образец из учебника (ответ вписан в книге). На уровне пропуска — если образец только этот пропуск.",
+    "item_id": "<источник><юнит>-<упражнение>.<пункт>, например GDU7-2.5 = юнит 7, упр. 7.2, пункт 5. Нумерация пунктов — как в учебнике (образец обычно пункт 1)."
+  },
+  "sections": [
+    { "id": "4", "page": 16, "title": "un, una, unos, unas — El artículo indeterminado", "summary": "Формы; un перед ж.р. ед.ч. на ударное a-/ha- (un águila), но unas águilas, una buena aula. un — отнести к классу/группе (Es un reloj; Es un cantante; La papaya es una fruta); un — количество: un/una = 1, unos/unas + pluralia tantum = 1 (unas tijeras), unos/unas + мн.ч. = несколько." },
+    { "id": "5", "page": 18, "title": "un coche / coche — Ausencia de artículo", "summary": "Ø после ser/hacerse с профессией, религией, национальностью, идеологией (Soy estudiante). НО un, если есть определение (un médico extraordinario) или если человека идентифицируют по профессии (¿Quién es Almodóvar? Es un director de cine). Ø перед прямым дополнением, когда речь о классе предметов, а не о конкретном (Colecciona sellos, ¿Tienes teléfono?, Bebemos agua). НО un — когда речь о количестве (una novela = 1) или есть прилагательное (unos sellos muy raros)." },
+    { "id": "6", "page": 20, "title": "el, la, los, las — El artículo determinado", "summary": "Формы; el перед ж.р. ед.ч. на ударное a-/ha- (el aula), но la otra aula, las aulas; al, del. el — единственный (La madre de Antonio; la capital de Argentina); конкретный, ясно какой (Quiero ver al director; Enciende la luz); в общем смысле (El tabaco es malo; Los chilenos hablan español)." },
+    { "id": "7", "page": 22, "title": "un perro / el perro — Contraste", "summary": "un — впервые, новое для слушателя; часть класса/группы (Un hijo de Andrés — у него три); количество (Un melón, por favor). el — уже упомянуто; единственное или конкретное в ситуации (La hija de Rosa — одна; Necesito arreglar el coche — мою машину); в общем смысле (Me encanta el melón)." },
+    { "id": "8", "page": 24, "title": "el señor Alonso, la calle Mayor — Nombres propios", "summary": "el/la + señor/señora/doctor… + фамилия (El señor Alonso es mi jefe); НО Ø при обращении (Buenos días, señor Alonso) и с don/doña и просто именами (Julián, Doña Rosa). el/la с улицами, площадями, кинотеатрами, отелями, музеями, реками, озёрами, морями, группами островов, горами, пустынями; Ø с отдельными островами (Mallorca) и с городами, регионами, странами, континентами — кроме La Habana, El Escorial, La Paz, El Cairo, El Salvador, (la) India, (los) Estados Unidos, La Mancha, La Rioja, La Pampa…" },
+    { "id": "9", "page": 26, "title": "el seis de enero — Tiempo y cantidad", "summary": "la/las + часы (las dos); el + день недели — конкретный день (El domingo voy a una fiesta), los + день недели — привычка (Los miércoles tengo clase); el + дата; Ø в «Hoy es lunes / cinco de marzo»; день недели + дата — один артикль (el jueves, veinte de junio); Ø с месяцами (en octubre). por la mañana/tarde/noche, но a mediodía, de madrugada. Частота: una hora al día, dos veces al mes. el/la/los + единицы измерения (dos euros el kilo)." },
+    { "id": "10", "page": 28, "title": "tocar la guitarra — Otros usos del artículo determinado", "summary": "tocar el piano (но tener/comprar una guitarra); jugar al fútbol / a las cartas (но hacer gimnasia, natación); las matemáticas, el griego (но hablar/saber/estudiar Ø chino); la policía, el ejército, los bomberos; la radio, la televisión, el periódico, las noticias (но una radio — аппарат, una noticia); el mar, el campo, la playa, el cielo, la naturaleza; ir al / estar en el hospital, cine, teatro, dentista, médico, banco, trabajo, colegio; la iglesia, universidad, cárcel, oficina; НО Ø: casa, correos, clase." },
+    { "id": "11", "page": 30, "title": "el rojo, uno rojo — Omisión del nombre", "summary": "el/la/los/las или uno/una/unos/unas + прилагательное вместо уже названного существительного: el — конкретное (¿Quién es Susi? La alta), uno — тип/класс (¿Qué tipo de coche? Uno pequeño). el/la/los/las + de + сущ. = принадлежность, место, материал (las de la derecha, los de oro). lo + прил. м.р. ед.ч. = «вещь, вещи» (Lo bueno del verano; Me gusta lo salado)." }
+  ],
+  "exercises": [
+    {
+      "id": "GDU4-1", "number": "4.1", "page": 17, "level": "A1", "section": "4", "type": "fill",
+      "instruction": "Complete con un, una, unos, unas.",
+      "note": "Существительные без контекста — проверяется только форма.",
+      "items": [
+        { "id": "GDU4-1.1", "example": true, "text": "{1} flor", "blanks": [ { "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU4-1.2", "text": "{1} sillas", "blanks": [ { "accept": ["unas"], "key": "unas" } ] },
+        { "id": "GDU4-1.3", "text": "{1} relojes", "blanks": [ { "accept": ["unos"], "key": "unos" } ] },
+        { "id": "GDU4-1.4", "text": "{1} paraguas", "blanks": [ { "accept": ["un", "unos"], "key": "un/unos" } ] },
+        { "id": "GDU4-1.5", "text": "{1} alumnos", "blanks": [ { "accept": ["unos"], "key": "unos" } ] },
+        { "id": "GDU4-1.6", "text": "{1} cine", "blanks": [ { "accept": ["un"], "key": "un" } ] },
+        { "id": "GDU4-1.7", "text": "{1} habitación", "blanks": [ { "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU4-1.8", "text": "{1} lápices", "blanks": [ { "accept": ["unos"], "key": "unos" } ] },
+        { "id": "GDU4-1.9", "text": "{1} chica", "blanks": [ { "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU4-1.10", "text": "{1} aulas", "blanks": [ { "accept": ["unas"], "key": "unas" } ] },
+        { "id": "GDU4-1.11", "text": "{1} ciudad", "blanks": [ { "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU4-1.12", "text": "{1} aula", "blanks": [ { "accept": ["un"], "key": "un" } ] },
+        { "id": "GDU4-1.13", "text": "{1} profesora", "blanks": [ { "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU4-1.14", "text": "{1} pantalones", "blanks": [ { "accept": ["unos"], "key": "unos" } ] },
+        { "id": "GDU4-1.15", "text": "{1} camarero", "blanks": [ { "accept": ["un"], "key": "un" } ] }
+      ]
+    },
+    {
+      "id": "GDU4-2", "number": "4.2", "page": 17, "level": "A1", "section": "4", "type": "fill_word",
+      "instruction": "Complete las respuestas utilizando un, una, unos, unas y las palabras de los recuadros.",
+      "word_bank": ["ciudad", "deporte", "flor", "fruta", "país", "científico", "escritora", "director de cine", "futbolista", "pintora"],
+      "items": [
+        { "id": "GDU4-2.1a", "example": true, "text": "¿Qué es el balonmano? Es {1} deporte.", "blanks": [ { "accept": ["un"], "noun": "deporte", "key": "un deporte" } ] },
+        { "id": "GDU4-2.2a", "text": "¿Qué es Sevilla? Es {1} ciudad.", "blanks": [ { "accept": ["una"], "noun": "ciudad", "key": "una ciudad" } ] },
+        { "id": "GDU4-2.3a", "text": "¿Qué es Colombia? Es {1} país.", "blanks": [ { "accept": ["un"], "noun": "país", "key": "un país" } ] },
+        { "id": "GDU4-2.4a", "text": "¿Qué es una rosa? Es {1} flor.", "blanks": [ { "accept": ["una"], "noun": "flor", "key": "una flor" } ] },
+        { "id": "GDU4-2.5a", "text": "¿Qué es el mango? Es {1} fruta.", "blanks": [ { "accept": ["una"], "noun": "fruta", "key": "una fruta" } ] },
+        { "id": "GDU4-2.1b", "example": true, "text": "¿Quién es Ronaldo? Es {1} futbolista.", "blanks": [ { "accept": ["un"], "noun": "futbolista", "key": "un futbolista" } ] },
+        { "id": "GDU4-2.2b", "text": "¿Quién es Isabel Allende? Es {1} escritora.", "blanks": [ { "accept": ["una"], "noun": "escritora", "key": "una escritora" } ] },
+        { "id": "GDU4-2.3b", "text": "¿Quién es Frida Kahlo? Es {1} pintora.", "blanks": [ { "accept": ["una"], "noun": "pintora", "key": "una pintora" } ] },
+        { "id": "GDU4-2.4b", "text": "¿Quién es Amenábar? Es {1} director de cine.", "blanks": [ { "accept": ["un"], "noun": "director de cine", "key": "un director de cine" } ] },
+        { "id": "GDU4-2.5b", "text": "¿Quién es Stephen Hawking? Es {1} científico.", "blanks": [ { "accept": ["un"], "noun": "científico", "key": "un científico" } ] }
+      ]
+    },
+    {
+      "id": "GDU4-3", "number": "4.3", "page": 17, "level": "A1", "section": "4", "type": "fill_word",
+      "instruction": "Escriba lo que hay en cada ilustración utilizando un, una, unos, unas y las palabras del recuadro.",
+      "word_bank": ["árboles", "caballo", "casa", "chicas", "coche", "gafas", "gato", "hacha", "libros", "niños", "televisión", "vacas"],
+      "note": "Ответ по картинке; проверяется только форма неопределённого артикля.",
+      "items": [
+        { "id": "GDU4-3.1", "example": true, "text": "{1} coche", "blanks": [ { "accept": ["un"], "noun": "coche", "key": "un coche" } ] },
+        { "id": "GDU4-3.2", "text": "{1} niños", "blanks": [ { "accept": ["unos"], "noun": "niños", "key": "unos niños" } ] },
+        { "id": "GDU4-3.3", "text": "{1} hacha", "blanks": [ { "accept": ["un"], "noun": "hacha", "key": "un hacha" } ] },
+        { "id": "GDU4-3.4", "text": "{1} libros", "blanks": [ { "accept": ["unos"], "noun": "libros", "key": "unos libros" } ] },
+        { "id": "GDU4-3.5", "text": "{1} casa", "blanks": [ { "accept": ["una"], "noun": "casa", "key": "una casa" } ] },
+        { "id": "GDU4-3.6", "text": "{1} gato", "blanks": [ { "accept": ["un"], "noun": "gato", "key": "un gato" } ] },
+        { "id": "GDU4-3.7", "text": "{1} vacas", "blanks": [ { "accept": ["unas"], "noun": "vacas", "key": "unas vacas" } ] },
+        { "id": "GDU4-3.8", "text": "{1} chicas", "blanks": [ { "accept": ["unas"], "noun": "chicas", "key": "unas chicas" } ] },
+        { "id": "GDU4-3.9", "text": "{1} televisión", "blanks": [ { "accept": ["una"], "noun": "televisión", "key": "una televisión" } ] },
+        { "id": "GDU4-3.10", "text": "{1} árboles", "blanks": [ { "accept": ["unos"], "noun": "árboles", "key": "unos árboles" } ] },
+        { "id": "GDU4-3.11", "text": "{1} gafas", "blanks": [ { "accept": ["unas"], "noun": "gafas", "key": "unas gafas" } ] },
+        { "id": "GDU4-3.12", "text": "{1} caballo", "blanks": [ { "accept": ["un"], "noun": "caballo", "key": "un caballo" } ] }
+      ]
+    },
+    {
+      "id": "GDU4-4", "number": "4.4", "page": 17, "level": "A1", "section": "4", "type": "fill",
+      "instruction": "Complete las frases con un, una, unos, unas.",
+      "items": [
+        { "id": "GDU4-4.1", "example": true, "text": "{1} melón, por favor.", "blanks": [ { "accept": ["un"], "key": "Un" } ] },
+        { "id": "GDU4-4.2", "text": "El Orinoco es {1} río.", "blanks": [ { "accept": ["un"], "key": "un" } ] },
+        { "id": "GDU4-4.3", "text": "¡Cuidado, {1} serpiente!", "blanks": [ { "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU4-4.4", "text": "¡Mira! {1} águila.", "blanks": [ { "accept": ["un"], "key": "Un" } ] },
+        { "id": "GDU4-4.5", "text": "Quiero {1} vaqueros, por favor.", "blanks": [ { "accept": ["unos"], "key": "unos" } ] },
+        { "id": "GDU4-4.6", "text": "—¿Qué es eso? —Es {1} radio.", "blanks": [ { "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU4-4.7", "text": "¿Tienes {1} mapa de Ecuador?", "blanks": [ { "accept": ["un"], "key": "un" } ] },
+        { "id": "GDU4-4.8", "text": "Rosa tiene {1} hija.", "blanks": [ { "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU4-4.9", "text": "Necesitamos {1} tijeras.", "blanks": [ { "accept": ["unas"], "key": "unas" } ] },
+        { "id": "GDU4-4.10", "text": "Tengo {1} zapatos muy cómodos.", "blanks": [ { "accept": ["unos"], "key": "unos" } ] }
+      ]
+    },
+    {
+      "id": "GDU5-1", "number": "5.1", "page": 19, "level": "A1", "section": "5", "type": "fill_word",
+      "instruction": "Observe las ilustraciones y complete las frases con las palabras del recuadro.",
+      "word_bank": ["abogada", "actriz", "camarera", "cocinero", "estudiante", "fotógrafo", "médico", "profesora"],
+      "note": "Пропуск — артикль (везде Ø) + профессия по картинке.",
+      "items": [
+        { "id": "GDU5-1.1", "example": true, "text": "Eva es {1} abogada.", "blanks": [ { "accept": ["Ø"], "noun": "abogada", "key": "abogada" } ] },
+        { "id": "GDU5-1.2", "text": "José Luis es {1} estudiante.", "blanks": [ { "accept": ["Ø"], "noun": "estudiante", "key": "estudiante" } ] },
+        { "id": "GDU5-1.3", "text": "Mar es {1} actriz.", "blanks": [ { "accept": ["Ø"], "noun": "actriz", "key": "actriz" } ] },
+        { "id": "GDU5-1.4", "text": "Félix es {1} fotógrafo.", "blanks": [ { "accept": ["Ø"], "noun": "fotógrafo", "key": "fotógrafo" } ] },
+        { "id": "GDU5-1.5", "text": "Roberto es {1} médico.", "blanks": [ { "accept": ["Ø"], "noun": "médico", "key": "médico" } ] },
+        { "id": "GDU5-1.6", "text": "Adrián es {1} cocinero.", "blanks": [ { "accept": ["Ø"], "noun": "cocinero", "key": "cocinero" } ] },
+        { "id": "GDU5-1.7", "text": "Eloísa es {1} camarera.", "blanks": [ { "accept": ["Ø"], "noun": "camarera", "key": "camarera" } ] },
+        { "id": "GDU5-1.8", "text": "Leonor es {1} profesora.", "blanks": [ { "accept": ["Ø"], "noun": "profesora", "key": "profesora" } ] }
+      ]
+    },
+    {
+      "id": "GDU5-2", "number": "5.2", "page": 19, "level": "A1-A2", "section": "5", "type": "choose",
+      "instruction": "Rodee la forma correcta en cada caso.",
+      "items": [
+        { "id": "GDU5-2.1", "example": true, "text": "—¿Quién es Luis Miguel? —Es {1} cantante; es {2} mexicano.", "blanks": [ { "options": ["Ø", "un"], "accept": ["un"], "key": "un cantante" }, { "options": ["Ø", "un"], "accept": ["Ø"], "key": "mexicano" } ] },
+        { "id": "GDU5-2.2", "text": "La doctora Ramírez es {1} médica buenísima; es {2} argentina.", "blanks": [ { "options": ["Ø", "una"], "accept": ["una"], "key": "una médica" }, { "options": ["Ø", "una"], "accept": ["Ø"], "key": "argentina" } ] },
+        { "id": "GDU5-2.3", "text": "El marido de Luisa es {1} abogado. Es {2} abogado muy caro.", "blanks": [ { "options": ["Ø", "un"], "accept": ["Ø"], "key": "abogado" }, { "options": ["Ø", "un"], "accept": ["un"], "key": "un abogado" } ] },
+        { "id": "GDU5-2.4", "text": "Tomás se ha hecho {1} musulmán.", "blanks": [ { "options": ["Ø", "un"], "accept": ["Ø"], "key": "musulmán" } ] },
+        { "id": "GDU5-2.5", "text": "Los tíos de Andrea son {1} protestantes.", "blanks": [ { "options": ["Ø", "unos"], "accept": ["Ø"], "key": "protestantes" } ] },
+        { "id": "GDU5-2.6", "text": "El hermano de Patricio es {1} actor famoso.", "blanks": [ { "options": ["Ø", "un"], "accept": ["un"], "key": "un actor" } ] },
+        { "id": "GDU5-2.7", "text": "—¿Quién es Vargas Llosa? —Es {1} escritor; es {2} peruano.", "blanks": [ { "options": ["Ø", "un"], "accept": ["un"], "key": "un escritor" }, { "options": ["Ø", "un"], "accept": ["Ø"], "key": "peruano" } ] },
+        { "id": "GDU5-2.8", "text": "Alberto y Lola son {1} estudiantes. Son {2} socialistas.", "blanks": [ { "options": ["Ø", "unos"], "accept": ["Ø"], "key": "estudiantes" }, { "options": ["Ø", "unos"], "accept": ["Ø"], "key": "socialistas" } ] },
+        { "id": "GDU5-2.9", "text": "Sarita quiere ser {1} bailarina.", "blanks": [ { "options": ["Ø", "una"], "accept": ["Ø"], "key": "bailarina" } ] },
+        { "id": "GDU5-2.10", "text": "García Márquez es {1} escritor de éxito.", "blanks": [ { "options": ["Ø", "un"], "accept": ["un"], "key": "un escritor" } ] }
+      ]
+    },
+    {
+      "id": "GDU5-3", "number": "5.3", "page": 19, "level": "A1-A2", "section": "5", "type": "fill",
+      "instruction": "Complete con un, una, unos, unas cuando sea necesario.",
+      "items": [
+        { "id": "GDU5-3.1", "example": true, "text": "—¿Comes {1} carne? —No, soy {2} vegetariano.", "blanks": [ { "accept": ["Ø"], "key": "Ø" }, { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU5-3.2", "text": "Colecciono {1} monedas. Ayer me compré {2} monedas chinas.", "blanks": [ { "accept": ["Ø"], "key": "Ø" }, { "accept": ["unas"], "key": "unas" } ] },
+        { "id": "GDU5-3.3", "text": "Alberto tiene {1} apartamento en Benidorm.", "blanks": [ { "accept": ["un"], "key": "un" } ] },
+        { "id": "GDU5-3.4", "text": "—¿Tomas {1} café? —Solo {2} taza al día.", "blanks": [ { "accept": ["Ø"], "key": "Ø" }, { "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU5-3.5", "text": "—¿Azúcar? —Gracias, no tomo {1} azúcar.", "blanks": [ { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU5-3.6", "text": "¿Tenéis {1} hijos?", "blanks": [ { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU5-3.7", "text": "Chelo canta {1} ópera.", "blanks": [ { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU5-3.8", "text": "Ernesto es {1} músico. Escribe {2} canciones.", "blanks": [ { "accept": ["Ø"], "key": "Ø" }, { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU5-3.9", "text": "¿Necesitas {1} dinero?", "blanks": [ { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU5-3.10", "text": "—¿Quieres {1} queso? —No, gracias; es {2} queso muy fuerte.", "blanks": [ { "accept": ["Ø"], "key": "Ø" }, { "accept": ["un"], "key": "un" } ] },
+        { "id": "GDU5-3.11", "text": "Carolina es {1} vendedora. Vende {2} enciclopedias.", "blanks": [ { "accept": ["Ø"], "key": "Ø" }, { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU5-3.12", "text": "¿Tienes {1} hermanos?", "blanks": [ { "accept": ["Ø"], "key": "Ø" } ] }
+      ]
+    },
+    {
+      "id": "GDU6-1", "number": "6.1", "page": 21, "level": "A1", "section": "6", "type": "fill",
+      "instruction": "Complete con el, la, los, las.",
+      "note": "Существительные без контекста — проверяется только форма.",
+      "items": [
+        { "id": "GDU6-1.1", "example": true, "text": "{1} casa", "blanks": [ { "accept": ["la"], "key": "la" } ] },
+        { "id": "GDU6-1.2", "text": "{1} médico", "blanks": [ { "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU6-1.3", "text": "{1} naranjas", "blanks": [ { "accept": ["las"], "key": "las" } ] },
+        { "id": "GDU6-1.4", "text": "{1} coche", "blanks": [ { "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU6-1.5", "text": "{1} habitación", "blanks": [ { "accept": ["la"], "key": "la" } ] },
+        { "id": "GDU6-1.6", "text": "{1} águila", "blanks": [ { "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU6-1.7", "text": "{1} pantalones", "blanks": [ { "accept": ["los"], "key": "los" } ] },
+        { "id": "GDU6-1.8", "text": "{1} aula", "blanks": [ { "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU6-1.9", "text": "{1} sillas", "blanks": [ { "accept": ["las"], "key": "las" } ] },
+        { "id": "GDU6-1.10", "text": "{1} lápices", "blanks": [ { "accept": ["los"], "key": "los" } ] },
+        { "id": "GDU6-1.11", "text": "{1} tijeras", "blanks": [ { "accept": ["las"], "key": "las" } ] },
+        { "id": "GDU6-1.12", "text": "{1} profesor", "blanks": [ { "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU6-1.13", "text": "{1} perro", "blanks": [ { "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU6-1.14", "text": "{1} hermana", "blanks": [ { "accept": ["la"], "key": "la" } ] },
+        { "id": "GDU6-1.15", "text": "{1} alumnos", "blanks": [ { "accept": ["los"], "key": "los" } ] }
+      ]
+    },
+    {
+      "id": "GDU6-2", "number": "6.2", "page": 21, "level": "A1", "section": "6", "type": "fill_word",
+      "instruction": "Observe la ilustración (árbol genealógico) y complete las frases con el, la, los, las y las palabras del recuadro.",
+      "word_bank": ["hermana", "hermanos", "hijas", "madre", "marido", "padre", "tía", "tío"],
+      "items": [
+        { "id": "GDU6-2.1", "example": true, "text": "{1} padre de Marta se llama Felipe.", "blanks": [ { "accept": ["el"], "noun": "padre", "key": "El padre" } ] },
+        { "id": "GDU6-2.2", "text": "{1} madre de Marta se llama Claudia.", "blanks": [ { "accept": ["la"], "noun": "madre", "key": "La madre" } ] },
+        { "id": "GDU6-2.3", "text": "{1} tío de Marta se llama Javier.", "blanks": [ { "accept": ["el"], "noun": "tío", "key": "El tío" } ] },
+        { "id": "GDU6-2.4", "text": "{1} tía de Marta se llama Lucía.", "blanks": [ { "accept": ["la"], "noun": "tía", "key": "La tía" } ] },
+        { "id": "GDU6-2.5", "text": "{1} hermanos de Marta se llaman Enrique y Fernando.", "blanks": [ { "accept": ["los"], "noun": "hermanos", "key": "Los hermanos" } ] },
+        { "id": "GDU6-2.6", "text": "{1} hermana de Marta se llama Isabel.", "blanks": [ { "accept": ["la"], "noun": "hermana", "key": "La hermana" } ] },
+        { "id": "GDU6-2.7", "text": "{1} marido de Marta se llama Juan.", "blanks": [ { "accept": ["el"], "noun": "marido", "key": "El marido" } ] },
+        { "id": "GDU6-2.8", "text": "{1} hijas de Marta se llaman Irene y Juana.", "blanks": [ { "accept": ["las"], "noun": "hijas", "key": "Las hijas" } ] }
+      ]
+    },
+    {
+      "id": "GDU6-3", "number": "6.3", "page": 21, "level": "A1", "section": "6", "type": "fill_word",
+      "instruction": "Complete las frases con las palabras del recuadro y el, la, los, las.",
+      "word_bank": ["agua", "diccionario", "jardín", "luz", "tijeras", "ventana"],
+      "items": [
+        { "id": "GDU6-3.1", "example": true, "text": "Susana está en {1} jardín.", "blanks": [ { "accept": ["el"], "noun": "jardín", "key": "el jardín" } ] },
+        { "id": "GDU6-3.2", "text": "Cierra {1} ventana.", "blanks": [ { "accept": ["la"], "noun": "ventana", "key": "la ventana" } ] },
+        { "id": "GDU6-3.3", "text": "Pásame {1} agua, por favor.", "blanks": [ { "accept": ["el"], "noun": "agua", "key": "el agua" } ] },
+        { "id": "GDU6-3.4", "text": "Déjame {1} diccionario.", "blanks": [ { "accept": ["el"], "noun": "diccionario", "key": "el diccionario" } ] },
+        { "id": "GDU6-3.5", "text": "Enciende {1} luz.", "blanks": [ { "accept": ["la"], "noun": "luz", "key": "la luz" } ] },
+        { "id": "GDU6-3.6", "text": "Pásame {1} tijeras.", "blanks": [ { "accept": ["las"], "noun": "tijeras", "key": "las tijeras" } ] }
+      ]
+    },
+    {
+      "id": "GDU6-4", "number": "6.4", "page": 21, "level": "A1", "section": "6", "type": "fill",
+      "instruction": "Complete las siguientes frases con el, la, los, las (utilice al y del cuando sea necesario).",
+      "note": "В учебнике «a ___» / «de ___»; в ключе al / del. Здесь предлог убран из текста, пропуск = итоговая форма.",
+      "items": [
+        { "id": "GDU6-4.1", "example": true, "text": "{1} águilas son aves.", "blanks": [ { "accept": ["las"], "key": "Las" } ] },
+        { "id": "GDU6-4.2", "text": "Montevideo es {1} capital de Uruguay.", "blanks": [ { "accept": ["la"], "key": "la" } ] },
+        { "id": "GDU6-4.3", "text": "Queremos ver {1} jefe de estudios.", "blanks": [ { "accept": ["el"], "key": "al", "surface": "al" } ] },
+        { "id": "GDU6-4.4", "text": "Cierra {1} puerta {2} jardín, por favor.", "blanks": [ { "accept": ["la"], "key": "la" }, { "accept": ["el"], "key": "del", "surface": "del" } ] },
+        { "id": "GDU6-4.5", "text": "Tenéis que ir {1} aula 15.", "blanks": [ { "accept": ["el"], "key": "al", "surface": "al" } ] },
+        { "id": "GDU6-4.6", "text": "{1} agua es mi bebida preferida.", "blanks": [ { "accept": ["el"], "key": "El" } ] },
+        { "id": "GDU6-4.7", "text": "{1} padres de Sofía viven en Lima.", "blanks": [ { "accept": ["los"], "key": "Los" } ] },
+        { "id": "GDU6-4.8", "text": "Me gustan {1} naranjas.", "blanks": [ { "accept": ["las"], "key": "las" } ] },
+        { "id": "GDU6-4.9", "text": "Vivimos cerca {1} centro.", "blanks": [ { "accept": ["el"], "key": "del", "surface": "del" } ] },
+        { "id": "GDU6-4.10", "text": "Ese coche es {1} padre de Mónica.", "blanks": [ { "accept": ["el"], "key": "del", "surface": "del" } ] }
+      ]
+    },
+    {
+      "id": "GDU7-1", "number": "7.1", "page": 23, "level": "A2", "section": "7", "type": "fill",
+      "instruction": "Complete los textos con un, una, unos, unas o el, la, los, las (utilice al o del cuando sea necesario).",
+      "note": "Три текста-реплики. Там, где в учебнике «de ___» с ответом del, предлог убран из текста.",
+      "items": [
+        { "id": "GDU7-1.1",
+          "text": "He visto {1} película preciosa. Es {2} comedia. {3} actores son fabulosos. {4} película es sobre {5} médico que se enamora de {6} paciente. {7} médico no sabe cómo decírselo a {8} paciente. Esta tiene {9} hijo y {10} médico tiene {11} hija. {12} hijo de {13} paciente y {14} hija {15} médico se conocen y se hacen amigos. {16} día dan {17} fiesta e invitan a sus padres a {18} fiesta. {19} película acaba con {20} boda de {21} padres.",
+          "blanks": [
+            { "accept": ["una"], "key": "una", "example": true },
+            { "accept": ["una"], "key": "una" },
+            { "accept": ["los"], "key": "Los" },
+            { "accept": ["la"], "key": "La" },
+            { "accept": ["un"], "key": "un" },
+            { "accept": ["una"], "key": "una" },
+            { "accept": ["el"], "key": "El" },
+            { "accept": ["la"], "key": "la" },
+            { "accept": ["un"], "key": "un" },
+            { "accept": ["el"], "key": "el" },
+            { "accept": ["una"], "key": "una" },
+            { "accept": ["el"], "key": "El" },
+            { "accept": ["la"], "key": "la" },
+            { "accept": ["la"], "key": "la" },
+            { "accept": ["el"], "key": "del", "surface": "del" },
+            { "accept": ["un"], "key": "Un" },
+            { "accept": ["una"], "key": "una" },
+            { "accept": ["la"], "key": "la" },
+            { "accept": ["la"], "key": "La" },
+            { "accept": ["la"], "key": "la" },
+            { "accept": ["los"], "key": "los" }
+          ] },
+        { "id": "GDU7-1.2",
+          "text": "Es {1} cuadro precioso. Se ve a {2} hombre y {3} mujer en {4} jardín. {5} hombre está leyendo {6} libro y {7} mujer está tumbada debajo de {8} árbol. En {9} ramas {10} árbol hay {11} pájaros de muchos colores. {12} pájaros tienen {13} alas extendidas; parece que van a echarse a volar.",
+          "blanks": [
+            { "accept": ["un"], "key": "un" },
+            { "accept": ["un"], "key": "un" },
+            { "accept": ["una"], "key": "una" },
+            { "accept": ["un"], "key": "un" },
+            { "accept": ["el"], "key": "El" },
+            { "accept": ["un"], "key": "un" },
+            { "accept": ["la"], "key": "la" },
+            { "accept": ["un"], "key": "un" },
+            { "accept": ["las"], "key": "las" },
+            { "accept": ["el"], "key": "del", "surface": "del" },
+            { "accept": ["unos"], "key": "unos" },
+            { "accept": ["los"], "key": "Los" },
+            { "accept": ["las"], "key": "las" }
+          ] },
+        { "id": "GDU7-1.3",
+          "text": "Mis hijos tienen {1} perro y {2} gato. {3} perro duerme en {4} jardín y {5} gato dentro de casa.",
+          "blanks": [
+            { "accept": ["un"], "key": "un" },
+            { "accept": ["un"], "key": "un" },
+            { "accept": ["el"], "key": "El" },
+            { "accept": ["el"], "key": "el" },
+            { "accept": ["el"], "key": "el" }
+          ] }
+      ]
+    },
+    {
+      "id": "GDU7-2", "number": "7.2", "page": 23, "level": "A2", "section": "7", "type": "choose",
+      "instruction": "Rodee la forma correcta en cada caso.",
+      "items": [
+        { "id": "GDU7-2.1", "example": true, "text": "Chihuahua es {1} ciudad de México.", "blanks": [ { "options": ["la", "una"], "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU7-2.2", "text": "He visto {1} película de acción. {2} personaje principal era {3} detective.", "blanks": [ { "options": ["la", "una"], "accept": ["una"], "key": "una" }, { "options": ["el", "un"], "accept": ["el"], "key": "El" }, { "options": ["el", "un"], "accept": ["un"], "key": "un" } ] },
+        { "id": "GDU7-2.3", "text": "{1} nueva película de Fernando Trueba es muy buena.", "blanks": [ { "options": ["la", "una"], "accept": ["la"], "key": "La" } ] },
+        { "id": "GDU7-2.4", "text": "Soy enfermero y trabajo en {1} hospital.", "blanks": [ { "options": ["el", "un"], "accept": ["un"], "key": "un" } ] },
+        { "id": "GDU7-2.5", "text": "Estoy leyendo {1} libro sobre {2} rey Juan Carlos.", "blanks": [ { "options": ["el", "un"], "accept": ["un"], "key": "un" }, { "options": ["el", "un"], "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU7-2.6", "text": "¿Qué es eso? ¿Es {1} televisión portátil?", "blanks": [ { "options": ["la", "una"], "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU7-2.7", "text": "¿Quién es {1} primer ministro?", "blanks": [ { "options": ["el", "un"], "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU7-2.8", "text": "Carmen trabaja en {1} hotel. Es recepcionista.", "blanks": [ { "options": ["el", "un"], "accept": ["un"], "key": "un" } ] },
+        { "id": "GDU7-2.9", "text": "{1} novia de Arturo es brasileña.", "blanks": [ { "options": ["la", "una"], "accept": ["la"], "key": "La" } ] },
+        { "id": "GDU7-2.10", "text": "{1} Sol es {2} estrella.", "blanks": [ { "options": ["el", "un"], "accept": ["el"], "key": "El" }, { "options": ["la", "una"], "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU7-2.11", "text": "Paco es {1} nombre español.", "blanks": [ { "options": ["el", "un"], "accept": ["un"], "key": "un" } ] },
+        { "id": "GDU7-2.12", "text": "—¿Dónde está Carlos? —En {1} cocina.", "blanks": [ { "options": ["la", "una"], "accept": ["la"], "key": "la" } ] },
+        { "id": "GDU7-2.13", "text": "Vivo en {1} centro de Lima.", "blanks": [ { "options": ["el", "un"], "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU7-2.14", "text": "{1} moto de Pedro es italiana.", "blanks": [ { "options": ["la", "una"], "accept": ["la"], "key": "La" } ] },
+        { "id": "GDU7-2.15", "text": "{1} Luna gira alrededor de {2} Tierra.", "blanks": [ { "options": ["la", "una"], "accept": ["la"], "key": "La" }, { "options": ["la", "una"], "accept": ["la"], "key": "la" } ] }
+      ]
+    },
+    {
+      "id": "GDU7-3", "number": "7.3", "page": 23, "level": "A2", "section": "7", "type": "fill",
+      "instruction": "Complete con un, una, unos, unas o el, la, los, las.",
+      "items": [
+        { "id": "GDU7-3.1", "example": true, "text": "Me han regalado {1} bombones.", "blanks": [ { "accept": ["unos"], "key": "unos" } ] },
+        { "id": "GDU7-3.2", "text": "No me gusta {1} chocolate.", "blanks": [ { "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU7-3.3", "text": "{1} piña, por favor.", "blanks": [ { "accept": ["una"], "key": "Una" } ] },
+        { "id": "GDU7-3.4", "text": "{1} piña es mi fruta preferida.", "blanks": [ { "accept": ["la"], "key": "La" } ] },
+        { "id": "GDU7-3.5", "text": "Me encantan {1} cuadros de Dalí.", "blanks": [ { "accept": ["los"], "key": "los" } ] },
+        { "id": "GDU7-3.6", "text": "¿Te gustan {1} peras?", "blanks": [ { "accept": ["las"], "key": "las" } ] },
+        { "id": "GDU7-3.7", "text": "Me he comprado {1} vaqueros.", "blanks": [ { "accept": ["unos"], "key": "unos" } ] },
+        { "id": "GDU7-3.8", "text": "Te he comprado {1} margaritas.", "blanks": [ { "accept": ["unas"], "key": "unas" } ] },
+        { "id": "GDU7-3.9", "text": "Quiero comprarme {1} pantalones cortos.", "blanks": [ { "accept": ["unos"], "key": "unos" } ] },
+        { "id": "GDU7-3.10", "text": "Me encanta {1} agua.", "blanks": [ { "accept": ["el"], "key": "el" } ] }
+      ]
+    },
+    {
+      "id": "GDU8-1", "number": "8.1", "page": 25, "level": "A1-A2", "section": "8", "type": "fill",
+      "instruction": "Complete con el, la, los, las cuando sea necesario.",
+      "items": [
+        { "id": "GDU8-1.1", "example": true, "text": "¿Dónde vive {1} don José?", "blanks": [ { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU8-1.2", "text": "—Buenas tardes, {1} señor Alfonsín. —Buenas tardes, {2} Elena.", "blanks": [ { "accept": ["Ø"], "key": "Ø" }, { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU8-1.3", "text": "{1} doctora Castro está en la sexta planta.", "blanks": [ { "accept": ["la"], "key": "La" } ] },
+        { "id": "GDU8-1.4", "text": "¿Quién es {1} señora Jiménez?", "blanks": [ { "accept": ["la"], "key": "la" } ] },
+        { "id": "GDU8-1.5", "text": "Aquí trabaja {1} Josefa.", "blanks": [ { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU8-1.6", "text": "—Buenos días, {1} doctor Rojo. —Buenos días, {2} María.", "blanks": [ { "accept": ["Ø"], "key": "Ø" }, { "accept": ["Ø"], "key": "Ø" } ] }
+      ]
+    },
+    {
+      "id": "GDU8-2", "number": "8.2", "page": 25, "level": "A2", "section": "8", "type": "fill_word",
+      "instruction": "Observe el mapa y complete las frases.",
+      "note": "Названия даны в скобках, места — по карте; пропуск = артикль перед названием.",
+      "items": [
+        { "id": "GDU8-2.1", "example": true, "text": "{1} Hotel Central está en {2} plaza de España.", "blanks": [ { "accept": ["el"], "key": "El Hotel Central" }, { "accept": ["la"], "noun": "plaza de España", "key": "la plaza de España" } ] },
+        { "id": "GDU8-2.2", "text": "{1} Museo Botero está en {2} calle Mayor.", "blanks": [ { "accept": ["el"], "key": "El Museo Botero" }, { "accept": ["la"], "noun": "calle Mayor", "key": "la calle Mayor" } ] },
+        { "id": "GDU8-2.3", "text": "{1} Banco Nacional está en {2} paseo del parque.", "blanks": [ { "accept": ["el"], "key": "El Banco Nacional" }, { "accept": ["el"], "noun": "paseo del parque", "key": "el paseo del parque" } ] },
+        { "id": "GDU8-2.4", "text": "{1} Teatro Lorca está en {2} avenida de América.", "blanks": [ { "accept": ["el"], "key": "El Teatro Lorca" }, { "accept": ["la"], "noun": "avenida de América", "key": "la avenida de América" } ] },
+        { "id": "GDU8-2.5", "text": "{1} Cine América está en {2} plaza Real.", "blanks": [ { "accept": ["el"], "key": "El Cine América" }, { "accept": ["la"], "noun": "plaza Real", "key": "la plaza Real" } ] },
+        { "id": "GDU8-2.6", "text": "{1} Hospital Universitario está en {2} paseo del Parque.", "blanks": [ { "accept": ["el"], "key": "El Hospital Universitario" }, { "accept": ["el"], "noun": "paseo del Parque", "key": "el paseo del Parque" } ] }
+      ]
+    },
+    {
+      "id": "GDU8-3", "number": "8.3", "page": 25, "level": "A2", "section": "8", "type": "fill_word",
+      "instruction": "Complete las frases con los nombres y el, la, los, las cuando sea necesario.",
+      "items": [
+        { "id": "GDU8-3.1", "example": true, "text": "{1} Habana es la capital de {2} Cuba.", "blanks": [ { "accept": ["la"], "key": "La Habana" }, { "accept": ["Ø"], "key": "Cuba" } ] },
+        { "id": "GDU8-3.2", "text": "{1} India está en {2} Asia.", "blanks": [ { "accept": ["la", "Ø"], "key": "(La) India" }, { "accept": ["Ø"], "key": "Asia" } ] },
+        { "id": "GDU8-3.3", "text": "{1} islas Galápagos están en {2} Ecuador.", "blanks": [ { "accept": ["las"], "key": "Las islas Galápagos" }, { "accept": ["Ø"], "key": "Ecuador" } ] },
+        { "id": "GDU8-3.4", "text": "{1} Salvador tiene frontera con {2} Guatemala y {3} Honduras.", "blanks": [ { "accept": ["el"], "key": "El Salvador" }, { "accept": ["Ø"], "key": "Guatemala" }, { "accept": ["Ø"], "key": "Honduras" } ] },
+        { "id": "GDU8-3.5", "text": "{1} Ángeles está en {2} California.", "blanks": [ { "accept": ["los"], "key": "Los Ángeles" }, { "accept": ["Ø"], "key": "California" } ] },
+        { "id": "GDU8-3.6", "text": "{1} lago Titicaca está entre {2} Perú y {3} Bolivia.", "blanks": [ { "accept": ["el"], "key": "El lago Titicaca" }, { "accept": ["Ø"], "key": "Perú" }, { "accept": ["Ø"], "key": "Bolivia" } ] },
+        { "id": "GDU8-3.7", "text": "{1} Amazonas es el río más largo de {2} América del Sur.", "blanks": [ { "accept": ["el"], "key": "El Amazonas" }, { "accept": ["Ø"], "key": "América del Sur" } ] },
+        { "id": "GDU8-3.8", "text": "{1} Jamaica está en {2} mar Caribe.", "blanks": [ { "accept": ["Ø"], "key": "Jamaica" }, { "accept": ["el"], "key": "el mar Caribe" } ] },
+        { "id": "GDU8-3.9", "text": "{1} Puerto Rico es una de {2} islas Antillas.", "blanks": [ { "accept": ["Ø"], "key": "Puerto Rico" }, { "accept": ["las"], "key": "las islas Antillas" } ] },
+        { "id": "GDU8-3.10", "text": "{1} Francia es un país de {2} Europa.", "blanks": [ { "accept": ["Ø"], "key": "Francia" }, { "accept": ["Ø"], "key": "Europa" } ] },
+        { "id": "GDU8-3.11", "text": "{1} Pampa es una región de {2} Argentina.", "blanks": [ { "accept": ["la"], "key": "La Pampa" }, { "accept": ["Ø"], "key": "Argentina" } ] },
+        { "id": "GDU8-3.12", "text": "{1} Pirineos separan {2} España de {3} Francia.", "blanks": [ { "accept": ["los"], "key": "los Pirineos" }, { "accept": ["Ø"], "key": "España" }, { "accept": ["Ø"], "key": "Francia" } ] }
+      ]
+    },
+    {
+      "id": "GDU8-4", "number": "8.4", "page": 25, "level": "A2", "section": "8", "type": "choose",
+      "instruction": "Rodee la forma correcta en cada caso.",
+      "items": [
+        { "id": "GDU8-4.1", "example": true, "text": "¿Has estado en {1} Museo del Prado?", "blanks": [ { "options": ["el", "Ø"], "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU8-4.2", "text": "{1} Felipe estudia en {2} Universidad de Alcalá.", "blanks": [ { "options": ["el", "Ø"], "accept": ["Ø"], "key": "Ø" }, { "options": ["la", "Ø"], "accept": ["la"], "key": "la" } ] },
+        { "id": "GDU8-4.3", "text": "{1} doctora Soria trabaja en {2} Hospital Doce de Octubre.", "blanks": [ { "options": ["la", "Ø"], "accept": ["la"], "key": "La" }, { "options": ["el", "Ø"], "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU8-4.4", "text": "El hermano de Ana vive en {1} Paz.", "blanks": [ { "options": ["la", "Ø"], "accept": ["la"], "key": "La" } ] },
+        { "id": "GDU8-4.5", "text": "{1} Cairo es la capital de {2} Egipto.", "blanks": [ { "options": ["el", "Ø"], "accept": ["el"], "key": "El" }, { "options": ["el", "Ø"], "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU8-4.6", "text": "{1} Pancho vive en {2} Monterrey.", "blanks": [ { "options": ["el", "Ø"], "accept": ["Ø"], "key": "Ø" }, { "options": ["el", "Ø"], "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU8-4.7", "text": "Este queso es de {1} Mancha.", "blanks": [ { "options": ["la", "Ø"], "accept": ["la"], "key": "La" } ] },
+        { "id": "GDU8-4.8", "text": "{1} cine Cartago está en {2} calle Buenos Aires.", "blanks": [ { "options": ["el", "Ø"], "accept": ["el"], "key": "El" }, { "options": ["la", "Ø"], "accept": ["la"], "key": "la" } ] }
+      ]
+    },
+    {
+      "id": "GDU9-1", "number": "9.1", "page": 27, "level": "A1", "section": "9", "type": "fill_word",
+      "instruction": "Escriba las horas utilizando las palabras del recuadro y la o las.",
+      "word_bank": ["cuatro menos diez", "doce y cinco", "dos", "ocho y media", "once y cuarto", "tres y veinte", "una menos cuarto", "una y veinticinco"],
+      "note": "Время — по картинке с часами; пропуск = la/las.",
+      "items": [
+        { "id": "GDU9-1.1", "example": true, "text": "{1} tres y veinte", "blanks": [ { "accept": ["las"], "key": "las tres y veinte" } ] },
+        { "id": "GDU9-1.2", "text": "{1} una y veinticinco", "blanks": [ { "accept": ["la"], "key": "la una y veinticinco" } ] },
+        { "id": "GDU9-1.3", "text": "{1} cuatro menos diez", "blanks": [ { "accept": ["las"], "key": "las cuatro menos diez" } ] },
+        { "id": "GDU9-1.4", "text": "{1} dos", "blanks": [ { "accept": ["las"], "key": "las dos" } ] },
+        { "id": "GDU9-1.5", "text": "{1} ocho y media", "blanks": [ { "accept": ["las"], "key": "las ocho y media" } ] },
+        { "id": "GDU9-1.6", "text": "{1} doce y cinco", "blanks": [ { "accept": ["las"], "key": "las doce y cinco" } ] },
+        { "id": "GDU9-1.7", "text": "{1} una menos cuarto", "blanks": [ { "accept": ["la"], "key": "la una menos cuarto" } ] },
+        { "id": "GDU9-1.8", "text": "{1} once y cuarto", "blanks": [ { "accept": ["las"], "key": "las once y cuarto" } ] }
+      ]
+    },
+    {
+      "id": "GDU9-2", "number": "9.2", "page": 27, "level": "A1-A2", "section": "9", "type": "fill",
+      "instruction": "Complete con el, la, los, las cuando sea necesario.",
+      "items": [
+        { "id": "GDU9-2.1", "example": true, "text": "Mi cumpleaños es {1} doce de febrero.", "blanks": [ { "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU9-2.2", "text": "{1} martes tenemos clase de español.", "blanks": [ { "accept": ["el", "los"], "key": "El/Los" } ] },
+        { "id": "GDU9-2.3", "text": "Normalmente estudiamos por {1} noche.", "blanks": [ { "accept": ["la"], "key": "la" } ] },
+        { "id": "GDU9-2.4", "text": "Felipe se casa {1} martes, {2} trece de julio.", "blanks": [ { "accept": ["el"], "key": "el" }, { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU9-2.5", "text": "La fiesta es {1} domingo a {2} siete.", "blanks": [ { "accept": ["el"], "key": "el" }, { "accept": ["las"], "key": "las" } ] },
+        { "id": "GDU9-2.6", "text": "Hoy es {1} jueves, {2} cuatro de {3} octubre.", "blanks": [ { "accept": ["Ø"], "key": "Ø" }, { "accept": ["Ø"], "key": "Ø" }, { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU9-2.7", "text": "El partido es a {1} diez.", "blanks": [ { "accept": ["las"], "key": "las" } ] },
+        { "id": "GDU9-2.8", "text": "Trabajo por {1} tarde y estudio por {2} mañana.", "blanks": [ { "accept": ["la"], "key": "la" }, { "accept": ["la"], "key": "la" } ] },
+        { "id": "GDU9-2.9", "text": "Nací {1} dos de {2} diciembre.", "blanks": [ { "accept": ["el"], "key": "el" }, { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU9-2.10", "text": "Diana sale siempre {1} sábados.", "blanks": [ { "accept": ["los"], "key": "los" } ] },
+        { "id": "GDU9-2.11", "text": "Tengo vacaciones en {1} agosto.", "blanks": [ { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU9-2.12", "text": "Tenemos un examen {1} lunes.", "blanks": [ { "accept": ["el"], "key": "el" } ] }
+      ]
+    },
+    {
+      "id": "GDU9-3", "number": "9.3", "page": 27, "level": "A2", "section": "9", "type": "fill_word",
+      "instruction": "Complete las frases (cantidad o frecuencia + al / a la + período de tiempo).",
+      "note": "Слова даны в скобках (8 horas, día…); пропуск = артикль перед периодом. Где ответ «al», предлог a убран из текста.",
+      "items": [
+        { "id": "GDU9-3.1", "example": true, "text": "Duermo ocho horas {1} día.", "blanks": [ { "accept": ["el"], "key": "ocho horas al día", "surface": "al" } ] },
+        { "id": "GDU9-3.2", "text": "Voy al gimnasio dos días a {1} semana.", "blanks": [ { "accept": ["la"], "key": "dos días a la semana" } ] },
+        { "id": "GDU9-3.3", "text": "Vamos de vacaciones una vez {1} año.", "blanks": [ { "accept": ["el"], "key": "una vez al año", "surface": "al" } ] },
+        { "id": "GDU9-3.4", "text": "Voy al cine dos veces {1} mes.", "blanks": [ { "accept": ["el"], "key": "dos veces al mes", "surface": "al" } ] },
+        { "id": "GDU9-3.5", "text": "Salimos una noche a {1} semana.", "blanks": [ { "accept": ["la"], "key": "una noche a la semana" } ] },
+        { "id": "GDU9-3.6", "text": "Corro una hora {1} día.", "blanks": [ { "accept": ["el"], "key": "una hora al día", "surface": "al" } ] }
+      ]
+    },
+    {
+      "id": "GDU9-4", "number": "9.4", "page": 27, "level": "A2", "section": "9", "type": "fill_word",
+      "instruction": "Escriba los precios como en el ejemplo.",
+      "note": "Цена — по картинке; пропуск = артикль перед единицей измерения.",
+      "items": [
+        { "id": "GDU9-4.1", "example": true, "text": "Dos euros {1} kilo de kiwis.", "blanks": [ { "accept": ["el"], "key": "Dos euros el kilo" } ] },
+        { "id": "GDU9-4.2", "text": "Cuatro pesos {1} litro de leche.", "blanks": [ { "accept": ["el"], "key": "Cuatro pesos el litro" } ] },
+        { "id": "GDU9-4.3", "text": "Dos euros {1} docena de huevos.", "blanks": [ { "accept": ["la"], "key": "Dos euros la docena" } ] },
+        { "id": "GDU9-4.4", "text": "Un peso {1} 100 gramos de queso.", "blanks": [ { "accept": ["los"], "key": "Un peso los 100 gramos" } ] }
+      ]
+    },
+    {
+      "id": "GDU10-1", "number": "10.1", "page": 29, "level": "A1-A2", "section": "10", "type": "fill_word",
+      "instruction": "Observe las ilustraciones y complete las frases utilizando las palabras del recuadro y el, la, los, las, al.",
+      "word_bank": ["ajedrez", "cartas", "fútbol", "guitarra", "piano", "tenis", "trompeta", "violín"],
+      "note": "В учебнике «juega a ___», в ключе «al ajedrez»: предлог a убран из текста.",
+      "items": [
+        { "id": "GDU10-1.1", "example": true, "text": "Santi toca {1} guitarra.", "blanks": [ { "accept": ["la"], "noun": "guitarra", "key": "la guitarra" } ] },
+        { "id": "GDU10-1.2", "text": "Elsa toca {1} violín.", "blanks": [ { "accept": ["el"], "noun": "violín", "key": "el violín" } ] },
+        { "id": "GDU10-1.3", "text": "Rosa juega {1} ajedrez.", "blanks": [ { "accept": ["el"], "noun": "ajedrez", "key": "al ajedrez", "surface": "al" } ] },
+        { "id": "GDU10-1.4", "text": "Elena toca {1} piano.", "blanks": [ { "accept": ["el"], "noun": "piano", "key": "el piano" } ] },
+        { "id": "GDU10-1.5", "text": "Inés juega {1} fútbol.", "blanks": [ { "accept": ["el"], "noun": "fútbol", "key": "al fútbol", "surface": "al" } ] },
+        { "id": "GDU10-1.6", "text": "Pepe juega {1} tenis.", "blanks": [ { "accept": ["el"], "noun": "tenis", "key": "al tenis", "surface": "al" } ] },
+        { "id": "GDU10-1.7", "text": "Juan toca {1} trompeta.", "blanks": [ { "accept": ["la"], "noun": "trompeta", "key": "la trompeta" } ] },
+        { "id": "GDU10-1.8", "text": "Miguel juega a {1} cartas.", "blanks": [ { "accept": ["las"], "noun": "cartas", "key": "las cartas" } ] }
+      ]
+    },
+    {
+      "id": "GDU10-2", "number": "10.2", "page": 29, "level": "A2", "section": "10", "type": "fill",
+      "instruction": "Complete con el, la, los, las, al, del o un, una, unos, unas cuando sea necesario.",
+      "items": [
+        { "id": "GDU10-2.1", "example": true, "text": "¡Fuego! Llamad a {1} bomberos.", "blanks": [ { "accept": ["los"], "key": "los" } ] },
+        { "id": "GDU10-2.2", "text": "¿Hablas {1} español?", "blanks": [ { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU10-2.3", "text": "{1} griego no es difícil.", "blanks": [ { "accept": ["el"], "key": "El" } ] },
+        { "id": "GDU10-2.4", "text": "Este fin de semana vamos a {1} playa.", "blanks": [ { "accept": ["la"], "key": "la" } ] },
+        { "id": "GDU10-2.5", "text": "¿Has escuchado {1} noticias?", "blanks": [ { "accept": ["las"], "key": "las" } ] },
+        { "id": "GDU10-2.6", "text": "Susana estudia {1} Arquitectura.", "blanks": [ { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU10-2.7", "text": "Merche hace {1} gimnasia en el colegio.", "blanks": [ { "accept": ["Ø"], "key": "Ø" } ] },
+        { "id": "GDU10-2.8", "text": "El padre de Pepe es general {1} ejército.", "blanks": [ { "accept": ["el"], "key": "del", "surface": "del", "note": "в учебнике «de___»" } ] },
+        { "id": "GDU10-2.9", "text": "{1} Historia es una asignatura apasionante.", "blanks": [ { "accept": ["la"], "key": "La" } ] },
+        { "id": "GDU10-2.10", "text": "Los Martín tienen una casa en {1} campo.", "blanks": [ { "accept": ["el"], "key": "el" } ] },
+        { "id": "GDU10-2.11", "text": "Antonio tiene {1} guitarra eléctrica.", "blanks": [ { "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU10-2.12", "text": "He comprado {1} televisión.", "blanks": [ { "accept": ["una"], "key": "una" } ] },
+        { "id": "GDU10-2.13", "text": "Escucho {1} radio por las mañanas.", "blanks": [ { "accept": ["la"], "key": "la" } ] },
+        { "id": "GDU10-2.14", "text": "¡Un ladrón! Llama a {1} policía.", "blanks": [ { "accept": ["la"], "key": "la" } ] },
+        { "id": "GDU10-2.15", "text": "Siempre leo {1} periódico después de desayunar.", "blanks": [ { "accept": ["el"], "key": "el" } ] }
+      ]
+    },
+    {
+      "id": "GDU10-3", "number": "10.3", "page": 29, "level": "A2", "section": "10", "type": "fill_word",
+      "instruction": "Complete las frases con las palabras del recuadro y con el, la, al o del si es necesario.",
+      "word_bank": ["cárcel", "casa", "colegio", "cine", "correos", "hospital", "médico", "universidad"],
+      "note": "Место — по картинке. В учебнике «Va a ___ / Viene de ___»; где ответ al/del, предлог убран из текста.",
+      "items": [
+        { "id": "GDU10-3.1", "example": true, "text": "Va a {1} universidad.", "blanks": [ { "accept": ["la"], "noun": "universidad", "key": "la universidad" } ] },
+        { "id": "GDU10-3.2", "text": "Va a {1} cárcel.", "blanks": [ { "accept": ["la"], "noun": "cárcel", "key": "la cárcel" } ] },
+        { "id": "GDU10-3.3", "text": "Lo llevan {1} hospital.", "blanks": [ { "accept": ["el"], "noun": "hospital", "key": "al hospital", "surface": "al" } ] },
+        { "id": "GDU10-3.4", "text": "Está en {1} casa.", "blanks": [ { "accept": ["Ø"], "noun": "casa", "key": "casa" } ] },
+        { "id": "GDU10-3.5", "text": "Va a {1} correos.", "blanks": [ { "accept": ["Ø"], "noun": "correos", "key": "correos" } ] },
+        { "id": "GDU10-3.6", "text": "Viene {1} colegio.", "blanks": [ { "accept": ["el"], "noun": "colegio", "key": "del colegio", "surface": "del" } ] },
+        { "id": "GDU10-3.7", "text": "Van {1} cine.", "blanks": [ { "accept": ["el"], "noun": "cine", "key": "al cine", "surface": "al" } ] },
+        { "id": "GDU10-3.8", "text": "Están en {1} médico.", "blanks": [ { "accept": ["el"], "noun": "médico", "key": "el médico" } ] }
+      ]
+    },
+    {
+      "id": "GDU11-1", "number": "11.1", "page": 31, "level": "A2", "section": "11", "type": "fill_word",
+      "instruction": "Complete las frases con el, la, los, las o uno, una, unos, unas y los adjetivos entre paréntesis.",
+      "note": "Существительное опускается; пропуск = артикль перед прилагательным.",
+      "items": [
+        { "id": "GDU11-1.1", "example": true, "text": "¿Qué zapatos prefieres, {1} negros o {2} blancos?", "blanks": [ { "accept": ["los"], "key": "los negros" }, { "accept": ["los"], "key": "los blancos" } ] },
+        { "id": "GDU11-1.2", "text": "—¿Qué tipo de cuaderno quiere? —{1} pequeño.", "blanks": [ { "accept": ["uno"], "key": "Uno pequeño" } ] },
+        { "id": "GDU11-1.3", "text": "—¿Te gustan estos sombreros? —Me gusta {1} negro, pero no {2} marrón.", "blanks": [ { "accept": ["el"], "key": "el negro" }, { "accept": ["el"], "key": "el marrón" } ] },
+        { "id": "GDU11-1.4", "text": "—¿Qué pantalones prefieres? —{1} rojos. {2} blancos son muy caros.", "blanks": [ { "accept": ["los"], "key": "Los rojos" }, { "accept": ["los"], "key": "Los blancos" } ] },
+        { "id": "GDU11-1.5", "text": "¿Ves a esas dos chicas? {1} alta es Marta.", "blanks": [ { "accept": ["la"], "key": "La alta" } ] },
+        { "id": "GDU11-1.6", "text": "—¿Qué tipo de libro quieres leer? —{1} entretenido.", "blanks": [ { "accept": ["uno"], "key": "Uno entretenido" } ] },
+        { "id": "GDU11-1.7", "text": "¿Qué manzanas prefiere, {1} verdes o {2} rojas?", "blanks": [ { "accept": ["las"], "key": "las verdes" }, { "accept": ["las"], "key": "las rojas" } ] },
+        { "id": "GDU11-1.8", "text": "Esta taza está sucia. Dame {1} limpia, por favor.", "blanks": [ { "accept": ["una"], "key": "una limpia" } ] },
+        { "id": "GDU11-1.9", "text": "—¿Qué clase de cámara quiere? —Quiero {1} buena, aunque sea cara.", "blanks": [ { "accept": ["una"], "key": "una buena" } ] },
+        { "id": "GDU11-1.10", "text": "—¿Tienes ordenador? —Sí, tengo {1} portátil.", "blanks": [ { "accept": ["uno"], "key": "uno portátil" } ] }
+      ]
+    },
+    {
+      "id": "GDU11-2", "number": "11.2", "page": 31, "level": "A2", "section": "11", "type": "fill_word",
+      "instruction": "Observe las ilustraciones y complete las frases con el, la, los o las, con de y con las palabras dadas.",
+      "note": "Два пропуска: артикль вместо опущенного существительного и артикль после de (в ключе слитно: del).",
+      "items": [
+        { "id": "GDU11-2.1", "example": true, "context": "¿Qué gafas le gustan? (derecha/izquierda)", "text": "{1} de {2} derecha.", "blanks": [ { "accept": ["las"], "key": "Las de" }, { "accept": ["la"], "key": "la derecha" } ] },
+        { "id": "GDU11-2.2", "context": "¿Quién es Alberto? (pelo corto/pelo largo)", "text": "{1} {2} pelo corto.", "blanks": [ { "accept": ["el"], "key": "El" }, { "accept": ["el"], "key": "del pelo corto", "surface": "del" } ] },
+        { "id": "GDU11-2.3", "context": "(Expoescultura) Me gusta más… (derecha/izquierda)", "text": "Me gusta más {1} de {2} izquierda.", "blanks": [ { "accept": ["la"], "key": "la de" }, { "accept": ["la"], "key": "la izquierda" } ] },
+        { "id": "GDU11-2.4", "context": "¿Qué galletas te gustan más? (chocolate/coco)", "text": "{1} de {2} chocolate.", "blanks": [ { "accept": ["las"], "key": "Las de" }, { "accept": ["Ø"], "key": "chocolate" } ] },
+        { "id": "GDU11-2.5", "context": "¿Quién es Rosi? (falda corta/falda larga)", "text": "{1} de {2} falda larga.", "blanks": [ { "accept": ["la"], "key": "La de" }, { "accept": ["la"], "key": "la falda larga" } ] },
+        { "id": "GDU11-2.6", "context": "¿Qué zapatos le gustan más? (abajo/arriba)", "text": "{1} de arriba.", "blanks": [ { "accept": ["los"], "key": "Los de arriba" } ] },
+        { "id": "GDU11-2.7", "context": "Quiero… (libros: José Crespo/Sandra Arenas)", "text": "Quiero {1} de {2} Sandra Arenas.", "blanks": [ { "accept": ["el"], "key": "el de" }, { "accept": ["Ø"], "key": "Sandra Arenas" } ] },
+        { "id": "GDU11-2.8", "context": "¿Cuál es tu padre? (barba/bigote)", "text": "{1} {2} bigote.", "blanks": [ { "accept": ["el"], "key": "El" }, { "accept": ["el"], "key": "del bigote", "surface": "del" } ] }
+      ]
+    },
+    {
+      "id": "GDU11-3", "number": "11.3", "page": 31, "level": "A2-B1", "section": "11", "type": "fill_word",
+      "instruction": "Complete las frases con el, la, los, las o lo y los adjetivos entre paréntesis.",
+      "items": [
+        { "id": "GDU11-3.1", "example": true, "text": "¿Qué es {1} mejor de Cuba?", "blanks": [ { "accept": ["lo"], "key": "lo mejor" } ] },
+        { "id": "GDU11-3.2", "text": "¿Qué naranjas prefiere, {1} caras o {2} baratas?", "blanks": [ { "accept": ["las"], "key": "las caras" }, { "accept": ["las"], "key": "las baratas" } ] },
+        { "id": "GDU11-3.3", "text": "No me gusta {1} amargo.", "blanks": [ { "accept": ["lo"], "key": "lo amargo" } ] },
+        { "id": "GDU11-3.4", "text": "{1} barato es siempre caro.", "blanks": [ { "accept": ["lo"], "key": "Lo barato" } ] },
+        { "id": "GDU11-3.5", "text": "¿Veis a aquel grupo de chicas? Mis hermanas son {1} morenas.", "blanks": [ { "accept": ["las"], "key": "las morenas" } ] },
+        { "id": "GDU11-3.6", "text": "{1} importante es ser feliz.", "blanks": [ { "accept": ["lo"], "key": "Lo importante" } ] },
+        { "id": "GDU11-3.7", "text": "{1} malo del invierno es el frío.", "blanks": [ { "accept": ["lo"], "key": "Lo malo" } ] },
+        { "id": "GDU11-3.8", "text": "¿Qué pendientes te gustan más, {1} largos o {2} cortos?", "blanks": [ { "accept": ["los"], "key": "los largos" }, { "accept": ["los"], "key": "los cortos" } ] },
+        { "id": "GDU11-3.9", "text": "—¿Qué coche es el tuyo? —{1} pequeño.", "blanks": [ { "accept": ["el"], "key": "El pequeño" } ] },
+        { "id": "GDU11-3.10", "text": "{1} pequeño es hermoso.", "blanks": [ { "accept": ["lo"], "key": "Lo pequeño" } ] }
+      ]
+    }
+  ]
+}
