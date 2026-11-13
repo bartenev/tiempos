@@ -27,9 +27,10 @@
 - `src/data/articles/source/*-annotations-v2.json` — признаки для правил второго учебника (имена, время, ser + профессия…).
 - `src/lib/articles/algorithm.ts` — алгоритм v2: особые случаи → ядро → форма. Описание и блок-схемы — [algorithm-v2.md](algorithm-v2.md),
   первая версия (только GBE) — [algorithm.md](algorithm.md).
+- `src/lib/articles/scheme.ts` — пошаговая схема для «Справки» (те же вопросы, что у алгоритма, но для человека).
 - `src/lib/articles/build.ts` — из упражнений собирает задания: один пропуск = одно задание,
   остальные пропуски пункта заполнены по ключу; если алгоритм где-то не совпал с ключом — ошибка.
-- `src/data/articles/__fixtures__/trainer-v2.json` — задания старой страницы `public/articulos` (эталон);
+- `src/data/articles/__fixtures__/trainer-v2.json` — задания старой страницы `public/articulos` (эталон; сама страница удалена);
   тест `src/data/articles.test.ts` сверяет с ним все 527 заданий поле в поле.
 
 Правка текста или ответа — в `source/*.json`; тест сразу покажет, если алгоритм с ключом разошёлся.

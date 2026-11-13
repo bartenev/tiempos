@@ -7,6 +7,7 @@ import ProgressPanel from './components/ProgressPanel.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import SummaryPanel from './components/SummaryPanel.vue'
 import TabBar from './components/TabBar.vue'
+import ArticleScheme from './components/ArticleScheme.vue'
 import DeckProgress from './components/DeckProgress.vue'
 import TablesPanel from './components/TablesPanel.vue'
 import { CHAPTERS } from './data/book'
@@ -275,6 +276,8 @@ function trainWeak() {
       @back="screen = 'hub'"
     />
     <SettingsPanel v-else-if="screen === 'settings'" />
+    <!-- «Справка»: у артиклей — пошаговая схема, у глаголов (и учебника) — таблицы спряжения -->
+    <ArticleScheme v-else-if="screen === 'tables' && settings.track === 'articles'" />
     <TablesPanel v-else-if="screen === 'tables'" />
     <DeckProgress
       v-else-if="screen === 'progress' && settings.track !== 'verbs'"

@@ -16,7 +16,7 @@ function listFiles(dir: string, root = dir): string[] {
 /**
  * Офлайн-режим без зависимостей: после сборки кладём в dist sw.js
  * со списком всех файлов. Версия кэша — хэш списка файлов и содержимого тех, у кого
- * имя не меняется от сборки к сборке (index.html, файлы из public вроде articulos/):
+ * имя не меняется от сборки к сборке (index.html, файлы из public вроде articles/algorithm-v2.pdf):
  * иначе их правка не обновила бы кэш. Картинки учебника лежат в своём постоянном кэше.
  */
 function serviceWorker(): Plugin {
@@ -89,7 +89,7 @@ self.addEventListener('fetch', (event) => {
   const { request } = event
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return
 
-  // Отдельные страницы из public (например, articulos/) — сеть, офлайн — их собственный файл из кэша.
+  // Отдельные страницы и файлы из public (например, схема в PDF) — сеть, офлайн — их собственный файл из кэша.
   // Главную ('./') ими не подменяем.
   const root = new URL('./', self.registration.scope).pathname
   if (request.mode === 'navigate' && new URL(request.url).pathname !== root) {

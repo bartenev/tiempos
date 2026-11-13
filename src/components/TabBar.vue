@@ -16,7 +16,7 @@ const emit = defineEmits<{
 const TABS: { screen: Tab; label: string; icon: IconName }[] = [
   { screen: 'hub', label: 'Тренировка', icon: 'practice' },
   { screen: 'progress', label: 'Прогресс', icon: 'progress' },
-  { screen: 'tables', label: 'Таблицы', icon: 'tables' },
+  { screen: 'tables', label: 'Справка', icon: 'tables' },
   { screen: 'settings', label: 'Настройки', icon: 'settings' },
 ]
 
