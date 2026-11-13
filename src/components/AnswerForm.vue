@@ -74,6 +74,12 @@ function fieldLabel(i: number): string {
   return book.value ? 'Ответ' : 'Форма глагола'
 }
 
+/** Кнопка доступна: условие учебника не сузило набор или вариант в нём есть. */
+function isAllowed(option: string): boolean {
+  const allowed = book.value?.allowed
+  return !allowed || allowed.includes(option)
+}
+
 function isAccepted(option: string): boolean {
   return blanks.value[0]!.some((answer) => normalizeAnswer(answer) === normalizeAnswer(option))
 }
@@ -120,7 +126,7 @@ function onEnter(i: number) {
 }
 
 function choose(option: string) {
-  if (revealed.value) return
+  if (revealed.value || !isAllowed(option)) return
   inputs.value = [option]
   submit()
 }
@@ -156,9 +162,10 @@ function insertAccent(ch: string) {
           :class="{
             'drill__option--ok': revealed && isAccepted(option),
             'drill__option--bad': revealed && option === inputs[0] && !isAccepted(option),
+            'drill__option--off': !isAllowed(option),
           }"
           type="button"
-          :disabled="revealed"
+          :disabled="revealed || !isAllowed(option)"
           lang="es"
           @click="choose(option)"
         >
@@ -286,6 +293,11 @@ function insertAccent(ch: string) {
 
 .drill__option:disabled {
   cursor: default;
+}
+
+/* не из набора, который разрешает условие учебника: на месте, но заблокирована */
+.drill__option--off {
+  opacity: 0.3;
 }
 
 .drill__option--ok {

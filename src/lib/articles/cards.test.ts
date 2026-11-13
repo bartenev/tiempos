@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { ARTICLE_ITEMS } from '../../data/articles'
+import { ARTICLE_ALLOWED, ARTICLE_ITEMS } from '../../data/articles'
 import type { ArticleRule } from '../../types'
 import translations from '../../data/articles/translations.json'
 import { briefOf } from './brief'
 import {
+  ARTICLE_PAD,
   articleCard,
   articleCount,
   buildArticleSession,
@@ -110,5 +111,26 @@ describe('article translations and short explanations', () => {
       expect(brief, item.id).not.toMatch(/^ →/)
     }
     expect(briefOf(byId('GBE5-04.5#2'))).toBe('Часов в доме несколько → un.')
+  })
+})
+
+describe('article button sets from the textbook instruction', () => {
+  it('the key is always among the enabled buttons', () => {
+    const pad = ARTICLE_PAD.flat()
+    for (const [exercise, allowed] of Object.entries(ARTICLE_ALLOWED)) {
+      for (const rule of allowed) expect(pad, exercise).toContain(rule)
+      const items = ARTICLE_ITEMS.filter((i) => `${i.book} ${i.exercise}` === exercise)
+      expect(items.length, exercise).toBeGreaterThan(0)
+      for (const item of items) {
+        const card = articleCard(item)
+        expect(card.allowed, item.id).toEqual(allowed)
+        expect(item.accept.some((a) => allowed.includes(a)), item.id).toBe(true)
+      }
+    }
+  })
+
+  it('other exercises keep every button', () => {
+    expect(articleCard(byId('GBE5-04.5#2')).allowed).toBeUndefined()
+    expect(articleCard(ARTICLE_ITEMS.find((i) => i.options)!).allowed).toBeUndefined()
   })
 })

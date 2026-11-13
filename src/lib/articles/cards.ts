@@ -1,4 +1,4 @@
-import { ARTICLE_BOOKS, ARTICLE_EXERCISES, ARTICLE_ITEMS } from '../../data/articles'
+import { ARTICLE_ALLOWED, ARTICLE_BOOKS, ARTICLE_EXERCISES, ARTICLE_ITEMS } from '../../data/articles'
 import translations from '../../data/articles/translations.json'
 import type { ArticleConfig, ArticleRule, ArticleTopic, BookCard, HintStep } from '../../types'
 import { buildDeckSession } from '../book'
@@ -100,6 +100,7 @@ export function articleCard(item: ArticleItem, rules: ArticleRule[] = rulesOf(it
     blanks: [first ? [capitalize(main!), ...rest] : item.accept],
     options: item.options && shuffle(item.options),
     optionGroups: item.options ? undefined : ARTICLE_PAD,
+    allowed: item.options ? undefined : ARTICLE_ALLOWED[`${item.book} ${item.exercise}`],
     context: item.context,
     steps: stepsOf(item),
     brief: briefOf(item),

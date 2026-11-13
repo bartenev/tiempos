@@ -51,7 +51,7 @@ const translation = computed(() => simple.value?.translation ?? props.card.trans
 const cue = computed(() => {
   const { card } = props
   if (!isBookCard(card)) return card.verb.infinitive
-  return (props.oral && card.options?.join(' / ')) || card.cue
+  return (props.oral && (card.options ?? card.allowed)?.join(' / ')) || card.cue
 })
 
 /** Части предложения вокруг пропусков `___`. */

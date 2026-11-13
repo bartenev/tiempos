@@ -202,6 +202,8 @@ export interface BookCard {
   options?: string[]
   /** Варианты, разбитые на ряды (кнопки артиклей: Ø | el la… | un una… | lo). */
   optionGroups?: string[][]
+  /** Какие из вариантов доступны (условие учебника); остальные кнопки заблокированы. */
+  allowed?: string[]
   image?: string
   /** Ситуация к пункту: «Hay varios relojes por la casa». */
   context?: string
