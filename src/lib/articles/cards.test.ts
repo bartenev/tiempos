@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { ARTICLE_ALLOWED, ARTICLE_ITEMS } from '../../data/articles'
 import type { ArticleRule } from '../../types'
+import situations from '../../data/articles/situations.json'
 import translations from '../../data/articles/translations.json'
 import { briefOf } from './brief'
 import {
@@ -132,5 +133,23 @@ describe('article button sets from the textbook instruction', () => {
   it('other exercises keep every button', () => {
     expect(articleCard(byId('GBE5-04.5#2')).allowed).toBeUndefined()
     expect(articleCard(ARTICLE_ITEMS.find((i) => i.options)!).allowed).toBeUndefined()
+  })
+})
+
+describe('article situations', () => {
+  it('shows a situation only where the answer depends on it', () => {
+    const shown = ARTICLE_ITEMS.filter((i) => articleCard(i).context)
+    expect(shown.length).toBe(83)
+    for (const item of shown) expect(situations.exercises, item.id).toContain(`${item.book} ${item.exercise}`)
+    for (const item of ARTICLE_ITEMS) expect(articleCard(item).task, item.id).toBe('')
+  })
+
+  it('every situation is translated, except dialogue questions', () => {
+    for (const item of ARTICLE_ITEMS.filter((i) => situations.exercises.includes(`${i.book} ${i.exercise}`))) {
+      expect(item.context, item.id).toBeTruthy()
+      if (item.exercise !== '11.2') expect(Object.keys(situations.situations), item.id).toContain(item.context)
+    }
+    const used = new Set(ARTICLE_ITEMS.map((i) => i.context))
+    expect(Object.keys(situations.situations).filter((k) => !used.has(k))).toEqual([])
   })
 })

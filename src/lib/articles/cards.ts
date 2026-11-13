@@ -1,4 +1,5 @@
 import { ARTICLE_ALLOWED, ARTICLE_BOOKS, ARTICLE_EXERCISES, ARTICLE_ITEMS } from '../../data/articles'
+import situations from '../../data/articles/situations.json'
 import translations from '../../data/articles/translations.json'
 import type { ArticleConfig, ArticleRule, ArticleTopic, BookCard, HintStep } from '../../types'
 import { buildDeckSession } from '../book'
@@ -35,6 +36,18 @@ const TRANSLATIONS = new Map(
 /** Русский перевод предложения (нейтральный — без «один из», «тот самый»). */
 export function translationOf(item: ArticleItem): string {
   return TRANSLATIONS.get(fullSentence(item)) ?? ''
+}
+
+const SITUATION_EXERCISES = new Set(situations.exercises)
+const SITUATIONS: Record<string, string> = situations.situations
+
+/**
+ * Ситуация к пункту — только там, где без неё ответ не вывести (детектив, Кармен и Лусия,
+ * сказка, «какой смысл», «тот, что…»); по-русски, кроме вопросов диалога. В остальных заданиях — ничего.
+ */
+export function situationOf(item: ArticleItem): string | undefined {
+  if (!item.context || !SITUATION_EXERCISES.has(`${item.book} ${item.exercise}`)) return undefined
+  return SITUATIONS[item.context] ?? item.context
 }
 
 /** Пропуск открывает предложение — ответ покажем с большой буквы. */
@@ -91,7 +104,9 @@ export function articleCard(item: ArticleItem, rules: ArticleRule[] = rulesOf(it
     key: item.id,
     label: topicOf(rules[0]!).label,
     group: `${item.book} ${item.exercise}`,
-    task: EXERCISE.get(`${item.book} ${item.exercise}`)?.instruction ?? '',
+    // условие упражнения на карточку не выводим: где оно решало, его заменяют ситуация к пункту
+    // и заблокированные кнопки; текст условия остаётся в данных (ARTICLE_EXERCISES)
+    task: '',
     rule: '',
     kind: 'choice',
     sentence,
@@ -101,7 +116,7 @@ export function articleCard(item: ArticleItem, rules: ArticleRule[] = rulesOf(it
     options: item.options && shuffle(item.options),
     optionGroups: item.options ? undefined : ARTICLE_PAD,
     allowed: item.options ? undefined : ARTICLE_ALLOWED[`${item.book} ${item.exercise}`],
-    context: item.context,
+    context: situationOf(item),
     steps: stepsOf(item),
     brief: briefOf(item),
     notes: notesOf(item),

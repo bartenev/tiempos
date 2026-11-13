@@ -168,7 +168,7 @@ function blankClass(i: number): string | undefined {
 }
 
 .drill__context {
-  margin: 0 0 var(--space-2);
+  margin: var(--space-2) 0;
   font-size: var(--text-sm);
   font-style: italic;
   color: var(--muted);
