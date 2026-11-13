@@ -1,10 +1,33 @@
 <script setup lang="ts">
+import { computed, reactive } from 'vue'
 import { IRREGULAR_INFINITIVES, findVerb } from '../data/verbs'
 import { settings } from '../lib/settingsState'
+import { describeVerbFilters } from '../lib/verbSummary'
+import type { VerbSummary } from '../lib/verbSummary'
 import type { Person } from '../types'
 import { PERSONS, TENSES, TENSE_LABELS, VERB_GROUPS } from '../types'
+import Icon from './Icon.vue'
 
 const irregularList = IRREGULAR_INFINITIVES
+
+type Block = keyof VerbSummary
+
+const BLOCKS: { key: Block; label: string }[] = [
+  { key: 'tenses', label: 'Времена' },
+  { key: 'persons', label: 'Лица' },
+  { key: 'groups', label: 'Окончания' },
+  { key: 'verbs', label: 'Глаголы' },
+]
+
+/** Свёрнуты по умолчанию; раскрытость не запоминается — на главной всегда коротко. */
+const open = reactive<Record<Block, boolean>>({
+  tenses: false,
+  persons: false,
+  groups: false,
+  verbs: false,
+})
+
+const summary = computed(() => describeVerbFilters(settings))
 
 /** Подписи чекбоксов; usted / ustedes тренируются вместе с él / ellos. */
 const PERSON_CHOICES: Record<Person, string> = {
@@ -30,70 +53,90 @@ function setAllIrregular(value: boolean) {
 </script>
 
 <template>
-  <fieldset class="group verb-picker__tenses">
-    <legend class="group__legend verb-picker__tenses-legend">Времена</legend>
-    <label v-for="tense in TENSES" :key="tense" class="choice verb-picker__tense">
-      <input v-model="settings.selected[tense]" class="choice__input verb-picker__tense-input" type="checkbox" />
-      <span class="choice__label verb-picker__tense-label">{{ TENSE_LABELS[tense] }}</span>
-    </label>
-  </fieldset>
+  <fieldset class="group verb-picker">
+    <legend class="group__legend verb-picker__legend">Что тренируем</legend>
+    <div
+      v-for="b in BLOCKS"
+      :key="b.key"
+      class="verb-picker__block"
+      :class="[`verb-picker__block--${b.key}`, { 'verb-picker__block--open': open[b.key] }]"
+    >
+      <button
+        class="verb-picker__head"
+        type="button"
+        :aria-expanded="open[b.key]"
+        :aria-controls="`verb-picker-${b.key}`"
+        @click="open[b.key] = !open[b.key]"
+      >
+        <span class="verb-picker__name">{{ b.label }}</span>
+        <span class="verb-picker__value">{{ summary[b.key] }}</span>
+        <Icon class="verb-picker__chevron" name="forward" />
+      </button>
 
-  <fieldset class="group verb-picker__persons">
-    <legend class="group__legend verb-picker__persons-legend">Лица</legend>
-    <div class="verb-picker__persons-grid">
-      <label v-for="person in PERSONS" :key="person" class="choice verb-picker__person">
-        <input v-model="settings.persons[person]" class="choice__input verb-picker__person-input" type="checkbox" />
-        <span class="choice__label verb-picker__person-label">{{ PERSON_CHOICES[person] }}</span>
-      </label>
-    </div>
-    <p class="group__note verb-picker__persons-note">
-      usted / ustedes — вместе с él / ellos; в imperativo формы yo нет.
-    </p>
-  </fieldset>
+      <div v-if="open[b.key]" :id="`verb-picker-${b.key}`" class="verb-picker__body">
+        <template v-if="b.key === 'tenses'">
+          <label v-for="tense in TENSES" :key="tense" class="choice verb-picker__tense">
+            <input v-model="settings.selected[tense]" class="choice__input verb-picker__tense-input" type="checkbox" />
+            <span class="choice__label verb-picker__tense-label">{{ TENSE_LABELS[tense] }}</span>
+          </label>
+        </template>
 
-  <fieldset class="group verb-picker__groups">
-    <legend class="group__legend verb-picker__groups-legend">Окончания</legend>
-    <div class="verb-picker__groups-row">
-      <label v-for="group in VERB_GROUPS" :key="group" class="choice verb-picker__group">
-        <input v-model="settings.groups[group]" class="choice__input verb-picker__group-input" type="checkbox" />
-        <span class="choice__label verb-picker__group-label">-{{ group }}</span>
-      </label>
-    </div>
-  </fieldset>
+        <template v-else-if="b.key === 'persons'">
+          <div class="verb-picker__persons-grid">
+            <label v-for="person in PERSONS" :key="person" class="choice verb-picker__person">
+              <input v-model="settings.persons[person]" class="choice__input verb-picker__person-input" type="checkbox" />
+              <span class="choice__label verb-picker__person-label">{{ PERSON_CHOICES[person] }}</span>
+            </label>
+          </div>
+          <p class="group__note verb-picker__persons-note">
+            usted / ustedes — вместе с él / ellos; в imperativo формы yo нет.
+          </p>
+        </template>
 
-  <fieldset class="group verb-picker__verbs">
-    <legend class="group__legend verb-picker__verbs-legend">Глаголы</legend>
-    <label class="choice verb-picker__verb-kind verb-picker__verb-kind--regular">
-      <input v-model="settings.includeRegular" class="choice__input verb-picker__verb-kind-input" type="checkbox" />
-      <span class="choice__label verb-picker__verb-kind-label">Правильные</span>
-    </label>
-    <label class="choice verb-picker__verb-kind verb-picker__verb-kind--irregular">
-      <input v-model="settings.includeIrregular" class="choice__input verb-picker__verb-kind-input" type="checkbox" />
-      <span class="choice__label verb-picker__verb-kind-label">Неправильные и с чередованием</span>
-    </label>
+        <template v-else-if="b.key === 'groups'">
+          <div class="verb-picker__groups-row">
+            <label v-for="group in VERB_GROUPS" :key="group" class="choice verb-picker__group">
+              <input v-model="settings.groups[group]" class="choice__input verb-picker__group-input" type="checkbox" />
+              <span class="choice__label verb-picker__group-label">-{{ group }}</span>
+            </label>
+          </div>
+        </template>
 
-    <div v-if="settings.includeIrregular" class="verb-picker__irregular">
-      <div class="verb-picker__irregular-head">
-        <p class="verb-picker__irregular-title">Какие именно</p>
-        <div class="verb-picker__irregular-actions">
-          <button class="link-button verb-picker__select-all" type="button" @click="setAllIrregular(true)">
-            Выбрать все
-          </button>
-          <button class="link-button verb-picker__select-none" type="button" @click="setAllIrregular(false)">
-            Отключить все
-          </button>
-        </div>
-      </div>
-      <div class="verb-picker__irregular-grid">
-        <label
-          v-for="inf in irregularList"
-          :key="inf"
-          class="choice verb-picker__irregular-item"
-          :class="{ 'verb-picker__irregular-item--off': irregularOff(inf) }"
-        >
-          <input v-model="settings.selectedIrregular[inf]" class="choice__input verb-picker__irregular-input" type="checkbox" />
-          <span class="choice__label verb-picker__irregular-label">{{ inf }}</span>
-        </label>
+        <template v-else>
+          <label class="choice verb-picker__verb-kind verb-picker__verb-kind--regular">
+            <input v-model="settings.includeRegular" class="choice__input verb-picker__verb-kind-input" type="checkbox" />
+            <span class="choice__label verb-picker__verb-kind-label">Правильные</span>
+          </label>
+          <label class="choice verb-picker__verb-kind verb-picker__verb-kind--irregular">
+            <input v-model="settings.includeIrregular" class="choice__input verb-picker__verb-kind-input" type="checkbox" />
+            <span class="choice__label verb-picker__verb-kind-label">Неправильные и с чередованием</span>
+          </label>
+
+          <div v-if="settings.includeIrregular" class="verb-picker__irregular">
+            <div class="verb-picker__irregular-head">
+              <p class="verb-picker__irregular-title">Какие именно</p>
+              <div class="verb-picker__irregular-actions">
+                <button class="link-button verb-picker__select-all" type="button" @click="setAllIrregular(true)">
+                  Выбрать все
+                </button>
+                <button class="link-button verb-picker__select-none" type="button" @click="setAllIrregular(false)">
+                  Отключить все
+                </button>
+              </div>
+            </div>
+            <div class="verb-picker__irregular-grid">
+              <label
+                v-for="inf in irregularList"
+                :key="inf"
+                class="choice verb-picker__irregular-item"
+                :class="{ 'verb-picker__irregular-item--off': irregularOff(inf) }"
+              >
+                <input v-model="settings.selectedIrregular[inf]" class="choice__input verb-picker__irregular-input" type="checkbox" />
+                <span class="choice__label verb-picker__irregular-label">{{ inf }}</span>
+              </label>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
   </fieldset>
@@ -101,6 +144,56 @@ function setAllIrregular(value: boolean) {
 
 <style scoped lang="scss">
 /* ===== verb-picker: что тренируем в разделе «Глаголы» ===== */
+
+/* блок — строка-сводка, по тапу раскрывается в чекбоксы */
+.verb-picker__block + .verb-picker__block {
+  border-top: 1px solid var(--line);
+}
+
+.verb-picker__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--tap);
+  padding: var(--space-2) 0;
+  border: none;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.verb-picker__name {
+  flex: none;
+  color: var(--muted);
+}
+
+.verb-picker__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: var(--weight-semibold);
+  text-align: right;
+}
+
+.verb-picker__chevron {
+  flex: none;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+
+.verb-picker__block--open .verb-picker__chevron {
+  transform: rotate(90deg);
+}
+
+.verb-picker__head:hover .verb-picker__chevron {
+  color: var(--accent);
+}
+
+.verb-picker__body {
+  padding: 0 0 var(--space-2);
+}
 
 .verb-picker__tense {
   padding: var(--space-1) 0;
@@ -158,5 +251,11 @@ function setAllIrregular(value: boolean) {
 /* отсеян фильтром окончаний — в сессию не попадёт */
 .verb-picker__irregular-item--off {
   opacity: 0.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .verb-picker__chevron {
+    transition: none;
+  }
 }
 </style>
