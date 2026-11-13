@@ -4,9 +4,10 @@ import { bookWeakCount } from '../lib/book'
 import { cellsForConfig, weakCount } from '../lib/session'
 import { bookConfigFromSettings, configFromSettings } from '../lib/settings'
 import { settings } from '../lib/settingsState'
-import { describeBook, describeSettings } from '../lib/settingsSummary'
 import type { BookConfig, SessionConfig, Track } from '../types'
+import BookPicker from './BookPicker.vue'
 import Icon from './Icon.vue'
+import VerbPicker from './VerbPicker.vue'
 
 defineProps<{
   error?: string
@@ -15,7 +16,6 @@ defineProps<{
 const emit = defineEmits<{
   start: [config: SessionConfig]
   'start-book': [config: BookConfig]
-  settings: []
 }>()
 
 const TRACKS: { track: Track; label: string }[] = [
@@ -46,10 +46,6 @@ const formsCount = computed(() => {
   if (cfg.tenses.length === 0 || cfg.persons.length === 0 || cfg.groups.length === 0) return 0
   return cellsForConfig(cfg).length
 })
-
-const summary = computed(() => describeSettings(settings))
-
-const bookSummary = computed(() => describeBook(settings))
 
 const canStart = computed(() => {
   if (formsCount.value === 0) return false
@@ -91,75 +87,16 @@ function start() {
       </button>
     </div>
 
-    <fieldset class="group home__filters">
-      <legend class="group__legend home__filters-legend">Что тренируем</legend>
-      <!-- вся карточка — одна кнопка в настройки -->
-      <button v-if="isBook" class="home__filters-body" type="button" @click="emit('settings')">
-        <span class="home__filter">
-          <span class="home__filter-name">Тема</span>
-          <span class="home__filter-value">{{ bookSummary.theme }}</span>
-        </span>
-        <span class="home__filter">
-          <span class="home__filter-name">Главы</span>
-          <span class="home__filter-value">{{ bookSummary.chapters }}</span>
-        </span>
-        <span class="home__filter">
-          <span class="home__filter-name">Упражнений</span>
-          <span class="home__filter-value">{{ bookSummary.exercises }}</span>
-        </span>
-        <span class="home__filter">
-          <span class="home__filter-name">Режим</span>
-          <span class="home__filter-value">{{ bookSummary.mode }}<template v-if="settings.mode === 'weak'"> · {{ weak }}</template></span>
-        </span>
-        <span class="home__filter">
-          <span class="home__filter-name">Сессия</span>
-          <span class="home__filter-value">{{ bookSummary.size }}</span>
-        </span>
-        <span class="home__filter">
-          <span class="home__filter-name">Ответ</span>
-          <span class="home__filter-value">{{ bookSummary.answer }}</span>
-        </span>
-        <span class="home__filters-edit">Изменить<Icon name="forward" /></span>
-      </button>
-      <button v-else class="home__filters-body" type="button" @click="emit('settings')">
-        <span class="home__filter">
-          <span class="home__filter-name">Времена</span>
-          <span class="home__filter-value">{{ summary.tenses }}</span>
-        </span>
-        <span class="home__filter">
-          <span class="home__filter-name">Лица</span>
-          <span class="home__filter-value">{{ summary.persons }}</span>
-        </span>
-        <span class="home__filter">
-          <span class="home__filter-name">Окончания</span>
-          <span class="home__filter-value">{{ summary.groups }}</span>
-        </span>
-        <span class="home__filter">
-          <span class="home__filter-name">Глаголы</span>
-          <span class="home__filter-value">{{ summary.verbs }}</span>
-        </span>
-        <span class="home__filter">
-          <span class="home__filter-name">Режим</span>
-          <span class="home__filter-value">{{ summary.mode }}<template v-if="settings.mode === 'weak'"> · {{ weak }}</template></span>
-        </span>
-        <span class="home__filter">
-          <span class="home__filter-name">Сессия</span>
-          <span class="home__filter-value">{{ summary.size }}</span>
-        </span>
-        <span class="home__filter">
-          <span class="home__filter-name">Ответ</span>
-          <span class="home__filter-value">{{ summary.answer }}</span>
-        </span>
-        <span class="home__filters-edit">Изменить<Icon name="forward" /></span>
-      </button>
-    </fieldset>
+    <!-- что тренируем — прямо на главной; общие настройки (режим, ответ…) — во вкладке «Настройки» -->
+    <BookPicker v-if="isBook" />
+    <VerbPicker v-else />
 
     <p v-if="formsCount === 0 && isBook" class="notice notice--muted home__no-chapters">
-      Выберите хотя бы одну главу — нажмите на «Что тренируем».
+      Выберите хотя бы одну главу.
     </p>
     <p v-else-if="formsCount === 0" class="notice notice--muted home__no-forms">
-      Под этот выбор нет форм — проверьте, что тренируем
-      (и что в imperativo нет yo).
+      Под этот выбор нет форм — проверьте времена, лица и окончания
+      (в imperativo нет yo).
     </p>
     <p v-else-if="settings.mode === 'weak' && weak === 0" class="notice notice--muted home__weak-empty">
       Слабых {{ isBook ? 'упражнений' : 'форм' }} в выбранном нет — выберите другой режим в настройках.
@@ -221,50 +158,6 @@ function start() {
 
 .home__articles:hover {
   border-color: var(--accent);
-  color: var(--accent-hover);
-}
-
-.home__filters-body {
-  display: block;
-  width: 100%;
-  padding: 0;
-  border: none;
-  background: none;
-  color: var(--ink);
-  text-align: left;
-  cursor: pointer;
-}
-
-.home__filter {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-2) 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.home__filter-name {
-  flex: none;
-  color: var(--muted);
-}
-
-.home__filter-value {
-  font-weight: var(--weight-semibold);
-  text-align: right;
-}
-
-/* строка-действие внизу карточки, как в списках настроек iOS */
-.home__filters-edit {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: var(--space-2) 0 var(--space-1);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--accent);
-}
-
-.home__filters-body:hover .home__filters-edit {
   color: var(--accent-hover);
 }
 

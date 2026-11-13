@@ -249,7 +249,6 @@ function trainWeak() {
       :error="startError"
       @start="start"
       @start-book="startBook"
-      @settings="screen = 'settings'"
     />
     <SettingsPanel v-else-if="screen === 'settings'" />
     <TablesPanel v-else-if="screen === 'tables'" />

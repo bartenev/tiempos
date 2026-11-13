@@ -1,17 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { IRREGULAR_INFINITIVES, findVerb } from '../data/verbs'
 import { bookWeakCount } from '../lib/book'
 import { weakCount } from '../lib/session'
 import { bookConfigFromSettings, configFromSettings } from '../lib/settings'
 import { settings } from '../lib/settingsState'
 import { setTheme, theme } from '../lib/theme'
-import type { Person, SessionMode } from '../types'
-import { PERSONS, TENSES, TENSE_LABELS, VERB_GROUPS } from '../types'
-import BookPicker from './BookPicker.vue'
+import type { SessionMode } from '../types'
 import Icon from './Icon.vue'
-
-const irregularList = IRREGULAR_INFINITIVES
 
 const SIZES = [10, 20, 30]
 
@@ -53,106 +48,11 @@ const answerNote = computed(() => {
   }
   return isBook.value ? 'Впишите ответ в пропуск или выберите вариант.' : 'Впишите форму глагола в пропуск.'
 })
-
-/** Подписи чекбоксов; usted / ustedes тренируются вместе с él / ellos. */
-const PERSON_CHOICES: Record<Person, string> = {
-  yo: 'yo',
-  tú: 'tú',
-  él: 'él / ella',
-  nosotros: 'nosotros',
-  vosotros: 'vosotros',
-  ellos: 'ellos / ellas',
-}
-
-/** Неправильный глагол отсеян фильтром окончаний — показываем приглушённым. */
-function irregularOff(infinitive: string): boolean {
-  const verb = findVerb(infinitive)
-  return verb ? !settings.groups[verb.group] : false
-}
-
-function setAllIrregular(value: boolean) {
-  for (const inf of irregularList) {
-    settings.selectedIrregular[inf] = value
-  }
-}
 </script>
 
 <template>
   <section class="settings">
     <h1 class="screen__title settings__title">Настройки</h1>
-
-    <BookPicker v-if="settings.track === 'book'" />
-
-    <template v-else>
-    <fieldset class="group settings__tenses">
-      <legend class="group__legend settings__tenses-legend">Времена</legend>
-      <label v-for="tense in TENSES" :key="tense" class="choice settings__tense">
-        <input v-model="settings.selected[tense]" class="choice__input settings__tense-input" type="checkbox" />
-        <span class="choice__label settings__tense-label">{{ TENSE_LABELS[tense] }}</span>
-      </label>
-    </fieldset>
-
-    <fieldset class="group settings__persons">
-      <legend class="group__legend settings__persons-legend">Лица</legend>
-      <div class="settings__persons-grid">
-        <label v-for="person in PERSONS" :key="person" class="choice settings__person">
-          <input v-model="settings.persons[person]" class="choice__input settings__person-input" type="checkbox" />
-          <span class="choice__label settings__person-label">{{ PERSON_CHOICES[person] }}</span>
-        </label>
-      </div>
-      <p class="group__note settings__persons-note">
-        usted / ustedes — вместе с él / ellos; в imperativo формы yo нет.
-      </p>
-    </fieldset>
-
-    <fieldset class="group settings__groups">
-      <legend class="group__legend settings__groups-legend">Окончания</legend>
-      <div class="settings__groups-row">
-        <label v-for="group in VERB_GROUPS" :key="group" class="choice settings__group">
-          <input v-model="settings.groups[group]" class="choice__input settings__group-input" type="checkbox" />
-          <span class="choice__label settings__group-label">-{{ group }}</span>
-        </label>
-      </div>
-    </fieldset>
-
-    <fieldset class="group settings__verbs">
-      <legend class="group__legend settings__verbs-legend">Глаголы</legend>
-      <label class="choice settings__verb-kind settings__verb-kind--regular">
-        <input v-model="settings.includeRegular" class="choice__input settings__verb-kind-input" type="checkbox" />
-        <span class="choice__label settings__verb-kind-label">Правильные</span>
-      </label>
-      <label class="choice settings__verb-kind settings__verb-kind--irregular">
-        <input v-model="settings.includeIrregular" class="choice__input settings__verb-kind-input" type="checkbox" />
-        <span class="choice__label settings__verb-kind-label">Неправильные и с чередованием</span>
-      </label>
-
-      <div v-if="settings.includeIrregular" class="settings__irregular">
-        <div class="settings__irregular-head">
-          <p class="settings__irregular-title">Какие именно</p>
-          <div class="settings__irregular-actions">
-            <button class="link-button settings__select-all" type="button" @click="setAllIrregular(true)">
-              Выбрать все
-            </button>
-            <button class="link-button settings__select-none" type="button" @click="setAllIrregular(false)">
-              Отключить все
-            </button>
-          </div>
-        </div>
-        <div class="settings__irregular-grid">
-          <label
-            v-for="inf in irregularList"
-            :key="inf"
-            class="choice settings__irregular-item"
-            :class="{ 'settings__irregular-item--off': irregularOff(inf) }"
-          >
-            <input v-model="settings.selectedIrregular[inf]" class="choice__input settings__irregular-input" type="checkbox" />
-            <span class="choice__label settings__irregular-label">{{ inf }}</span>
-          </label>
-        </div>
-      </div>
-    </fieldset>
-
-    </template>
 
     <fieldset class="group settings__mode">
       <legend class="group__legend settings__mode-legend">Режим</legend>
@@ -283,10 +183,6 @@ function setAllIrregular(value: boolean) {
 <style scoped lang="scss">
 /* ===== settings: экран настроек ===== */
 
-.settings__tense {
-  padding: var(--space-1) 0;
-}
-
 .settings__labs-note {
   margin: 0 0 var(--space-2);
 }
@@ -306,59 +202,5 @@ function setAllIrregular(value: boolean) {
   font-size: var(--text-sm);
   line-height: 1.4;
   color: var(--muted);
-}
-
-.settings__persons-grid {
-  /* как таблица спряжения: слева ед. число, справа мн. */
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(3, auto);
-  grid-auto-flow: column;
-  column-gap: var(--space-3);
-}
-
-.settings__groups-row {
-  display: flex;
-  gap: var(--space-6);
-}
-
-.settings__irregular {
-  margin-top: var(--space-2);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--line);
-}
-
-.settings__irregular-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-1) var(--space-3);
-}
-
-.settings__irregular-title {
-  margin: 0;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--muted);
-}
-
-.settings__irregular-actions {
-  display: flex;
-  gap: var(--space-4);
-}
-
-.settings__irregular-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: var(--space-3);
-  max-height: 17.5rem;
-  overflow-y: auto;
-  padding-right: var(--space-1);
-}
-
-/* отсеян фильтром окончаний — в сессию не попадёт */
-.settings__irregular-item--off {
-  opacity: 0.4;
 }
 </style>
