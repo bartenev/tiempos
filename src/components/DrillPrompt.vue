@@ -34,7 +34,7 @@ const book = computed(() => (isBookCard(props.card) ? props.card : null))
 
 const label = computed(() => {
   const { card } = props
-  return isBookCard(card) ? `Глава ${card.unit}` : TENSE_LABELS[card.tense]
+  return isBookCard(card) ? card.label : TENSE_LABELS[card.tense]
 })
 
 /** Карточка глагола без предложения (настройка «Ответ»). */
@@ -79,9 +79,10 @@ function blankClass(i: number): string | undefined {
       {{ label }}
       <span v-if="card.retry" class="drill__retry">повтор</span>
     </div>
-    <p v-if="book" class="drill__task">{{ book.task }}</p>
+    <p v-if="book?.task" class="drill__task">{{ book.task }}</p>
     <p v-if="book?.bank" class="drill__bank" lang="es">{{ book.bank }}</p>
     <p v-if="book?.prompt" class="drill__prompt">{{ book.prompt }}</p>
+    <p v-if="book?.context" class="drill__context">{{ book.context }}</p>
     <ZoomImage v-if="book?.image" class="drill__image" :src="book.image" alt="Иллюстрация из учебника" />
     <p
       class="drill__sentence"
@@ -101,7 +102,7 @@ function blankClass(i: number): string | undefined {
       </template>
       <span v-if="cue && blankCount !== 1" class="drill__infinitive">({{ cue }})</span>
     </p>
-    <p class="drill__translation">{{ translation }}</p>
+    <p v-if="translation" class="drill__translation">{{ translation }}</p>
   </div>
 </template>
 
@@ -164,6 +165,13 @@ function blankClass(i: number): string | undefined {
   color: var(--ink);
   font-size: var(--text-sm);
   font-style: italic;
+}
+
+.drill__context {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-style: italic;
+  color: var(--muted);
 }
 
 .drill__prompt {

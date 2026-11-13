@@ -28,7 +28,7 @@ describe('chapters', () => {
     const chapter = chapterOf(35)!
     const cards = chapterCards(chapter)
     expect(cards).toHaveLength(chapterSize(chapter))
-    expect(cards.every((c) => c.unit === 35)).toBe(true)
+    expect(cards.every((c) => c.group === '35')).toBe(true)
   })
 
   it('capitalizes an answer that opens a sentence', () => {
@@ -82,13 +82,13 @@ describe('buildBookSession', () => {
   it('takes cards only from the chosen chapters, with no repeats', () => {
     const cards = buildBookSession(config({ mode: 'random', size: 15 }), {})
     expect(cards).toHaveLength(15)
-    expect(cards.every((c) => c.unit === 35 || c.unit === 36)).toBe(true)
+    expect(cards.every((c) => c.group === '35' || c.group === '36')).toBe(true)
     expect(new Set(cards.map((c) => c.key)).size).toBe(15)
   })
 
   it('a single chapter is a session of its own', () => {
     const cards = buildBookSession(config({ units: [41], size: 30, mode: 'smart' }), {})
-    expect(cards.every((c) => c.unit === 41)).toBe(true)
+    expect(cards.every((c) => c.group === '41')).toBe(true)
     expect(cards.length).toBe(Math.min(30, chapterSize(chapterOf(41)!)))
   })
 
@@ -106,7 +106,7 @@ describe('buildBookSession', () => {
 
   it('smart mode brings new material in book order', () => {
     const cards = buildBookSession(config({ size: 6 }), {})
-    expect(cards.every((c) => c.unit === 35)).toBe(true)
+    expect(cards.every((c) => c.group === '35')).toBe(true)
   })
 
   it('smart mode guarantees a share of the session to weak exercises', () => {

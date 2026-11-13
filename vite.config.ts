@@ -148,6 +148,10 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(version),
   },
   plugins: [vue(), serviceWorker()],
+  build: {
+    // Одно офлайн-приложение одним файлом: данные глаголов, учебника и ~180 КБ упражнений на артикли.
+    chunkSizeWarningLimit: 700,
+  },
   test: {
     environment: 'happy-dom',
   },

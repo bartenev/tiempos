@@ -1,53 +1,71 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { articleWeakCount } from '../lib/articles/cards'
 import { bookWeakCount } from '../lib/book'
 import { weakCount } from '../lib/session'
-import { bookConfigFromSettings, configFromSettings } from '../lib/settings'
+import { articleConfigFromSettings, bookConfigFromSettings, configFromSettings } from '../lib/settings'
 import { settings } from '../lib/settingsState'
 import { setTheme, theme } from '../lib/theme'
-import type { SessionMode } from '../types'
+import type { SessionMode, Track } from '../types'
 import Icon from './Icon.vue'
 
 const SIZES = [10, 20, 30]
 
-const MODES: { mode: SessionMode; label: string; hint: string; bookHint?: string }[] = [
+const MODES: { mode: SessionMode; label: string; hint: Record<Track, string> }[] = [
   {
     mode: 'smart',
     label: 'Умная',
-    hint: 'Новое — порциями, ошибки — всегда, выученное — реже.',
-    bookHint: 'Новое — глава за главой, ошибки — всегда, выученное — реже.',
+    hint: {
+      verbs: 'Новое — порциями, ошибки — всегда, выученное — реже.',
+      articles: 'Новое — упражнение за упражнением, ошибки — всегда, выученное — реже.',
+      book: 'Новое — глава за главой, ошибки — всегда, выученное — реже.',
+    },
   },
   {
     mode: 'weak',
     label: 'Слабые',
-    hint: 'Только формы, где были ошибки.',
-    bookHint: 'Только упражнения, где были ошибки.',
+    hint: {
+      verbs: 'Только формы, где были ошибки.',
+      articles: 'Только задания, где были ошибки.',
+      book: 'Только упражнения, где были ошибки.',
+    },
   },
-  { mode: 'random', label: 'Случайно', hint: 'Равномерно, без учёта прогресса.' },
+  {
+    mode: 'random',
+    label: 'Случайно',
+    hint: {
+      verbs: 'Равномерно, без учёта прогресса.',
+      articles: 'Равномерно, без учёта прогресса.',
+      book: 'Равномерно, без учёта прогресса.',
+    },
+  },
 ]
 
-const isBook = computed(() => settings.track === 'book')
-
-/** Сколько слабых в выбранном — бейдж у «Слабых». */
-const weak = computed(() =>
-  isBook.value
-    ? bookWeakCount(bookConfigFromSettings(settings).units)
-    : weakCount(configFromSettings(settings)),
-)
-
-const modeHint = computed(() => {
-  const mode = MODES.find((m) => m.mode === settings.mode)!
-  return isBook.value ? mode.bookHint ?? mode.hint : mode.hint
+/** Сколько слабых в выбранном у открытого тренажёра — бейдж у «Слабых». */
+const weak = computed(() => {
+  if (settings.track === 'book') return bookWeakCount(bookConfigFromSettings(settings).units)
+  if (settings.track === 'articles') return articleWeakCount(articleConfigFromSettings(settings).rules)
+  return weakCount(configFromSettings(settings))
 })
 
-const answerNote = computed(() => {
-  if (settings.answer === 'oral') {
-    return isBook.value
-      ? 'Скажите ответ вслух, откройте его и отметьте себя.'
-      : 'Скажите форму вслух, откройте её и отметьте себя.'
-  }
-  return isBook.value ? 'Впишите ответ в пропуск или выберите вариант.' : 'Впишите форму глагола в пропуск.'
-})
+const modeHint = computed(() => MODES.find((m) => m.mode === settings.mode)!.hint[settings.track])
+
+const ANSWER_NOTES: Record<Track, { text: string; oral: string }> = {
+  verbs: {
+    text: 'Впишите форму глагола в пропуск.',
+    oral: 'Скажите форму вслух, откройте её и отметьте себя.',
+  },
+  articles: {
+    text: 'Выберите артикль кнопкой.',
+    oral: 'Скажите артикль вслух, откройте ответ и отметьте себя.',
+  },
+  book: {
+    text: 'Впишите ответ в пропуск или выберите вариант.',
+    oral: 'Скажите ответ вслух, откройте его и отметьте себя.',
+  },
+}
+
+const answerNote = computed(() => ANSWER_NOTES[settings.track][settings.answer])
 </script>
 
 <template>
@@ -121,11 +139,11 @@ const answerNote = computed(() => {
         </button>
       </div>
       <p class="group__note settings__answer-note">{{ answerNote }}</p>
-      <!-- только глаголы: упражнения учебника без предложения не имеют смысла -->
-      <label v-if="settings.track !== 'book'" class="choice settings__simple">
+      <!-- только глаголы: упражнения учебника и артикли без предложения не имеют смысла -->
+      <label class="choice settings__simple">
         <input v-model="settings.simpleCards" class="choice__input settings__simple-input" type="checkbox" />
         <span class="choice__label settings__simple-label">
-          Без предложений
+          Глаголы без предложений
           <span class="settings__simple-hint">только местоимение и глагол с переводом</span>
         </span>
       </label>
@@ -160,20 +178,13 @@ const answerNote = computed(() => {
     <fieldset class="group settings__labs">
       <legend class="group__legend settings__labs-legend">Лаборатория</legend>
       <p class="group__note settings__labs-note">
-        Функции в разработке: могут меняться и работать неидеально. Включённые появятся на главной.
+        Функции в разработке: могут меняться и работать неидеально. Включённые появятся в списке тренажёров.
       </p>
       <label class="choice settings__lab">
         <input v-model="settings.labs.book" class="choice__input settings__lab-input" type="checkbox" />
         <span class="choice__label settings__lab-label">
           Учебник
           <span class="settings__lab-hint">упражнения по главам Gramática de uso</span>
-        </span>
-      </label>
-      <label class="choice settings__lab">
-        <input v-model="settings.labs.articles" class="choice__input settings__lab-input" type="checkbox" />
-        <span class="choice__label settings__lab-label">
-          Артикли
-          <span class="settings__lab-hint">тренажёр артиклей на отдельной странице</span>
         </span>
       </label>
     </fieldset>

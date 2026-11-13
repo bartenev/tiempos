@@ -3,7 +3,7 @@ import type { Screen } from '../types'
 import type { IconName } from './Icon.vue'
 import Icon from './Icon.vue'
 
-type Tab = 'setup' | 'progress' | 'tables' | 'settings'
+type Tab = 'hub' | 'progress' | 'tables' | 'settings'
 
 const props = defineProps<{
   screen: Screen
@@ -14,15 +14,15 @@ const emit = defineEmits<{
 }>()
 
 const TABS: { screen: Tab; label: string; icon: IconName }[] = [
-  { screen: 'setup', label: 'Тренировка', icon: 'practice' },
+  { screen: 'hub', label: 'Тренировка', icon: 'practice' },
   { screen: 'progress', label: 'Прогресс', icon: 'progress' },
   { screen: 'tables', label: 'Таблицы', icon: 'tables' },
   { screen: 'settings', label: 'Настройки', icon: 'settings' },
 ]
 
-/** Итоги завершают тренировку — подсвечиваем «Тренировку». */
+/** Список тренажёров, главная тренажёра и итоги — всё «Тренировка». */
 function isActive(tab: Tab): boolean {
-  return tab === 'setup' ? props.screen === 'setup' || props.screen === 'summary' : props.screen === tab
+  return tab === 'hub' ? ['hub', 'setup', 'summary'].includes(props.screen) : props.screen === tab
 }
 </script>
 

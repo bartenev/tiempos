@@ -52,8 +52,11 @@ export interface DrillCard {
  */
 export type SessionMode = 'smart' | 'weak' | 'random'
 
-/** Что тренируем: спряжение глаголов или главы учебника. */
-export type Track = 'verbs' | 'book'
+/** Тренажёр: спряжение глаголов, артикли или главы учебника (местоимения, «Лаборатория»). */
+export type Track = 'verbs' | 'articles' | 'book'
+
+/** Колода упражнений с ключом: у каждой своё хранилище прогресса. */
+export type Deck = 'book' | 'articles'
 
 /** Как отвечать: вписывать форму или сказать её и оценить себя самому. */
 export type AnswerMode = 'text' | 'oral'
@@ -160,12 +163,29 @@ export interface Chapter {
   sets: BookSet[]
 }
 
-/** Карточка упражнения: тот же экран, что у глаголов, но без спряжения. */
+/** Шаг разбора: правило, по которому шёл алгоритм (артикли). */
+export interface HintStep {
+  /** Откуда правило: «GDU8», «GBE B-I / GDU6-7». */
+  source: string
+  text: string
+  /** Главное правило — то, что решило выбор. */
+  main: boolean
+}
+
+/**
+ * Карточка упражнения с ключом (учебник, артикли): тот же экран, что у глаголов,
+ * но без спряжения.
+ */
 export interface BookCard {
   type: 'book'
+  /** Колода — какое хранилище прогресса. */
+  deck: Deck
   /** Постоянный ключ упражнения — по нему хранится прогресс. */
   key: string
-  unit: number
+  /** Подпись над заданием: «Глава 35», «Имена и места». */
+  label: string
+  /** Новое в умной очереди идёт группа за группой: глава, упражнение учебника. */
+  group: string
   task: string
   rule: string
   /** Банк слов из рамки упражнения. */
@@ -180,7 +200,17 @@ export interface BookCard {
   cue?: string
   prompt?: string
   options?: string[]
+  /** Варианты, разбитые на ряды (кнопки артиклей: Ø | el la… | un una… | lo). */
+  optionGroups?: string[][]
   image?: string
+  /** Ситуация к пункту: «Hay varios relojes por la casa». */
+  context?: string
+  /** Разбор: путь по правилам (артикли). */
+  steps?: HintStep[]
+  /** Пояснения к разметке: почему так, спорное место. */
+  notes?: string[]
+  /** Откуда задание: учебник, упражнение, пункт, страница. */
+  source?: string
   retry?: boolean
 }
 
@@ -212,6 +242,63 @@ export interface BookConfig {
   answer: AnswerMode
 }
 
+/** Тема артиклей — группа правил на главной. */
+export type ArticleTopic =
+  | 'form'
+  | 'concrete'
+  | 'zero'
+  | 'general'
+  | 'names'
+  | 'time'
+  | 'pred'
+  | 'lex'
+  | 'lo'
+
+/** Правило внутри темы: по ним (как по лицам у глаголов) выбирают, что тренировать. */
+export type ArticleRule =
+  // форма
+  | 'gender'
+  | 'a-tonica'
+  | 'contraction'
+  | 'no-noun'
+  // un или el
+  | 'new'
+  | 'unique'
+  | 'mentioned'
+  // Ø
+  | 'type'
+  | 'quantity'
+  | 'eval'
+  // обобщение
+  | 'class'
+  | 'any'
+  // имена и места
+  | 'people'
+  | 'places'
+  | 'place-names'
+  // время
+  | 'hours'
+  | 'days'
+  | 'per'
+  // профессия после ser
+  | 'pred-zero'
+  | 'pred-un'
+  // устойчивые сочетания
+  | 'play'
+  | 'go'
+  | 'learn'
+  | 'institutions'
+  // lo
+  | 'lo'
+
+/** Что тренируем в артиклях: выбранные правила. */
+export interface ArticleConfig {
+  rules: ArticleRule[]
+  size: number
+  mode: SessionMode
+  answer: AnswerMode
+}
+
 export interface SessionMistake {
   /** Что считать одной и той же ошибкой (повторы не дублируем в итогах). */
   key: string
@@ -233,7 +320,7 @@ export interface SessionResult {
   mistakes: SessionMistake[]
 }
 
-export type Screen = 'setup' | 'settings' | 'drill' | 'summary' | 'tables' | 'progress'
+export type Screen = 'hub' | 'setup' | 'settings' | 'drill' | 'summary' | 'tables' | 'progress'
 
 export const MODE_LABELS: Record<SessionMode, string> = {
   smart: 'Умная очередь',

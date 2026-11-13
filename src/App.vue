@@ -2,30 +2,35 @@
 import { computed, ref, watch } from 'vue'
 import DrillPanel from './components/DrillPanel.vue'
 import HomePanel from './components/HomePanel.vue'
+import HubPanel from './components/HubPanel.vue'
 import ProgressPanel from './components/ProgressPanel.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import SummaryPanel from './components/SummaryPanel.vue'
 import TabBar from './components/TabBar.vue'
-import BookProgress from './components/BookProgress.vue'
+import DeckProgress from './components/DeckProgress.vue'
 import TablesPanel from './components/TablesPanel.vue'
 import { CHAPTERS } from './data/book'
+import { buildArticleSession } from './lib/articles/cards'
+import { ARTICLE_RULES } from './lib/articles/topics'
 import { buildBookSession } from './lib/book'
 import { cardMistake, cardRun, cardStat, recordCard, restoreCard, retryOf, siblingOf } from './lib/cards'
 import { IRREGULAR_INFINITIVES } from './data/verbs'
 import { buildSession } from './lib/session'
-import { bookConfigFromSettings, configFromSettings } from './lib/settings'
+import { articleConfigFromSettings, bookConfigFromSettings, configFromSettings } from './lib/settings'
 import { settings } from './lib/settingsState'
 import type { CellStat } from './lib/stats'
 import { initTheme } from './lib/theme'
 import type {
   AnswerMode,
   AnyCard,
+  ArticleConfig,
   BookConfig,
   Screen,
   SessionConfig,
   SessionMistake,
   SessionMode,
   SessionResult,
+  Track,
 } from './types'
 import { PERSONS, TENSES, VERB_GROUPS } from './types'
 
@@ -44,7 +49,8 @@ interface Run {
   build: () => AnyCard[]
 }
 
-const screen = ref<Screen>('setup')
+/** Начало — список тренажёров; из него — главная выбранного тренажёра. */
+const screen = ref<Screen>('hub')
 const run = ref<Run | null>(null)
 const cards = ref<AnyCard[]>([])
 const index = ref(0)
@@ -83,7 +89,7 @@ const current = computed(() => cards.value[index.value]!)
 
 /** Панель вкладок — на экранах-разделах и на итогах; в сессии не отвлекает. */
 const showTabBar = computed(() =>
-  ['setup', 'settings', 'progress', 'tables', 'summary'].includes(screen.value),
+  ['hub', 'setup', 'settings', 'progress', 'tables', 'summary'].includes(screen.value),
 )
 
 const result = computed<SessionResult>(() => ({
@@ -125,6 +131,17 @@ function start(cfg: SessionConfig) {
 
 function startBook(cfg: BookConfig) {
   begin({ mode: cfg.mode, answer: cfg.answer, build: () => buildBookSession(cfg) })
+}
+
+function startArticles(cfg: ArticleConfig) {
+  begin({ mode: cfg.mode, answer: cfg.answer, build: () => buildArticleSession(cfg) })
+}
+
+/** Из списка тренажёров — на главную выбранного. */
+function openTrainer(track: Track) {
+  settings.track = track
+  startError.value = ''
+  screen.value = 'setup'
 }
 
 function finish() {
@@ -228,6 +245,10 @@ function trainWeak() {
     startBook(bookConfigFromSettings(settings, { mode: 'weak', units: CHAPTERS.map((c) => c.unit) }))
     return
   }
+  if (settings.track === 'articles') {
+    startArticles(articleConfigFromSettings(settings, { mode: 'weak', rules: [...ARTICLE_RULES] }))
+    return
+  }
   start(
     configFromSettings(settings, {
       mode: 'weak',
@@ -244,15 +265,23 @@ function trainWeak() {
 
 <template>
   <div class="app" :class="{ 'app--tabbar': showTabBar }">
+    <HubPanel v-if="screen === 'hub'" @open="openTrainer" />
     <HomePanel
-      v-if="screen === 'setup'"
+      v-else-if="screen === 'setup'"
       :error="startError"
       @start="start"
       @start-book="startBook"
+      @start-articles="startArticles"
+      @back="screen = 'hub'"
     />
     <SettingsPanel v-else-if="screen === 'settings'" />
     <TablesPanel v-else-if="screen === 'tables'" />
-    <BookProgress v-else-if="screen === 'progress' && settings.track === 'book'" @train-weak="trainWeak" />
+    <DeckProgress
+      v-else-if="screen === 'progress' && settings.track !== 'verbs'"
+      :key="settings.track"
+      :deck="settings.track"
+      @train-weak="trainWeak"
+    />
     <ProgressPanel v-else-if="screen === 'progress'" @train-weak="trainWeak" />
     <DrillPanel
       v-else-if="screen === 'drill' && current"

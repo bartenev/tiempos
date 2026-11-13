@@ -1,4 +1,4 @@
-import type { Person, Tense } from '../types'
+import type { Deck, Person, Tense } from '../types'
 
 /**
  * История по каждой форме глагол × время × местоимение —
@@ -8,6 +8,15 @@ export const STATS_KEY = 'tiempos.stats.v1'
 
 /** То же по упражнениям учебника: ключ — BookCard.key. */
 export const BOOK_STATS_KEY = 'tiempos.book.v2'
+
+/** То же по заданиям на артикли: ключ — id задания (`GDU7-2.5#1`). */
+export const ARTICLE_STATS_KEY = 'tiempos.articles.v1'
+
+/** Хранилище прогресса колоды упражнений. */
+export const DECK_STATS_KEYS: Record<Deck, string> = {
+  book: BOOK_STATS_KEY,
+  articles: ARTICLE_STATS_KEY,
+}
 
 /** Прежний прогресс по учебнику: ключом был текст упражнения. */
 export const LEGACY_BOOK_STATS_KEY = 'tiempos.book.v1'
@@ -105,6 +114,10 @@ export function loadBookStats(): StatsStore {
   return loadStore(BOOK_STATS_KEY)
 }
 
+export function loadDeckStats(deck: Deck): StatsStore {
+  return loadStore(DECK_STATS_KEYS[deck])
+}
+
 /** Перенести прогресс на новые ключи при запуске; старый ключ стираем после записи. */
 export function migrateBookStats(newKeys: Record<string, string>): void {
   try {
@@ -155,6 +168,15 @@ export function recordBookAttempt(
   return record(BOOK_STATS_KEY, key, correct, now)
 }
 
+export function recordDeckAttempt(
+  deck: Deck,
+  key: string,
+  correct: boolean,
+  now: number = Date.now(),
+): CellStat {
+  return record(DECK_STATS_KEYS[deck], key, correct, now)
+}
+
 function restore(storageKey: string, key: string, previous: CellStat | undefined): void {
   const store = loadStore(storageKey)
   if (previous) store[key] = previous
@@ -174,6 +196,10 @@ export function restoreStat(
 
 export function restoreBookStat(key: string, previous: CellStat | undefined): void {
   restore(BOOK_STATS_KEY, key, previous)
+}
+
+export function restoreDeckStat(deck: Deck, key: string, previous: CellStat | undefined): void {
+  restore(DECK_STATS_KEYS[deck], key, previous)
 }
 
 /** Слабая форма: были ошибки и с тех пор меньше recoveryStreak(bad) верных подряд. */

@@ -22,7 +22,21 @@ const SLOT: Record<Person, string> = {
 
 <template>
   <div class="rule-hint">
-    <p class="rule-hint__rule">{{ hint.rule }}</p>
+    <p v-if="hint.rule" class="rule-hint__rule">{{ hint.rule }}</p>
+    <template v-if="hint.steps?.length">
+      <p class="rule-hint__steps-title">Как к этому приходит алгоритм:</p>
+      <ol class="rule-hint__steps">
+        <li
+          v-for="(step, i) in hint.steps"
+          :key="i"
+          class="rule-hint__step"
+          :class="{ 'rule-hint__step--main': step.main }"
+        >
+          <span v-if="step.source" class="rule-hint__step-source">{{ step.source }}</span>
+          {{ step.text }}
+        </li>
+      </ol>
+    </template>
     <ul v-if="hint.row.length > 0" class="rule-hint__row">
       <li
         v-for="item in hint.row"
@@ -35,6 +49,8 @@ const SLOT: Record<Person, string> = {
       </li>
     </ul>
     <p v-if="hint.note" class="rule-hint__note">{{ hint.note }}</p>
+    <p v-for="(note, i) in hint.notes" :key="`note-${i}`" class="rule-hint__note">{{ note }}</p>
+    <p v-if="hint.source" class="rule-hint__source">{{ hint.source }}</p>
   </div>
 </template>
 
@@ -125,6 +141,44 @@ const SLOT: Record<Person, string> = {
   font-size: var(--text-xs);
   line-height: 1.4;
   color: var(--muted);
+}
+
+/* ===== rule-hint: разбор по шагам (артикли) ===== */
+
+.rule-hint__steps-title {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.rule-hint__steps {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding-left: var(--space-5);
+  line-height: 1.45;
+}
+
+.rule-hint__step--main {
+  font-weight: var(--weight-semibold);
+}
+
+.rule-hint__step-source {
+  display: inline-block;
+  margin-right: var(--space-1);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  color: var(--muted);
+}
+
+.rule-hint__source {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+  color: var(--muted);
+  opacity: 0.8;
 }
 
 @media (max-width: 380px) {

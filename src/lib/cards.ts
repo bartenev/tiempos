@@ -6,11 +6,11 @@ import { retryCard, siblingCard } from './session'
 import type { CellStat } from './stats'
 import {
   cellKey,
-  loadBookStats,
+  loadDeckStats,
   loadStats,
   recordAttempt,
-  recordBookAttempt,
-  restoreBookStat,
+  recordDeckAttempt,
+  restoreDeckStat,
   restoreStat,
 } from './stats'
 
@@ -18,7 +18,7 @@ import {
 
 export function cardStat(card: AnyCard): CellStat | undefined {
   return isBookCard(card)
-    ? loadBookStats()[card.key]
+    ? loadDeckStats(card.deck)[card.key]
     : loadStats()[cellKey(card.verb.infinitive, card.tense, card.person)]
 }
 
@@ -29,7 +29,7 @@ export function cardRun(card: AnyCard): number | undefined | null {
 
 export function recordCard(card: AnyCard, correct: boolean): void {
   if (isBookCard(card)) {
-    recordBookAttempt(card.key, correct)
+    recordDeckAttempt(card.deck, card.key, correct)
     return
   }
   recordAttempt(card.verb.infinitive, card.tense, card.person, correct)
@@ -43,7 +43,7 @@ export function restoreCard(
   previousRun: number | undefined | null,
 ): void {
   if (isBookCard(card)) {
-    restoreBookStat(card.key, previous)
+    restoreDeckStat(card.deck, card.key, previous)
     return
   }
   restoreStat(card.verb.infinitive, card.tense, card.person, previous)
@@ -58,7 +58,7 @@ export function cardBlanks(card: AnyCard): string[][] {
 export function cardMistake(card: AnyCard, given: string): SessionMistake {
   const { answer } = card
   if (isBookCard(card)) {
-    const meta = `Глава ${card.unit} · ${card.sentence.replaceAll('___', '…')}`
+    const meta = `${card.label} · ${card.sentence.replaceAll('___', '…')}`
     return { key: card.key, meta, answer, given }
   }
   const { infinitive } = card.verb

@@ -65,7 +65,7 @@ const hint = computed(() => {
   if (!answerShown.value) return null
   const { card } = props
   return isBookCard(card)
-    ? { rule: card.rule, row: [] }
+    ? { rule: card.rule, row: [], steps: card.steps, notes: card.notes, source: card.source }
     : explainForm(card.verb, card.tense, card.person)
 })
 

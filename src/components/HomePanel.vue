@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { articleCount, articleWeakCount } from '../lib/articles/cards'
 import { bookWeakCount } from '../lib/book'
 import { cellsForConfig, weakCount } from '../lib/session'
-import { bookConfigFromSettings, configFromSettings } from '../lib/settings'
+import { articleConfigFromSettings, bookConfigFromSettings, configFromSettings } from '../lib/settings'
 import { settings } from '../lib/settingsState'
-import type { BookConfig, SessionConfig, Track } from '../types'
+import type { ArticleConfig, BookConfig, SessionConfig, Track } from '../types'
+import ArticlePicker from './ArticlePicker.vue'
 import BookPicker from './BookPicker.vue'
 import Icon from './Icon.vue'
 import VerbPicker from './VerbPicker.vue'
@@ -16,32 +18,39 @@ defineProps<{
 const emit = defineEmits<{
   start: [config: SessionConfig]
   'start-book': [config: BookConfig]
+  'start-articles': [config: ArticleConfig]
+  /** Назад к списку тренажёров. */
+  back: []
 }>()
 
-const TRACKS: { track: Track; label: string }[] = [
-  { track: 'verbs', label: 'Глаголы' },
-  { track: 'book', label: 'Учебник' },
-]
+const TITLES: Record<Track, { title: string; lead: string; unit: string }> = {
+  verbs: { title: 'Глаголы', lead: 'Тренажёр спряжения испанских глаголов.', unit: 'форм' },
+  articles: {
+    title: 'Артикли',
+    lead: 'el, un или Ø: предложения из двух учебников, ответы — по их ключам.',
+    unit: 'заданий',
+  },
+  book: { title: 'Учебник', lead: 'Упражнения по главам учебника.', unit: 'упражнений' },
+}
 
-/** Версия приложения — мелко внизу главной (повышать по правилам из README). */
-const version = __APP_VERSION__
-
-/** Тренажёр артиклей — статическая страница из public/articulos (собрана в проекте espanol). */
-const articlesUrl = `${import.meta.env.BASE_URL}articulos/`
-
-const isBook = computed(() => settings.track === 'book')
+const head = computed(() => TITLES[settings.track])
 
 const config = computed(() => configFromSettings(settings))
 
 const bookConfig = computed(() => bookConfigFromSettings(settings))
 
-const weak = computed(() =>
-  isBook.value ? bookWeakCount(bookConfig.value.units) : weakCount(config.value),
-)
+const articleConfig = computed(() => articleConfigFromSettings(settings))
 
-/** Сколько форм под фильтр (0, например, если только yo и только imperativo). */
+const weak = computed(() => {
+  if (settings.track === 'book') return bookWeakCount(bookConfig.value.units)
+  if (settings.track === 'articles') return articleWeakCount(articleConfig.value.rules)
+  return weakCount(config.value)
+})
+
+/** Сколько заданий под выбор (у глаголов 0, например, если только yo и только imperativo). */
 const formsCount = computed(() => {
-  if (isBook.value) return bookConfig.value.units.length
+  if (settings.track === 'book') return bookConfig.value.units.length
+  if (settings.track === 'articles') return articleCount(articleConfig.value.rules)
   const cfg = config.value
   if (cfg.tenses.length === 0 || cfg.persons.length === 0 || cfg.groups.length === 0) return 0
   return cellsForConfig(cfg).length
@@ -55,51 +64,36 @@ const canStart = computed(() => {
 
 function start() {
   if (!canStart.value) return
-  if (isBook.value) emit('start-book', bookConfig.value)
+  if (settings.track === 'book') emit('start-book', bookConfig.value)
+  else if (settings.track === 'articles') emit('start-articles', articleConfig.value)
   else emit('start', config.value)
 }
 </script>
 
 <template>
-  <section class="home">
-    <header class="home__header">
-      <h1 class="screen__title home__title">Tiempos</h1>
-      <!-- отдельная статическая страница из public/articulos: тренажёр и схема артиклей -->
-      <a v-if="settings.labs.articles" class="home__articles" :href="articlesUrl">Артикли<Icon name="forward" /></a>
-    </header>
-    <p class="screen__lead home__lead">
-      {{ isBook ? 'Упражнения по главам учебника.' : 'Тренажёр спряжения испанских глаголов.' }}
-    </p>
+  <section class="home" :class="`home--${settings.track}`">
+    <button class="button button--ghost button--small home__back" type="button" @click="emit('back')">
+      <Icon name="back" />Тренажёры
+    </button>
+    <h1 class="screen__title home__title">{{ head.title }}</h1>
+    <p class="screen__lead home__lead">{{ head.lead }}</p>
 
-    <!-- Учебник — в «Лаборатории» настроек; выключен — тренируем только глаголы. -->
-    <div v-if="settings.labs.book" class="segmented home__track" role="radiogroup" aria-label="Что тренируем">
-      <button
-        v-for="t in TRACKS"
-        :key="t.track"
-        class="segmented__item home__track-item"
-        :class="{ 'segmented__item--active': settings.track === t.track }"
-        type="button"
-        role="radio"
-        :aria-checked="settings.track === t.track"
-        @click="settings.track = t.track"
-      >
-        {{ t.label }}
-      </button>
-    </div>
-
-    <!-- что тренируем — прямо на главной; общие настройки (режим, ответ…) — во вкладке «Настройки» -->
-    <BookPicker v-if="isBook" />
+    <BookPicker v-if="settings.track === 'book'" />
+    <ArticlePicker v-else-if="settings.track === 'articles'" />
     <VerbPicker v-else />
 
-    <p v-if="formsCount === 0 && isBook" class="notice notice--muted home__no-chapters">
+    <p v-if="formsCount === 0 && settings.track === 'book'" class="notice notice--muted home__no-chapters">
       Выберите хотя бы одну главу.
+    </p>
+    <p v-else-if="formsCount === 0 && settings.track === 'articles'" class="notice notice--muted home__no-rules">
+      Выберите хотя бы одно правило.
     </p>
     <p v-else-if="formsCount === 0" class="notice notice--muted home__no-forms">
       Под этот выбор нет форм — проверьте времена, лица и окончания
       (в imperativo нет yo).
     </p>
     <p v-else-if="settings.mode === 'weak' && weak === 0" class="notice notice--muted home__weak-empty">
-      Слабых {{ isBook ? 'упражнений' : 'форм' }} в выбранном нет — выберите другой режим в настройках.
+      Слабых {{ head.unit }} в выбранном нет — выберите другой режим в настройках.
     </p>
     <p v-if="error" class="notice notice--bad home__error">{{ error }}</p>
 
@@ -108,57 +102,14 @@ function start() {
         Начать
       </button>
     </div>
-
-    <p class="home__version">версия {{ version }}</p>
   </section>
 </template>
 
 <style scoped lang="scss">
-/* ===== home: главная ===== */
+/* ===== home: главная тренажёра ===== */
 
-.home__version {
-  margin: var(--space-2) 0 0;
-  text-align: center;
-  font-size: var(--text-xs);
-  color: var(--muted);
-  opacity: 0.7;
-}
-
-.home__track {
+.home__back {
   margin-bottom: var(--space-4);
-}
-
-.home__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  margin-bottom: var(--space-2);
-}
-
-.home__title {
-  margin: 0;
-}
-
-.home__articles {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: var(--space-1);
-  min-height: var(--tap);
-  padding: 0 var(--space-3) 0 var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  background: var(--card);
-  color: var(--accent);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  text-decoration: none;
-}
-
-.home__articles:hover {
-  border-color: var(--accent);
-  color: var(--accent-hover);
 }
 
 /* «Начать» всегда видна — закреплена над панелью вкладок */

@@ -5,6 +5,7 @@ import type {
   BookItem,
   BookSet,
   Chapter,
+  SessionMode,
 } from '../types'
 import { shuffle } from './session'
 import type { Mastery, StatsStore } from './stats'
@@ -59,8 +60,10 @@ function makeCard(chapter: Chapter, set: BookSet, item: BookItem, index: number)
   const blanks = blanksOf(item)
   return {
     type: 'book',
+    deck: 'book',
     key: itemKey(set, index),
-    unit: chapter.unit,
+    label: `Глава ${chapter.unit}`,
+    group: String(chapter.unit),
     task: set.task,
     rule: set.rule,
     bank: set.bank,
@@ -133,7 +136,7 @@ function pickWeighted(cards: BookCard[], stats: StatsStore, size: number): BookC
 /**
  * Умная очередь: слабым — до трети сессии (сначала с большим числом ошибок),
  * тем, у кого подошёл срок повторения, — ещё до трети,
- * новое — по порядку глав, так что глава проходится целиком,
+ * новое — по порядку групп (глав, упражнений), так что группа проходится целиком,
  * остальное — повторение, выученное всё реже.
  */
 function smartCards(
@@ -151,9 +154,9 @@ function smartCards(
 
   const picked = weak.slice(0, Math.ceil(size * WEAK_SHARE))
   picked.push(...pickWeighted(due, stats, Math.ceil(size * DUE_SHARE)))
-  // внутри главы упражнения вперемешку, сами главы — по порядку
-  const units = [...new Set(fresh.map((c) => c.unit))]
-  const ordered = units.flatMap((unit) => shuffle(fresh.filter((c) => c.unit === unit)))
+  // внутри группы упражнения вперемешку, сами группы — по порядку
+  const groups = [...new Set(fresh.map((c) => c.group))]
+  const ordered = groups.flatMap((group) => shuffle(fresh.filter((c) => c.group === group)))
   const newSlots = Math.min(size - picked.length, Math.ceil(size * NEW_SHARE))
   picked.push(...ordered.slice(0, newSlots))
   const repeated = new Set(picked.map((c) => c.key))
@@ -169,6 +172,23 @@ function smartCards(
   return shuffle(picked)
 }
 
+/** Сессия из готовых карточек колоды: умная очередь, только слабые или случайно. */
+export function buildDeckSession(
+  cards: BookCard[],
+  config: { mode: SessionMode; size: number },
+  stats: StatsStore,
+  now: number = Date.now(),
+  noWeak = 'Слабых упражнений в выбранном нет',
+): BookCard[] {
+  if (config.mode === 'weak') {
+    const weak = cards.filter((c) => isWeak(stats[c.key]))
+    if (weak.length === 0) throw new Error(noWeak)
+    return shuffle(weak).slice(0, config.size)
+  }
+  if (config.mode === 'random') return shuffle(cards).slice(0, config.size)
+  return smartCards(cards, stats, config.size, now)
+}
+
 export function buildBookSession(
   config: BookConfig,
   stats: StatsStore = loadBookStats(),
@@ -176,13 +196,7 @@ export function buildBookSession(
 ): BookCard[] {
   if (config.units.length === 0) throw new Error('Выберите хотя бы одну главу')
   const cards = cardsForUnits(config.units)
-  if (config.mode === 'weak') {
-    const weak = cards.filter((c) => isWeak(stats[c.key]))
-    if (weak.length === 0) throw new Error('Слабых упражнений в выбранных главах нет')
-    return shuffle(weak).slice(0, config.size)
-  }
-  if (config.mode === 'random') return shuffle(cards).slice(0, config.size)
-  return smartCards(cards, stats, config.size, now)
+  return buildDeckSession(cards, config, stats, now, 'Слабых упражнений в выбранных главах нет')
 }
 
 /** Та же карточка ещё раз — повтор после ошибки. */

@@ -9,10 +9,10 @@ export const settings = reactive(loadSettings())
 
 watch(settings, (value) => saveSettings(value), { deep: true })
 
-// Учебник выключили в «Лаборатории» — переключателя на главной больше нет, тренируем глаголы.
+// Учебник выключили в «Лаборатории» — его нет в списке тренажёров, открываем глаголы.
 watch(
   () => settings.labs.book,
   (on) => {
-    if (!on) settings.track = 'verbs'
+    if (!on && settings.track === 'book') settings.track = 'verbs'
   },
 )

@@ -1,6 +1,8 @@
 import { IRREGULAR_INFINITIVES } from '../data/verbs'
 import type {
   AnswerMode,
+  ArticleConfig,
+  ArticleRule,
   BookConfig,
   BookSelection,
   Person,
@@ -11,6 +13,7 @@ import type {
   VerbGroup,
 } from '../types'
 import { PERSONS, VERB_GROUPS } from '../types'
+import { ARTICLE_RULES } from './articles/topics'
 import {
   defaultSelection,
   parseSelection,
@@ -22,14 +25,12 @@ export const SETTINGS_KEY = 'tiempos.settings.v1'
 
 /** «Лаборатория»: функции в разработке, которые включают вручную. */
 export interface LabsSettings {
-  /** Упражнения по главам учебника (переключатель «Учебник» на главной). */
+  /** Упражнения по главам учебника (тренажёр «Учебник» в списке на главной). */
   book: boolean
-  /** Ссылка на тренажёр артиклей на главной. */
-  articles: boolean
 }
 
 export interface SetupSettings {
-  /** Что тренируем: глаголы или главы учебника. */
+  /** Тренажёр, открытый последним: глаголы, артикли или главы учебника. */
   track: Track
   /** Что выбрано в учебнике: темы или свой список глав. */
   bookSelection: BookSelection
@@ -42,6 +43,8 @@ export interface SetupSettings {
   includeIrregular: boolean
   /** Чекбоксы неправильных глаголов: infinitive → выбран. */
   selectedIrregular: Record<string, boolean>
+  /** Чекбоксы правил артиклей. */
+  articleRules: Record<ArticleRule, boolean>
   size: number
   mode: SessionMode
   answer: AnswerMode
@@ -54,6 +57,10 @@ export function defaultSelectedIrregular(
   infinitives: string[] = IRREGULAR_INFINITIVES,
 ): Record<string, boolean> {
   return Object.fromEntries(infinitives.map((inf) => [inf, true]))
+}
+
+export function defaultArticleRules(): Record<ArticleRule, boolean> {
+  return Object.fromEntries(ARTICLE_RULES.map((rule) => [rule, true])) as Record<ArticleRule, boolean>
 }
 
 export const DEFAULT_SETTINGS: SetupSettings = {
@@ -82,11 +89,12 @@ export const DEFAULT_SETTINGS: SetupSettings = {
   includeRegular: true,
   includeIrregular: true,
   selectedIrregular: defaultSelectedIrregular(),
+  articleRules: defaultArticleRules(),
   size: 20,
   mode: 'smart',
   answer: 'text',
   simpleCards: false,
-  labs: { book: false, articles: false },
+  labs: { book: false },
 }
 
 const SIZES = new Set([10, 20, 30])
@@ -95,7 +103,7 @@ const MODES = new Set<SessionMode>(['smart', 'weak', 'random'])
 
 const ANSWERS = new Set<AnswerMode>(['text', 'oral'])
 
-const TRACKS = new Set<Track>(['verbs', 'book'])
+const TRACKS = new Set<Track>(['verbs', 'articles', 'book'])
 
 function isBool(value: unknown): value is boolean {
   return typeof value === 'boolean'
@@ -158,6 +166,17 @@ export function mergeSelectedIrregular(
   return result
 }
 
+/** Новые правила — включены; снятые галки сохраняются. */
+function parseArticleRules(raw: unknown): Record<ArticleRule, boolean> {
+  const base = defaultArticleRules()
+  if (!raw || typeof raw !== 'object') return base
+  const obj = raw as Record<string, unknown>
+  for (const rule of ARTICLE_RULES) {
+    if (isBool(obj[rule])) base[rule] = obj[rule]
+  }
+  return base
+}
+
 function cloneDefaults(): SetupSettings {
   return {
     ...DEFAULT_SETTINGS,
@@ -166,6 +185,7 @@ function cloneDefaults(): SetupSettings {
     persons: { ...DEFAULT_SETTINGS.persons },
     groups: { ...DEFAULT_SETTINGS.groups },
     selectedIrregular: defaultSelectedIrregular(),
+    articleRules: defaultArticleRules(),
     labs: { ...DEFAULT_SETTINGS.labs },
   }
 }
@@ -198,6 +218,7 @@ export function loadSettings(): SetupSettings {
         ? parsed.includeIrregular
         : DEFAULT_SETTINGS.includeIrregular,
       selectedIrregular: mergeSelectedIrregular(parsed.selectedIrregular),
+      articleRules: parseArticleRules(parsed.articleRules),
       size:
         typeof parsed.size === 'number' && SIZES.has(parsed.size)
           ? parsed.size
@@ -238,6 +259,19 @@ export function bookConfigFromSettings(
 ): BookConfig {
   return {
     units: selectedUnits(settings.bookSelection),
+    size: settings.size,
+    mode: settings.mode,
+    answer: settings.answer,
+    ...overrides,
+  }
+}
+
+export function articleConfigFromSettings(
+  settings: SetupSettings,
+  overrides: Partial<ArticleConfig> = {},
+): ArticleConfig {
+  return {
+    rules: ARTICLE_RULES.filter((rule) => settings.articleRules[rule]),
     size: settings.size,
     mode: settings.mode,
     answer: settings.answer,

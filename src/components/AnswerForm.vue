@@ -43,7 +43,14 @@ const book = computed(() => (isBookCard(props.card) ? props.card : null))
 
 const blanks = computed(() => cardBlanks(props.card))
 
-const options = computed(() => book.value?.options)
+/** Ряды кнопок-вариантов: у артиклей Ø | el la… | un una… | lo, у учебника — один ряд. */
+const optionRows = computed(() => {
+  const card = book.value
+  if (!card) return null
+  return card.optionGroups ?? (card.options ? [card.options] : null)
+})
+
+const options = computed(() => optionRows.value?.flat())
 
 const multi = computed(() => blanks.value.length > 1)
 
@@ -135,21 +142,29 @@ function insertAccent(ch: string) {
 
 <template>
   <form class="drill__form" @submit.prevent="submit">
-    <div v-if="options" class="drill__options" role="group" aria-label="Варианты ответа">
-      <button
-        v-for="option in options"
-        :key="option"
-        class="drill__option"
-        :class="{
-          'drill__option--ok': revealed && isAccepted(option),
-          'drill__option--bad': revealed && option === inputs[0],
-        }"
-        type="button"
-        :disabled="revealed"
-        @click="choose(option)"
+    <div v-if="optionRows" class="drill__choices" role="group" aria-label="Варианты ответа">
+      <div
+        v-for="(row, r) in optionRows"
+        :key="r"
+        class="drill__options"
+        :class="{ 'drill__options--pad': optionRows.length > 1 }"
       >
-        {{ option }}
-      </button>
+        <button
+          v-for="option in row"
+          :key="option"
+          class="drill__option"
+          :class="{
+            'drill__option--ok': revealed && isAccepted(option),
+            'drill__option--bad': revealed && option === inputs[0] && !isAccepted(option),
+          }"
+          type="button"
+          :disabled="revealed"
+          lang="es"
+          @click="choose(option)"
+        >
+          {{ option }}
+        </button>
+      </div>
     </div>
 
     <template v-else>
@@ -229,10 +244,27 @@ function insertAccent(ch: string) {
 <style scoped lang="scss">
 /* ===== drill: варианты на выбор ===== */
 
+.drill__choices {
+  display: grid;
+  gap: var(--space-2);
+}
+
 .drill__options {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
   gap: var(--space-2);
+}
+
+/* кнопки артиклей: ряды по типу (Ø lo | el la… | un una…), узкие — 6 в ряд и на 320 px */
+.drill__options--pad {
+  grid-template-columns: repeat(auto-fit, minmax(2.6rem, 1fr));
+  gap: var(--space-1);
+}
+
+.drill__options--pad .drill__option {
+  min-height: 2.75rem;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-base);
 }
 
 .drill__option {

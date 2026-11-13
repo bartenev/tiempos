@@ -5,8 +5,10 @@ import { defaultSelection, onlyUnits, selectedUnits } from './bookSelection'
 import {
   DEFAULT_SETTINGS,
   SETTINGS_KEY,
+  articleConfigFromSettings,
   bookConfigFromSettings,
   configFromSettings,
+  defaultArticleRules,
   defaultSelectedIrregular,
   loadSettings,
   mergeSelectedIrregular,
@@ -41,16 +43,19 @@ describe('settings', () => {
       includeRegular: true,
       includeIrregular: true,
       selectedIrregular,
+      articleRules: { ...defaultArticleRules(), hours: false },
       size: 30,
       mode: 'weak',
       answer: 'oral',
       simpleCards: true,
-      labs: { book: true, articles: false },
+      labs: { book: true },
     })
     const loaded = loadSettings()
     expect(loaded.track).toBe('book')
     expect(loaded.simpleCards).toBe(true)
-    expect(loaded.labs).toEqual({ book: true, articles: false })
+    expect(loaded.labs).toEqual({ book: true })
+    expect(loaded.articleRules.hours).toBe(false)
+    expect(loaded.articleRules.lo).toBe(true)
     expect(selectedUnits(loaded.bookSelection)).not.toContain(35)
     expect(selectedUnits(loaded.bookSelection)).toContain(36)
     expect(loaded.selected.indefinido).toBe(false)
@@ -155,10 +160,20 @@ describe('textbook settings', () => {
     expect(config).toMatchObject({ size: 10, mode: 'weak', answer: 'text' })
   })
 
-  it('keeps textbook and articles hidden until turned on in Лаборатория', () => {
-    expect(loadSettings().labs).toEqual({ book: false, articles: false })
+  it('keeps the textbook hidden until turned on in Лаборатория', () => {
+    expect(loadSettings().labs).toEqual({ book: false })
+    // прежний флаг «Артикли» из Лаборатории больше не нужен — артикли теперь отдельный тренажёр
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({ size: 10, labs: { articles: true, junk: 1 } }))
-    expect(loadSettings().labs).toEqual({ book: false, articles: true })
+    expect(loadSettings().labs).toEqual({ book: false })
+  })
+
+  it('remembers the articles trainer and its rules', () => {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ track: 'articles', articleRules: { lo: false, junk: false } }))
+    const loaded = loadSettings()
+    expect(loaded.track).toBe('articles')
+    expect(loaded.articleRules.lo).toBe(false)
+    expect(loaded.articleRules.new).toBe(true)
+    expect(articleConfigFromSettings(loaded).rules).not.toContain('lo')
   })
 
   it('carries simplified cards over from Лаборатория', () => {

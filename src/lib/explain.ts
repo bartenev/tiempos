@@ -1,4 +1,4 @@
-import type { Person, StemChange, Tense, Verb } from '../types'
+import type { HintStep, Person, StemChange, Tense, Verb } from '../types'
 import { PERSONS, personLabel, personsFor } from '../types'
 import {
   HABER_PRESENT,
@@ -39,6 +39,12 @@ export interface FormHint {
   row: HintRowItem[]
   /** Дополнительная заметка (орфография, ударение, исключение). */
   note?: string
+  /** Разбор по шагам: путь алгоритма (артикли). */
+  steps?: HintStep[]
+  /** Пояснения к разбору: почему так, спорное место. */
+  notes?: string[]
+  /** Откуда задание. */
+  source?: string
 }
 
 const STEM_CHANGE_TEXT: Record<StemChange, string> = {
