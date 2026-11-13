@@ -133,6 +133,12 @@ export interface ArticleItem {
   /** Признак при разметке выбирал составитель — пояснение. */
   judgment?: string
   category: LegacyCategory
+  /** «Почему» из основной разметки (вопросы ядра: конкретный? известен?). */
+  coreWhy?: string
+  /** «Почему» из разметки v2 (особые случаи, оценка). */
+  extraWhy?: string
+  /** Признаки, по которым решал алгоритм (разметка + v2) — для короткого пояснения. */
+  features: ArticleFeatures
 }
 
 /** Упражнение учебника: его условие и где оно в книге. */
@@ -248,6 +254,9 @@ export function buildArticles(sources: ArticleSource[]): {
         alt: !special && base.alt ? base.alt.why : undefined,
         judgment: JUDGMENT[id],
         category: category(r.path, !!base.given),
+        coreWhy: base.why || undefined,
+        extraWhy: o?.why || undefined,
+        features: f,
       })
     }
 

@@ -4,6 +4,7 @@ import { cardBlanks } from '../lib/cards'
 import { explainForm } from '../lib/explain'
 import type { AnswerCheck } from '../lib/normalize'
 import { checkBlanks, overallCheck } from '../lib/normalize'
+import { settings } from '../lib/settingsState'
 import type { AnyCard } from '../types'
 import { isBookCard } from '../types'
 import AnswerForm from './AnswerForm.vue'
@@ -64,9 +65,10 @@ const answerShown = computed(() => shown.value || checks.value !== null)
 const hint = computed(() => {
   if (!answerShown.value) return null
   const { card } = props
-  return isBookCard(card)
-    ? { rule: card.rule, row: [], steps: card.steps, notes: card.notes, source: card.source }
-    : explainForm(card.verb, card.tense, card.person)
+  if (!isBookCard(card)) return explainForm(card.verb, card.tense, card.person)
+  // «Лаборатория» → «Короткие пояснения»: одна строка своими словами вместо разбора
+  if (card.brief && settings.labs.briefHints) return { rule: card.brief, row: [], source: card.source }
+  return { rule: card.rule, row: [], steps: card.steps, notes: card.notes, source: card.source }
 })
 
 watch(

@@ -48,12 +48,12 @@ describe('settings', () => {
       mode: 'weak',
       answer: 'oral',
       simpleCards: true,
-      labs: { book: true },
+      labs: { book: true, briefHints: true },
     })
     const loaded = loadSettings()
     expect(loaded.track).toBe('book')
     expect(loaded.simpleCards).toBe(true)
-    expect(loaded.labs).toEqual({ book: true })
+    expect(loaded.labs).toEqual({ book: true, briefHints: true })
     expect(loaded.articleRules.hours).toBe(false)
     expect(loaded.articleRules.lo).toBe(true)
     expect(selectedUnits(loaded.bookSelection)).not.toContain(35)
@@ -161,10 +161,10 @@ describe('textbook settings', () => {
   })
 
   it('keeps the textbook hidden until turned on in Лаборатория', () => {
-    expect(loadSettings().labs).toEqual({ book: false })
+    expect(loadSettings().labs).toEqual({ book: false, briefHints: false })
     // прежний флаг «Артикли» из Лаборатории больше не нужен — артикли теперь отдельный тренажёр
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({ size: 10, labs: { articles: true, junk: 1 } }))
-    expect(loadSettings().labs).toEqual({ book: false })
+    expect(loadSettings().labs).toEqual({ book: false, briefHints: false })
   })
 
   it('remembers the articles trainer and its rules', () => {

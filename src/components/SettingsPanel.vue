@@ -187,6 +187,13 @@ const answerNote = computed(() => ANSWER_NOTES[settings.track][settings.answer])
           <span class="settings__lab-hint">упражнения по главам Gramática de uso</span>
         </span>
       </label>
+      <label class="choice settings__lab">
+        <input v-model="settings.labs.briefHints" class="choice__input settings__lab-input" type="checkbox" />
+        <span class="choice__label settings__lab-label">
+          Короткие пояснения
+          <span class="settings__lab-hint">в артиклях после ошибки — одна строка своими словами вместо разбора по правилам</span>
+        </span>
+      </label>
     </fieldset>
   </section>
 </template>

@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import { ARTICLE_ITEMS } from '../../data/articles'
 import type { ArticleRule } from '../../types'
-import { articleCard, articleCount, buildArticleSession, cardsForRules, ruleSize, sourceOf } from './cards'
+import translations from '../../data/articles/translations.json'
+import { briefOf } from './brief'
+import {
+  articleCard,
+  articleCount,
+  buildArticleSession,
+  cardsForRules,
+  fullSentence,
+  ruleSize,
+  sourceOf,
+  translationOf,
+} from './cards'
 import { ARTICLE_RULES, ARTICLE_TOPICS, rulesOf } from './topics'
 
 const byId = (id: string) => ARTICLE_ITEMS.find((i) => i.id === id)!
@@ -73,5 +84,31 @@ describe('article cards', () => {
 
   it('needs at least one rule', () => {
     expect(() => buildArticleSession({ rules: [], size: 20, mode: 'smart', answer: 'text' }, {})).toThrow()
+  })
+})
+
+describe('article translations and short explanations', () => {
+  it('every sentence has a Russian translation', () => {
+    const missing = ARTICLE_ITEMS.filter((i) => translationOf(i) === '').map((i) => i.id)
+    expect(missing).toEqual([])
+  })
+
+  it('no translation is left without a sentence', () => {
+    const used = new Set(ARTICLE_ITEMS.map(fullSentence))
+    const stale = Object.keys(translations.sentences).filter(
+      (es) => !used.has(es.replace(/\s+/g, ' ').trim().toLowerCase()),
+    )
+    expect(stale).toEqual([])
+  })
+
+  it('every item has a short explanation that ends with the answer', () => {
+    for (const item of ARTICLE_ITEMS) {
+      const brief = briefOf(item)
+      expect(brief, item.id).toMatch(/^\S.* → \S.*\.$/)
+      // без служебных пометок разметки
+      expect(brief, item.id).not.toMatch(/^(I{1,3} →|[ab]: |п\.\d+ →)/i)
+      expect(brief, item.id).not.toMatch(/^ →/)
+    }
+    expect(briefOf(byId('GBE5-04.5#2'))).toBe('Часов в доме несколько → un.')
   })
 })

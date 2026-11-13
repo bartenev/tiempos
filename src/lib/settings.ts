@@ -27,6 +27,8 @@ export const SETTINGS_KEY = 'tiempos.settings.v1'
 export interface LabsSettings {
   /** Упражнения по главам учебника (тренажёр «Учебник» в списке на главной). */
   book: boolean
+  /** Артикли: после ошибки — короткое пояснение своими словами вместо разбора по правилам. */
+  briefHints: boolean
 }
 
 export interface SetupSettings {
@@ -94,7 +96,7 @@ export const DEFAULT_SETTINGS: SetupSettings = {
   mode: 'smart',
   answer: 'text',
   simpleCards: false,
-  labs: { book: false },
+  labs: { book: false, briefHints: false },
 }
 
 const SIZES = new Set([10, 20, 30])

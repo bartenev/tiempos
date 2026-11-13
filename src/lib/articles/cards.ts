@@ -1,10 +1,12 @@
 import { ARTICLE_BOOKS, ARTICLE_EXERCISES, ARTICLE_ITEMS } from '../../data/articles'
+import translations from '../../data/articles/translations.json'
 import type { ArticleConfig, ArticleRule, ArticleTopic, BookCard, HintStep } from '../../types'
 import { buildDeckSession } from '../book'
 import { shuffle } from '../session'
 import type { Mastery, StatsStore } from '../stats'
 import { isWeak, loadDeckStats, masteryOf } from '../stats'
 import { RULES } from './algorithm'
+import { briefOf } from './brief'
 import type { ArticleItem } from './build'
 import { ARTICLE_TOPICS, rulesOf, topicOf } from './topics'
 
@@ -19,6 +21,21 @@ export const ARTICLE_PAD: string[][] = [
 const TAGGED = ARTICLE_ITEMS.map((item) => ({ item, rules: rulesOf(item) }))
 
 const EXERCISE = new Map(ARTICLE_EXERCISES.map((e) => [`${e.book} ${e.number}`, e]))
+
+/** Предложение целиком, с ответами по ключу, — ключ перевода (регистр и пробелы не важны). */
+export function fullSentence(item: ArticleItem): string {
+  const answer = item.accept[0] === 'Ø' ? '' : item.accept[0]
+  return `${item.before}${answer}${item.after}`.replace(/\s+/g, ' ').trim().toLowerCase()
+}
+
+const TRANSLATIONS = new Map(
+  Object.entries(translations.sentences).map(([es, ru]) => [es.replace(/\s+/g, ' ').trim().toLowerCase(), ru]),
+)
+
+/** Русский перевод предложения (нейтральный — без «один из», «тот самый»). */
+export function translationOf(item: ArticleItem): string {
+  return TRANSLATIONS.get(fullSentence(item)) ?? ''
+}
 
 /** Пропуск открывает предложение — ответ покажем с большой буквы. */
 function startsSentence(before: string): boolean {
@@ -78,13 +95,14 @@ export function articleCard(item: ArticleItem, rules: ArticleRule[] = rulesOf(it
     rule: '',
     kind: 'choice',
     sentence,
-    translation: '',
+    translation: translationOf(item),
     answer: first ? capitalize(item.answer) : item.answer,
     blanks: [first ? [capitalize(main!), ...rest] : item.accept],
     options: item.options && shuffle(item.options),
     optionGroups: item.options ? undefined : ARTICLE_PAD,
     context: item.context,
     steps: stepsOf(item),
+    brief: briefOf(item),
     notes: notesOf(item),
     source: sourceOf(item),
   }
