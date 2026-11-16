@@ -29,7 +29,9 @@ describe('VerbLookup', () => {
     const wrapper = await find('pedir')
     await wrapper.find('.verb-lookup__suggestion-button').trigger('click')
     expect(wrapper.find('.verb-lookup__verb').text()).toBe('pedir')
-    const titles = wrapper.findAll('.verb-lookup__tense-title').map((w) => w.text())
+    const titles = wrapper
+      .findAll('.verb-lookup__tense-title')
+      .map((w) => w.text().replace(/\s*(по правилу|неправильно)$/, ''))
     expect(titles).toEqual(['Presente', 'Pretérito indefinido', 'Pretérito imperfecto', 'Pretérito perfecto', 'Imperativo'])
     const forms = wrapper.findAll('.rule-hint__form').map((w) => w.text())
     expect(forms).toContain('pido')
@@ -40,17 +42,26 @@ describe('VerbLookup', () => {
     expect(wrapper.find('.verb-lookup__tags').text()).toContain('e → i')
   })
 
-  it('marks a regular verb with an irregular participle', async () => {
+  it('marks which tenses follow the rule', async () => {
     const wrapper = await find('abrir')
     await wrapper.find('.verb-lookup__suggestion-button').trigger('click')
     const tags = wrapper.find('.verb-lookup__tags').text()
-    expect(tags).toContain('правильный, кроме perfecto')
+    expect(tags).not.toContain('правильный')
     expect(tags).toContain('participio: abierto')
+    // по правилу везде, кроме perfecto
+    expect(wrapper.findAll('.verb-lookup__regularity').map((w) => w.text())).toEqual([
+      'по правилу',
+      'по правилу',
+      'по правилу',
+      'неправильно',
+      'по правилу',
+    ])
     expect(wrapper.findAll('.rule-hint__form').map((w) => w.text())).toContain('he abierto')
 
     const regular = await find('hablar')
     await regular.find('.verb-lookup__suggestion-button').trigger('click')
-    expect(regular.find('.verb-lookup__tags').text()).not.toContain('кроме')
+    expect(regular.find('.verb-lookup__tags').text()).toContain('правильный')
+    expect(regular.find('.verb-lookup__regularity--irregular').exists()).toBe(false)
   })
 
   it('goes back to search', async () => {

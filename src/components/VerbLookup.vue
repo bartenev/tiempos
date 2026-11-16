@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { VERBS, isRegularVerb } from '../data/verbs'
+import { VERBS, isRegularIn, isRegularVerb } from '../data/verbs'
 import { VERB_RU } from '../data/verbRu'
 import { hasTense } from '../lib/conjugate'
 import { explainForm } from '../lib/explain'
@@ -50,8 +50,8 @@ const tags = computed<string[]>(() => {
   const verb = selected.value
   if (!verb) return []
   const out = [`-${verb.group}`]
-  // abrir, escribir: спрягаются по правилу, но participio неправильный — perfecto не по правилу
-  if (isRegularVerb(verb)) out.push(verb.participle ? 'правильный, кроме perfecto' : 'правильный')
+  // какие времена не по правилу — видно у заголовков времён
+  if (isRegularVerb(verb)) out.push('правильный')
   if (verb.stemChange) out.push(`чередование ${verb.stemChange.replace('>', ' → ')}`)
   if (verb.presentYo) out.push(`yo: ${verb.presentYo}`)
   if (verb.indefinidoStem) out.push(`indefinido: ${verb.indefinidoStem}-`)
@@ -67,6 +67,7 @@ const tenses = computed(() => {
   return TENSES.map((tense) => ({
     tense,
     available: hasTense(verb, tense),
+    regular: isRegularIn(verb, tense),
     hint: hasTense(verb, tense)
       ? {
           rule: '',
@@ -125,7 +126,14 @@ const tenses = computed(() => {
       </p>
 
       <section v-for="t in tenses" :key="t.tense" class="verb-lookup__tense">
-        <h3 class="verb-lookup__tense-title">{{ TENSE_LABELS[t.tense] }}</h3>
+        <h3 class="verb-lookup__tense-title">
+          {{ TENSE_LABELS[t.tense] }}
+          <span
+            v-if="t.available"
+            class="verb-lookup__regularity"
+            :class="{ 'verb-lookup__regularity--irregular': !t.regular }"
+          >{{ t.regular ? 'по правилу' : 'неправильно' }}</span>
+        </h3>
         <RuleHint v-if="t.hint" class="verb-lookup__forms" :hint="t.hint" />
         <p v-else class="verb-lookup__none">В тренажёре этого времени у глагола нет.</p>
       </section>
@@ -245,9 +253,23 @@ const tenses = computed(() => {
 }
 
 .verb-lookup__tense-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
   margin: var(--space-4) 0 0;
   font-size: var(--text-base);
   font-weight: var(--weight-semibold);
+}
+
+/* по правилу / неправильно — в этом времени (tener: imperfecto по правилу) */
+.verb-lookup__regularity {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  color: var(--muted);
+}
+
+.verb-lookup__regularity--irregular {
+  color: var(--bad);
 }
 
 /* сетка форм как в подсказке после ошибки, но без отступа сверху */

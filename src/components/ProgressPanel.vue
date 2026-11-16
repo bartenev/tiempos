@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { VERBS, isRegularVerb } from '../data/verbs'
+import { VERBS, isRegularIn } from '../data/verbs'
 import { conjugate, hasTense } from '../lib/conjugate'
 import type { CellStat, Mastery } from '../lib/stats'
 import { cellKey, errorRate, loadStats, masteryOf, recoveryStreak } from '../lib/stats'
@@ -101,14 +101,15 @@ const COLUMN_LABELS: Record<string, string> = {
 const tense = ref<Tense>('presente')
 const selectedKey = ref<string | null>(null)
 
-const groups = [
-  { title: 'Правильные', verbs: VERBS.filter(isRegularVerb) },
-  { title: 'Неправильные и с чередованием', verbs: VERBS.filter((v) => !isRegularVerb(v)) },
-]
+/** Правильные / неправильные — в выбранном времени (tener в imperfecto — правильный). */
+const groups = computed(() => [
+  { title: 'Правильные', verbs: VERBS.filter((v) => isRegularIn(v, tense.value)) },
+  { title: 'Неправильные и с чередованием', verbs: VERBS.filter((v) => !isRegularIn(v, tense.value)) },
+])
 
 /** В сетке — только глаголы, начатые в этом времени: есть ответ хотя бы по одному лицу. */
 const visibleGroups = computed(() =>
-  groups
+  groups.value
     .map((g) => ({
       ...g,
       verbs: g.verbs.filter(

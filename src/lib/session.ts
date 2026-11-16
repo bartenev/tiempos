@@ -1,6 +1,6 @@
 import { framesFor } from '../data/frames'
 import { buildVerbSentence } from '../data/sentences'
-import { REGULAR_VERBS, VERBS, isRegularIn, isRegularVerb } from '../data/verbs'
+import { VERBS, isRegularIn } from '../data/verbs'
 import type { DrillCard, Person, SessionConfig, Tense, Verb } from '../types'
 import { personsFor } from '../types'
 import { conjugate, hasTense } from './conjugate'
@@ -55,7 +55,7 @@ export function siblingCard(card: DrillCard, stats: StatsStore = loadStats()): D
   // карточка из реактивной очереди: verb — прокси, сравниваем по инфинитиву
   const { verb, tense, person } = card
   if (!isRegularIn(verb, tense)) return null
-  const forms = REGULAR_VERBS.filter(
+  const forms = VERBS.filter(
     (v) => v.infinitive !== verb.infinitive && v.group === verb.group && isRegularIn(v, tense) && hasTense(v, tense),
   ).map((v) => toCell(v, tense, person, stats))
   const next = formsInTurn(forms)[0]
@@ -67,14 +67,20 @@ export function retryCard(card: DrillCard): DrillCard {
   return { ...makeCard(card.verb, card.tense, card.person), retry: true }
 }
 
+/**
+ * Глагол в этом времени попадает в фильтр. «Правильные» / «Неправильные» —
+ * по форме времени, а не по глаголу целиком: tener в imperfecto (tenía) — правильный,
+ * abrir в perfecto (he abierto) — неправильный.
+ */
+export function inConfig(config: SessionConfig, verb: Verb, tense: Tense): boolean {
+  if (!config.groups.includes(verb.group) || !hasTense(verb, tense)) return false
+  if (isRegularIn(verb, tense)) return config.includeRegular
+  return config.includeIrregular && config.selectedIrregular.includes(verb.infinitive)
+}
+
+/** Глаголы, у которых под фильтр попадает хоть одно выбранное время. */
 export function verbsForConfig(config: SessionConfig): Verb[] {
-  const irregularSet = new Set(config.selectedIrregular)
-  return VERBS.filter((verb) => {
-    if (!config.groups.includes(verb.group)) return false
-    const regular = isRegularVerb(verb)
-    if (regular) return config.includeRegular
-    return config.includeIrregular && irregularSet.has(verb.infinitive)
-  })
+  return VERBS.filter((verb) => config.tenses.some((tense) => inConfig(config, verb, tense)))
 }
 
 export interface Cell {
@@ -104,7 +110,7 @@ export function cellsForConfig(
   const cells: Cell[] = []
   for (const verb of verbsForConfig(config)) {
     for (const tense of config.tenses) {
-      if (!hasTense(verb, tense)) continue
+      if (!inConfig(config, verb, tense)) continue
       for (const person of personsOf(config, tense)) {
         cells.push(toCell(verb, tense, person, stats))
       }
@@ -403,12 +409,12 @@ export function buildSession(
     // Равномерно по времени, затем по глаголу и лицу (у части глаголов нет императива,
     // в императиве нет yo).
     const tenses = config.tenses.filter(
-      (t) => personsOf(config, t).length > 0 && pool.some((v) => hasTense(v, t)),
+      (t) => personsOf(config, t).length > 0 && pool.some((v) => inConfig(config, v, t)),
     )
     const cards: DrillCard[] = []
     for (let i = 0; i < config.size; i++) {
       const tense = pickRandom(tenses)
-      const verb = pickRandom(pool.filter((v) => hasTense(v, tense)))
+      const verb = pickRandom(pool.filter((v) => inConfig(config, v, tense)))
       const person = pickRandom(personsOf(config, tense))
       cards.push(makeCard(verb, tense, person))
     }

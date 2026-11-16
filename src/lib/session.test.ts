@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { IRREGULAR_INFINITIVES, findVerb, isRegularVerb } from '../data/verbs'
+import { IRREGULAR_INFINITIVES, findVerb, isRegularIn, isRegularVerb } from '../data/verbs'
 import { buildCard, buildSession, cellsForConfig, siblingCard } from './session'
-import type { SessionConfig } from '../types'
+import type { SessionConfig, Tense } from '../types'
 import { PERSONS, VERB_GROUPS } from '../types'
 
 const base: SessionConfig = {
@@ -49,8 +49,30 @@ describe('buildSession', () => {
       size: 40,
     })
     for (const c of cards) {
-      expect(isRegularVerb(c.verb)).toBe(true)
+      expect(isRegularIn(c.verb, c.tense)).toBe(true)
     }
+  })
+
+  it('regular / irregular is decided per tense, not per verb', () => {
+    const only = (tenses: Tense[], regular: boolean) =>
+      cellsForConfig(
+        {
+          ...base,
+          tenses,
+          includeRegular: regular,
+          includeIrregular: !regular,
+          selectedIrregular: regular ? [] : [...IRREGULAR_INFINITIVES],
+        },
+        {},
+      )
+    const verbsOf = (cells: { verb: { infinitive: string } }[]) => new Set(cells.map((c) => c.verb.infinitive))
+    // tener в imperfecto (tenía) — правильный, abrir в perfecto (he abierto) — нет
+    expect(verbsOf(only(['imperfecto'], true))).toContain('tener')
+    expect(verbsOf(only(['presente'], true))).toContain('abrir')
+    expect(verbsOf(only(['perfecto'], true))).not.toContain('abrir')
+    expect(verbsOf(only(['perfecto'], false))).toContain('abrir')
+    // неправильный imperfecto — только у ser, ir, ver
+    expect([...verbsOf(only(['imperfecto'], false))].sort()).toEqual(['ir', 'ser', 'ver'])
   })
 
   it('filters to selected irregular verbs only', () => {
@@ -62,7 +84,7 @@ describe('buildSession', () => {
       size: 40,
     })
     for (const c of cards) {
-      expect(isRegularVerb(c.verb)).toBe(false)
+      expect(isRegularIn(c.verb, c.tense)).toBe(false)
       expect(['ser', 'ir']).toContain(c.verb.infinitive)
     }
   })
@@ -373,7 +395,7 @@ describe('siblingCard: the same rule on another verb after a mistake', () => {
       const next = siblingCard(card('hablar'), {})!
       expect(next.verb.infinitive).not.toBe('hablar')
       expect(next.verb.group).toBe('ar')
-      expect(isRegularVerb(next.verb)).toBe(true)
+      expect(isRegularIn(next.verb, 'presente')).toBe(true)
       expect(next.tense).toBe('presente')
       expect(next.person).toBe('yo')
       expect(next.retry).toBe(true)

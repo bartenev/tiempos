@@ -101,6 +101,10 @@ function setAllIrregular(value: boolean) {
           <input v-model="settings.includeIrregular" class="choice__input verb-picker__verb-kind-input" type="checkbox" />
           <span class="choice__label verb-picker__verb-kind-label">Неправильные и с чередованием</span>
         </label>
+        <p class="group__note verb-picker__verbs-note">
+          Считается по каждому времени: tener в imperfecto (tenía) — правильный,
+          abrir в perfecto (he abierto) — неправильный.
+        </p>
 
         <div v-if="settings.includeIrregular" class="verb-picker__irregular">
           <div class="verb-picker__irregular-head">

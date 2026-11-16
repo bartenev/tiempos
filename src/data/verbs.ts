@@ -1,4 +1,6 @@
+import { hasTense, paradigmOf } from '../lib/conjugate'
 import type { Tense, Verb } from '../types'
+import { TENSES } from '../types'
 
 /** Банк глаголов для тренажёра (~80). */
 export const VERBS: Verb[] = [
@@ -420,26 +422,29 @@ export function findVerb(infinitive: string): Verb | undefined {
   return VERBS.find((v) => v.infinitive === infinitive)
 }
 
-/**
- * Форма времени правильная: глагол правильный и, в pretérito perfecto,
- * participio тоже по правилу (escribir — правильный, но escrito — нет).
- */
-export function isRegularIn(verb: Verb, tense: Tense): boolean {
-  return isRegularVerb(verb) && !(tense === 'perfecto' && verb.participle)
-}
+const regularIn = new Map<string, boolean>()
 
 /**
- * Правильный глагол: спрягается по стандартным окончаниям
- * (без stem-change, yo-исключений, irregular indefinido и полной парадигмы).
- * Орфография -car/-gar/-zar остаётся «правильной».
+ * Время у глагола правильное: все его формы совпадают с тем, что дают окончания
+ * по правилу для «голого» глагола той же группы (без чередований, особой yo,
+ * основы indefinido, своего participio и своих форм). Орфография -car/-gar/-zar —
+ * тоже правило. tener: presente — нет (tengo, tienes), imperfecto — да (tenía);
+ * abrir: perfecto — нет (he abierto), остальное — да.
  */
+export function isRegularIn(verb: Verb, tense: Tense): boolean {
+  const key = `${verb.infinitive}|${verb.group}|${tense}`
+  let regular = regularIn.get(key)
+  if (regular === undefined) {
+    const plain: Verb = { infinitive: verb.infinitive, group: verb.group }
+    regular = paradigmOf(verb, tense).join() === paradigmOf(plain, tense).join()
+    regularIn.set(key, regular)
+  }
+  return regular
+}
+
+/** Глагол правильный во всех временах тренажёра (так считает справка и список «Какие именно»). */
 export function isRegularVerb(verb: Verb): boolean {
-  return (
-    !verb.stemChange &&
-    !verb.presentYo &&
-    !verb.indefinidoStem &&
-    !verb.forms
-  )
+  return TENSES.every((tense) => !hasTense(verb, tense) || isRegularIn(verb, tense))
 }
 
 export const REGULAR_VERBS: Verb[] = VERBS.filter(isRegularVerb)
