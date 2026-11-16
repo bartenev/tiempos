@@ -173,7 +173,7 @@ const answerNote = computed(() => ANSWER_NOTES[settings.track][settings.answer])
         <input v-model="settings.labs.hideVerbTranslation" class="choice__input settings__lab-input" type="checkbox" />
         <span class="choice__label settings__lab-label">
           Глаголы без перевода
-          <span class="settings__lab-hint">перевод предложения на карточке появится только после ответа</span>
+          <span class="settings__lab-hint">не показывать русский перевод предложения на карточке</span>
         </span>
       </label>
     </fieldset>

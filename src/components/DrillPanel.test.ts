@@ -53,14 +53,14 @@ describe('DrillPanel', () => {
     expect(wrapper.text()).toContain('Почти')
   })
 
-  it('«Лаборатория»: the translation waits for the answer when hidden', async () => {
+  it('«Лаборатория»: no translation before or after the answer when hidden', async () => {
     settings.labs.hideVerbTranslation = true
     try {
       const wrapper = mountDrill()
       expect(wrapper.find('.drill__translation').exists()).toBe(false)
       await wrapper.find('#answer').setValue('hablas')
       await wrapper.find('form').trigger('submit')
-      expect(wrapper.find('.drill__translation').exists()).toBe(true)
+      expect(wrapper.find('.drill__translation').exists()).toBe(false)
     } finally {
       settings.labs.hideVerbTranslation = false
     }
