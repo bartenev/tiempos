@@ -324,6 +324,12 @@ describe('smart mode with portions', () => {
     expect(estar / 20).toBeGreaterThan(5)
   })
 
+  it('in imperativo, the short tú forms (ven, haz, di) come first', () => {
+    const imperativo = { ...learning, tenses: ['imperativo' as const], includeIrregular: true, selectedIrregular: [...IRREGULAR_INFINITIVES] }
+    const order = portionStatuses(cellsForConfig(imperativo, {})).map((s) => s.portion)
+    expect(order).toEqual(['ar', 'er', 'ir', 'short-tu', 'special', 'from-yo', 'vowel'])
+  })
+
   it('new forms of frequent verbs come first inside a portion', () => {
     // освоены ser, estar, ir, hay, yo-go, прочие — текущая порция e→ie (13 глаголов)
     const presente = {

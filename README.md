@@ -129,7 +129,8 @@ npm run build
   внутри порции все лица и глаголы вперемешку; следующая открывается, когда в текущей по каждому
   лицу есть 2 верных ответа и нет слабых форм. Неправильности — тоже порции, от самых нужных:
   в presente ser → estar → ir → hay → yo на -go (tengo, hago) → sé/doy/veo → e→ie → o→ue → e→i → -zco,
-  в indefinido fui/fue → основы на -u-, -i-, -j- → di/vi → pidió → leyó. Если выбраны только
+  в indefinido fui/fue → основы на -u-, -i-, -j- → di/vi → pidió → leyó,
+  в imperativo ven/haz/di/pon → sea/vaya/esté → tenga/haga → piensa/vuelve/pide. Если выбраны только
   неправильные глаголы, их модели идут раньше правильных форм (pensamos, podéis).
   Внутри порции новые формы частотных глаголов выпадают раньше: tener и querer до regar
   (`VERB_FREQUENCY` в `src/data/verbs.ts`). Текущей порции — ~60% сессии, остальное —
