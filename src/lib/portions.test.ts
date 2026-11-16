@@ -392,8 +392,12 @@ describe('estar + gerundio portions', () => {
   })
 
   it('a session from scratch starts with -ando', () => {
-    const cards = buildSession({ ...gerundio, size: 20 }, {}, {})
-    expect(cards.filter((c) => c.answer.endsWith('ando')).length).toBeGreaterThan(5)
+    // выборка случайная (от 3 до 16 на сессию) — смотрим среднее по 20 сессиям, оно около 8,5
+    let ando = 0
+    for (let i = 0; i < 20; i++) {
+      ando += buildSession({ ...gerundio, size: 20 }, {}, {}).filter((c) => c.answer.endsWith('ando')).length
+    }
+    expect(ando / 20).toBeGreaterThan(6)
   })
 })
 
