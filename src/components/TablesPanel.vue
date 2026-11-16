@@ -9,6 +9,7 @@ import { endingsRow } from '../lib/tables'
 import { theme } from '../lib/theme'
 import type { Person, Tense, Verb } from '../types'
 import { TENSES, TENSE_LABELS, personLabel, personsFor } from '../types'
+import VerbLookup from './VerbLookup.vue'
 
 const EXAMPLES: Verb[] = [
   { infinitive: 'hablar', group: 'ar' },
@@ -70,7 +71,11 @@ function rowSum(tense: Tense, person: Person): number {
 
 <template>
   <section class="tables">
-    <h1 class="screen__title tables__title">Таблицы</h1>
+    <h1 class="screen__title tables__title">Справка</h1>
+
+    <VerbLookup />
+
+    <h2 class="screen__section-title tables__endings-title">Окончания</h2>
     <p class="screen__lead tables__lead">
       Окончания правильных глаголов на примерах
       <b class="tables__example">hablar</b>, <b class="tables__example">comer</b>, <b class="tables__example">vivir</b>.
