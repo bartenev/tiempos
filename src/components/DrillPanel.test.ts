@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { findVerb } from '../data/verbs'
 import { cardsForUnits } from '../lib/book'
 import { buildCard } from '../lib/session'
+import { settings } from '../lib/settingsState'
 import DrillPanel from './DrillPanel.vue'
 
 function mountDrill() {
@@ -50,6 +51,23 @@ describe('DrillPanel', () => {
     await wrapper.find('form').trigger('submit')
     expect(wrapper.emitted('next')).toBeUndefined()
     expect(wrapper.text()).toContain('Почти')
+  })
+
+  it('«Лаборатория»: the translation waits for the answer when hidden', async () => {
+    settings.labs.hideVerbTranslation = true
+    try {
+      const wrapper = mountDrill()
+      expect(wrapper.find('.drill__translation').exists()).toBe(false)
+      await wrapper.find('#answer').setValue('hablas')
+      await wrapper.find('form').trigger('submit')
+      expect(wrapper.find('.drill__translation').exists()).toBe(true)
+    } finally {
+      settings.labs.hideVerbTranslation = false
+    }
+  })
+
+  it('shows the translation right away by default', () => {
+    expect(mountDrill().find('.drill__translation').exists()).toBe(true)
   })
 })
 

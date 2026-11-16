@@ -153,7 +153,7 @@ const answerNote = computed(() => ANSWER_NOTES[settings.track][settings.answer])
     <fieldset class="group settings__labs">
       <legend class="group__legend settings__labs-legend">Лаборатория</legend>
       <p class="group__note settings__labs-note">
-        Функции в разработке: могут меняться и работать неидеально. Включённые появятся в списке тренажёров.
+        Функции в разработке: могут меняться и работать неидеально.
       </p>
       <label class="choice settings__lab">
         <input v-model="settings.labs.book" class="choice__input settings__lab-input" type="checkbox" />
@@ -167,6 +167,13 @@ const answerNote = computed(() => ANSWER_NOTES[settings.track][settings.answer])
         <span class="choice__label settings__lab-label">
           Короткие пояснения
           <span class="settings__lab-hint">в артиклях после ошибки — одна строка своими словами вместо разбора по правилам</span>
+        </span>
+      </label>
+      <label class="choice settings__lab">
+        <input v-model="settings.labs.hideVerbTranslation" class="choice__input settings__lab-input" type="checkbox" />
+        <span class="choice__label settings__lab-label">
+          Глаголы без перевода
+          <span class="settings__lab-hint">перевод предложения на карточке появится только после ответа</span>
         </span>
       </label>
     </fieldset>

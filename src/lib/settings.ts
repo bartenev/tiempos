@@ -29,6 +29,8 @@ export interface LabsSettings {
   book: boolean
   /** Артикли: после ошибки — короткое пояснение своими словами вместо разбора по правилам. */
   briefHints: boolean
+  /** Глаголы: перевод предложения скрыт до ответа — время угадывается по испанскому. */
+  hideVerbTranslation: boolean
 }
 
 export interface SetupSettings {
@@ -96,7 +98,7 @@ export const DEFAULT_SETTINGS: SetupSettings = {
   mode: 'smart',
   answer: 'text',
   simpleCards: false,
-  labs: { book: false, briefHints: false },
+  labs: { book: false, briefHints: false, hideVerbTranslation: false },
 }
 
 const SIZES = new Set([10, 20, 30])

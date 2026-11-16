@@ -45,7 +45,11 @@ const simple = computed(() => {
 
 const sentence = computed(() => simple.value?.sentence ?? props.card.sentence)
 
-const translation = computed(() => simple.value?.translation ?? props.card.translation)
+/** «Лаборатория»: у глаголов перевод можно скрыть до ответа. */
+const translation = computed(() => {
+  if (!isBookCard(props.card) && settings.labs.hideVerbTranslation && !filled.value) return ''
+  return simple.value?.translation ?? props.card.translation
+})
 
 /** Подсказка в скобках у пропуска; устно варианты уходят сюда с кнопок. */
 const cue = computed(() => {
