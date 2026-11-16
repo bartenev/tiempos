@@ -40,6 +40,19 @@ describe('VerbLookup', () => {
     expect(wrapper.find('.verb-lookup__tags').text()).toContain('e → i')
   })
 
+  it('marks a regular verb with an irregular participle', async () => {
+    const wrapper = await find('abrir')
+    await wrapper.find('.verb-lookup__suggestion-button').trigger('click')
+    const tags = wrapper.find('.verb-lookup__tags').text()
+    expect(tags).toContain('правильный, кроме perfecto')
+    expect(tags).toContain('participio: abierto')
+    expect(wrapper.findAll('.rule-hint__form').map((w) => w.text())).toContain('he abierto')
+
+    const regular = await find('hablar')
+    await regular.find('.verb-lookup__suggestion-button').trigger('click')
+    expect(regular.find('.verb-lookup__tags').text()).not.toContain('кроме')
+  })
+
   it('goes back to search', async () => {
     const wrapper = await find('ser')
     await wrapper.find('.verb-lookup__suggestion-button').trigger('click')

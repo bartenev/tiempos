@@ -49,8 +49,9 @@ function pickFirst() {
 const tags = computed<string[]>(() => {
   const verb = selected.value
   if (!verb) return []
-  if (isRegularVerb(verb)) return [`правильный, -${verb.group}`]
   const out = [`-${verb.group}`]
+  // abrir, escribir: спрягаются по правилу, но participio неправильный — perfecto не по правилу
+  if (isRegularVerb(verb)) out.push(verb.participle ? 'правильный, кроме perfecto' : 'правильный')
   if (verb.stemChange) out.push(`чередование ${verb.stemChange.replace('>', ' → ')}`)
   if (verb.presentYo) out.push(`yo: ${verb.presentYo}`)
   if (verb.indefinidoStem) out.push(`indefinido: ${verb.indefinidoStem}-`)
