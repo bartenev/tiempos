@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { articleCount, articleWeakCount } from '../lib/articles/cards'
-import { bookWeakCount } from '../lib/book'
-import { cellsForConfig, weakCount } from '../lib/session'
+import { articleCount } from '../lib/articles/cards'
+import { cellsForConfig } from '../lib/session'
 import { articleConfigFromSettings, bookConfigFromSettings, configFromSettings } from '../lib/settings'
 import { settings } from '../lib/settingsState'
 import type { ArticleConfig, BookConfig, SessionConfig, Track } from '../types'
@@ -23,14 +22,13 @@ const emit = defineEmits<{
   back: []
 }>()
 
-const TITLES: Record<Track, { title: string; lead: string; unit: string }> = {
-  verbs: { title: 'Глаголы', lead: 'Тренажёр спряжения испанских глаголов.', unit: 'форм' },
+const TITLES: Record<Track, { title: string; lead: string }> = {
+  verbs: { title: 'Глаголы', lead: 'Тренажёр спряжения испанских глаголов.' },
   articles: {
     title: 'Артикли',
     lead: 'el, un или Ø: предложения из двух учебников, ответы — по их ключам.',
-    unit: 'заданий',
   },
-  book: { title: 'Учебник', lead: 'Упражнения по главам учебника.', unit: 'упражнений' },
+  book: { title: 'Учебник', lead: 'Упражнения по главам учебника.' },
 }
 
 const head = computed(() => TITLES[settings.track])
@@ -41,12 +39,6 @@ const bookConfig = computed(() => bookConfigFromSettings(settings))
 
 const articleConfig = computed(() => articleConfigFromSettings(settings))
 
-const weak = computed(() => {
-  if (settings.track === 'book') return bookWeakCount(bookConfig.value.units)
-  if (settings.track === 'articles') return articleWeakCount(articleConfig.value.rules)
-  return weakCount(config.value)
-})
-
 /** Сколько заданий под выбор (у глаголов 0, например, если только yo и только imperativo). */
 const formsCount = computed(() => {
   if (settings.track === 'book') return bookConfig.value.units.length
@@ -56,11 +48,7 @@ const formsCount = computed(() => {
   return cellsForConfig(cfg).length
 })
 
-const canStart = computed(() => {
-  if (formsCount.value === 0) return false
-  if (settings.mode === 'weak' && weak.value === 0) return false
-  return true
-})
+const canStart = computed(() => formsCount.value > 0)
 
 function start() {
   if (!canStart.value) return
@@ -91,9 +79,6 @@ function start() {
     <p v-else-if="formsCount === 0" class="notice notice--muted home__no-forms">
       Под этот выбор нет форм — проверьте времена, лица и окончания
       (в imperativo нет yo).
-    </p>
-    <p v-else-if="settings.mode === 'weak' && weak === 0" class="notice notice--muted home__weak-empty">
-      Слабых {{ head.unit }} в выбранном нет — выберите другой режим в настройках.
     </p>
     <p v-if="error" class="notice notice--bad home__error">{{ error }}</p>
 

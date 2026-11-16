@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { articleWeakCount } from '../lib/articles/cards'
-import { bookWeakCount } from '../lib/book'
-import { weakCount } from '../lib/session'
-import { articleConfigFromSettings, bookConfigFromSettings, configFromSettings } from '../lib/settings'
 import { settings } from '../lib/settingsState'
 import { setTheme, theme } from '../lib/theme'
-import type { SessionMode, Track } from '../types'
+import type { SettingsMode, Track } from '../types'
 import Icon from './Icon.vue'
 
 const SIZES = [10, 20, 30]
 
-const MODES: { mode: SessionMode; label: string; hint: Record<Track, string> }[] = [
+const MODES: { mode: SettingsMode; label: string; hint: Record<Track, string> }[] = [
   {
     mode: 'smart',
     label: 'Умная',
@@ -19,15 +15,6 @@ const MODES: { mode: SessionMode; label: string; hint: Record<Track, string> }[]
       verbs: 'Новое — порциями, ошибки — всегда, выученное — реже.',
       articles: 'Новое — упражнение за упражнением, ошибки — всегда, выученное — реже.',
       book: 'Новое — глава за главой, ошибки — всегда, выученное — реже.',
-    },
-  },
-  {
-    mode: 'weak',
-    label: 'Слабые',
-    hint: {
-      verbs: 'Только формы, где были ошибки.',
-      articles: 'Только задания, где были ошибки.',
-      book: 'Только упражнения, где были ошибки.',
     },
   },
   {
@@ -40,13 +27,6 @@ const MODES: { mode: SessionMode; label: string; hint: Record<Track, string> }[]
     },
   },
 ]
-
-/** Сколько слабых в выбранном у открытого тренажёра — бейдж у «Слабых». */
-const weak = computed(() => {
-  if (settings.track === 'book') return bookWeakCount(bookConfigFromSettings(settings).units)
-  if (settings.track === 'articles') return articleWeakCount(articleConfigFromSettings(settings).rules)
-  return weakCount(configFromSettings(settings))
-})
 
 const modeHint = computed(() => MODES.find((m) => m.mode === settings.mode)!.hint[settings.track])
 
@@ -86,11 +66,6 @@ const answerNote = computed(() => ANSWER_NOTES[settings.track][settings.answer])
           @click="settings.mode = m.mode"
         >
           {{ m.label }}
-          <span
-            v-if="m.mode === 'weak'"
-            class="badge settings__weak-count"
-            :class="{ 'badge--hot': weak > 0 }"
-          >{{ weak }}</span>
         </button>
       </div>
       <p class="group__note settings__mode-note">{{ modeHint }}</p>

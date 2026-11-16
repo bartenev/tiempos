@@ -52,6 +52,9 @@ export interface DrillCard {
  */
 export type SessionMode = 'smart' | 'weak' | 'random'
 
+/** Режим в настройках: «только слабые» — не постоянный режим, а разовая сессия с «Прогресса». */
+export type SettingsMode = Exclude<SessionMode, 'weak'>
+
 /** Тренажёр: спряжение глаголов, артикли или главы учебника (местоимения, «Лаборатория»). */
 export type Track = 'verbs' | 'articles' | 'book'
 

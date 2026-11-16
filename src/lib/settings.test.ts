@@ -45,7 +45,7 @@ describe('settings', () => {
       selectedIrregular,
       articleRules: { ...defaultArticleRules(), hours: false },
       size: 30,
-      mode: 'weak',
+      mode: 'random',
       answer: 'oral',
       simpleCards: true,
       labs: { book: true, briefHints: true },
@@ -64,7 +64,7 @@ describe('settings', () => {
     expect(loaded.selectedIrregular.ir).toBe(false)
     expect(loaded.selectedIrregular.tener).toBe(true)
     expect(loaded.size).toBe(30)
-    expect(loaded.mode).toBe('weak')
+    expect(loaded.mode).toBe('random')
     expect(loaded.answer).toBe('oral')
     expect(loaded.persons.tú).toBe(false)
     expect(loaded.persons.vosotros).toBe(false)
@@ -96,6 +96,11 @@ describe('settings', () => {
     expect(loadSettings().mode).toBe('smart')
     expect(loadSettings().answer).toBe('text')
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({ mode: 'bogus' }))
+    expect(loadSettings().mode).toBe('smart')
+  })
+
+  it('reads the removed «только слабые» setting as smart', () => {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ mode: 'weak' }))
     expect(loadSettings().mode).toBe('smart')
   })
 

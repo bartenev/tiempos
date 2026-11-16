@@ -7,7 +7,7 @@ import type {
   BookSelection,
   Person,
   SessionConfig,
-  SessionMode,
+  SettingsMode,
   Tense,
   Track,
   VerbGroup,
@@ -48,7 +48,7 @@ export interface SetupSettings {
   /** Чекбоксы правил артиклей. */
   articleRules: Record<ArticleRule, boolean>
   size: number
-  mode: SessionMode
+  mode: SettingsMode
   answer: AnswerMode
   /** Карточки глаголов без предложения: только местоимение и глагол с переводом. */
   simpleCards: boolean
@@ -101,7 +101,8 @@ export const DEFAULT_SETTINGS: SetupSettings = {
 
 const SIZES = new Set([10, 20, 30])
 
-const MODES = new Set<SessionMode>(['smart', 'weak', 'random'])
+/** Сохранённое «weak» (режим убран из настроек) читается как умная очередь. */
+const MODES = new Set<SettingsMode>(['smart', 'random'])
 
 const ANSWERS = new Set<AnswerMode>(['text', 'oral'])
 
