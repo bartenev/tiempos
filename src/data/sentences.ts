@@ -15,6 +15,8 @@ export interface Complement {
   ruPl?: string
   /** Только для этих времён (иначе — для всех). */
   tenses?: Tense[]
+  /** Для всех времён, кроме этих. */
+  except?: Tense[]
 }
 
 interface Phrase {
@@ -50,6 +52,12 @@ export const TIME_MARKERS: Record<Exclude<Tense, 'imperativo'>, Phrase[]> = {
     { es: 'Esta semana', ru: 'На этой неделе' },
     { es: 'Este mes', ru: 'В этом месяце' },
     { es: 'Este año', ru: 'В этом году' },
+  ],
+  // Действие идёт сейчас или в эти дни.
+  gerundio: [
+    { es: 'Ahora mismo', ru: 'Прямо сейчас' },
+    { es: 'En este momento', ru: 'В данный момент' },
+    { es: 'Estos días', ru: 'В эти дни' },
   ],
 }
 
@@ -119,7 +127,7 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
   ],
   llegar: [
     { es: 'tarde', ru: 'поздно' },
-    { es: 'a casa a las ocho', ru: 'домой в восемь' },
+    { es: 'a casa a las ocho', ru: 'домой в восемь', except: ['gerundio'] },
   ],
   buscar: [
     { es: 'las llaves', ru: 'ключи' },
@@ -169,7 +177,7 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
     // «Ayer viví en Madrid» — бессмыслица: место жительства не про один день.
     { es: 'en Madrid', ru: 'в Мадриде', tenses: ['presente', 'imperfecto'] },
     { es: 'cerca del mar', ru: 'у моря', tenses: ['presente', 'imperfecto'] },
-    { es: 'una gran aventura', ru: 'большое приключение', tenses: ['indefinido', 'perfecto'] },
+    { es: 'una gran aventura', ru: 'большое приключение', tenses: ['indefinido', 'perfecto', 'gerundio'] },
   ],
   escribir: [
     { es: 'una carta', ru: 'письмо' },
@@ -188,7 +196,7 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
     { es: 'cambiar de trabajo', ru: 'сменить работу' },
   ],
   recibir: [
-    { es: 'un regalo', ru: 'подарок' },
+    { es: 'un regalo', ru: 'подарок', except: ['gerundio'] },
     { es: 'muchas cartas', ru: 'много писем' },
   ],
   permitir: [
@@ -202,7 +210,7 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
     { es: 'mucho en ti', ru: 'много о тебе' },
   ],
   empezar: [
-    { es: 'el trabajo a las nueve', ru: 'работу в девять' },
+    { es: 'el trabajo a las nueve', ru: 'работу в девять', except: ['gerundio'] },
     { es: 'un curso nuevo', ru: 'новый курс' },
   ],
   encontrar: [
@@ -244,7 +252,7 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
   ],
   comenzar: [
     { es: 'el curso', ru: 'курс' },
-    { es: 'a trabajar a las nueve', ru: 'работать в девять' },
+    { es: 'a trabajar a las nueve', ru: 'работать в девять', except: ['gerundio'] },
   ],
   recomendar: [
     { es: 'un libro', ru: 'книгу' },
@@ -371,7 +379,7 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
   ],
   conocer: [
     { es: 'a mucha gente', ru: 'много людей' },
-    { es: 'bien la ciudad', ru: 'город хорошо' },
+    { es: 'bien la ciudad', ru: 'город хорошо', except: ['gerundio'] },
   ],
   parecer: [
     { es: 'cansado', esPl: 'cansados', ru: 'усталым', ruPl: 'усталыми' },
@@ -383,7 +391,7 @@ export const VERB_COMPLEMENTS: Record<string, Complement[]> = {
   ],
   oír: [
     { es: 'un ruido', ru: 'шум' },
-    { es: 'la noticia', ru: 'новость' },
+    { es: 'la noticia', ru: 'новость', except: ['gerundio'] },
   ],
   caer: [
     { es: 'al suelo', ru: 'на пол' },
@@ -483,11 +491,15 @@ export const IMPERATIVE_COMPLEMENTS: Record<string, Complement[]> = {
   ],
 }
 
+function fitsTense(c: Complement, tense: Tense): boolean {
+  return (!c.tenses || c.tenses.includes(tense)) && !c.except?.includes(tense)
+}
+
 export function imperativeComplements(infinitive: string): Complement[] {
   return (
     IMPERATIVE_COMPLEMENTS[infinitive] ??
     (VERB_COMPLEMENTS[infinitive] ?? []).filter(
-      (c) => !c.tenses || c.tenses.includes('imperativo'),
+      (c) => fitsTense(c, 'imperativo'),
     )
   )
 }
@@ -551,9 +563,7 @@ export function buildVerbSentence(
     }
   }
 
-  const complements = (VERB_COMPLEMENTS[infinitive] ?? []).filter(
-    (c) => !c.tenses || c.tenses.includes(tense),
-  )
+  const complements = (VERB_COMPLEMENTS[infinitive] ?? []).filter((c) => fitsTense(c, tense))
   if (complements.length === 0) return null
 
   const plural = PLURAL.has(person)

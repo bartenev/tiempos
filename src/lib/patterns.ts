@@ -1,5 +1,5 @@
 import type { Person, Tense, Verb, VerbGroup } from '../types'
-import { conjugate } from './conjugate'
+import { conjugate, gerundOf, indefinidoShift } from './conjugate'
 
 /**
  * Модели неправильности: к какой модели относится конкретная форма.
@@ -30,6 +30,10 @@ export type Pattern =
   | 'era-iba-veia'
   // perfecto
   | 'participle'
+  // estar + gerundio
+  | 'gerund-i'
+  | 'gerund-y'
+  | 'gerund-u'
   // imperativo
   | 'vowel'
   | 'from-yo'
@@ -57,6 +61,8 @@ export const PATTERNS_BY_TENSE: Record<Tense, Pattern[]> = {
   indefinido: ['fui', 'stem-u', 'stem-i', 'stem-j', 'di-vi', 'shift-3', 'y'],
   imperfecto: ['era-iba-veia'],
   perfecto: ['participle'],
+  // diciendo, viniendo, pidiendo → yendo, leyendo, oyendo → durmiendo
+  gerundio: ['gerund-i', 'gerund-y', 'gerund-u'],
   // ven, haz, di, pon, ten → sea, vaya, esté → tenga, haga → piensa, vuelve, pide
   imperativo: ['short-tu', 'special', 'from-yo', 'vowel'],
 }
@@ -121,6 +127,11 @@ function imperativoPattern(verb: Verb, person: Person): Pattern {
   return 'vowel'
 }
 
+function gerundioPattern(verb: Verb): Pattern {
+  if (gerundOf(verb).endsWith('yendo')) return 'gerund-y'
+  return indefinidoShift(verb) === 'o>u' ? 'gerund-u' : 'gerund-i'
+}
+
 /** Модель неправильности формы или null, если форма правильная. */
 export function patternOf(verb: Verb, tense: Tense, person: Person): Pattern | null {
   const form = conjugate(verb, tense, person)
@@ -134,6 +145,8 @@ export function patternOf(verb: Verb, tense: Tense, person: Person): Pattern | n
       return 'era-iba-veia'
     case 'perfecto':
       return 'participle'
+    case 'gerundio':
+      return gerundioPattern(verb)
     case 'imperativo':
       return imperativoPattern(verb, person)
   }

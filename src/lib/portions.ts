@@ -28,6 +28,12 @@ export interface PortionCell {
 export const PERSON_OK = 2
 
 /**
+ * В estar + gerundio по лицам меняется только estar, а он уже знаком: новое — сам
+ * gerundio. Поэтому лица порции считаются вместе, и хватает GERUND_OK верных на всю порцию.
+ */
+export const GERUND_OK = 4
+
+/**
  * mastered — освоена (её новые формы — уже повторение);
  * current — сейчас изучается (самая продвинутая из начатых, иначе первая неосвоенная);
  * next — станет текущей после неё (выбирается по тому же правилу);
@@ -59,18 +65,14 @@ export function cellPortionKey(cell: PortionCell): string {
   return portionKey(cell.tense, portionOf(cell.verb, cell.tense, cell.person))
 }
 
-function personDone(cells: PortionCell[]): boolean {
-  return personNeed(cells) === 0
-}
-
-/** Верных ответов до освоения лица: добрать PERSON_OK и вытащить слабые формы. */
-function personNeed(cells: PortionCell[]): number {
+/** Верных ответов до освоения лица: добрать target верных и вытащить слабые формы. */
+function personNeed(cells: PortionCell[], target: number): number {
   const ok = cells.reduce((sum, c) => sum + (c.stat?.ok ?? 0), 0)
   const recover = cells.reduce(
     (sum, c) => sum + (c.stat && isWeak(c.stat) ? recoveryStreak(c.stat.bad) - c.stat.streak : 0),
     0,
   )
-  return Math.max(0, PERSON_OK - ok) + recover
+  return Math.max(0, target - ok) + recover
 }
 
 interface PortionProgress {
@@ -126,14 +128,17 @@ export function portionStatuses(cells: PortionCell[]): PortionStatus[] {
       const inPortion = byPortion.get(portionKey(tense, portion))
       if (!inPortion) continue
 
-      const persons = [...new Set(inPortion.map((c) => c.person))]
-      const byPerson = persons.map((p) => inPortion.filter((c) => c.person === p))
+      // у gerundio все лица — одна группа (см. GERUND_OK)
+      const target = tense === 'gerundio' ? GERUND_OK : PERSON_OK
+      const persons = tense === 'gerundio' ? [null] : [...new Set(inPortion.map((c) => c.person))]
+      const byPerson = persons.map((p) => inPortion.filter((c) => p === null || c.person === p))
+      const needs = byPerson.map((list) => personNeed(list, target))
       portions.push({
         tense,
         portion,
-        personsDone: byPerson.filter(personDone).length,
+        personsDone: needs.filter((n) => n === 0).length,
         personsTotal: persons.length,
-        need: byPerson.reduce((sum, list) => sum + personNeed(list), 0),
+        need: needs.reduce((sum, n) => sum + n, 0),
         ok: inPortion.reduce((sum, c) => sum + (c.stat?.ok ?? 0), 0),
         started: inPortion.some((c) => c.stat),
         verbs: new Set(inPortion.map((c) => c.verb.infinitive)).size,

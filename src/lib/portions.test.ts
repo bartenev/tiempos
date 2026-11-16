@@ -369,3 +369,31 @@ describe('smart mode with portions', () => {
     expect(new Set(random.map((c) => c.verb.group)).size).toBe(3)
   })
 })
+
+describe('estar + gerundio portions', () => {
+  const gerundio: SessionConfig = {
+    ...learning,
+    tenses: ['gerundio'],
+    includeIrregular: true,
+    selectedIrregular: [...IRREGULAR_INFINITIVES],
+  }
+
+  it('persons count together: 4 correct answers master a portion', () => {
+    const fresh = portionStatuses(cellsForConfig(gerundio, {}))
+    expect(fresh.map((s) => s.portion)).toEqual(['ar', 'er', 'ir', 'gerund-i', 'gerund-y', 'gerund-u'])
+    expect(fresh[0]).toMatchObject({ state: 'current', personsDone: 0, personsTotal: 1, need: 4 })
+
+    const stats = {
+      'hablar|gerundio|yo': ok(1),
+      'cantar|gerundio|tú': ok(1),
+      'tomar|gerundio|nosotros': ok(2),
+    }
+    expect(portionStatuses(cellsForConfig(gerundio, stats))[0]!.state).toBe('mastered')
+  })
+
+  it('a session from scratch starts with -ando', () => {
+    const cards = buildSession({ ...gerundio, size: 20 }, {}, {})
+    expect(cards.filter((c) => c.answer.endsWith('ando')).length).toBeGreaterThan(5)
+  })
+})
+

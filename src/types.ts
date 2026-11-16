@@ -1,4 +1,4 @@
-export type Tense = 'presente' | 'indefinido' | 'imperfecto' | 'perfecto' | 'imperativo'
+export type Tense = 'presente' | 'indefinido' | 'imperfecto' | 'perfecto' | 'gerundio' | 'imperativo'
 
 export type Person = 'yo' | 'tú' | 'él' | 'nosotros' | 'vosotros' | 'ellos'
 
@@ -28,6 +28,10 @@ export interface Verb {
   participle?: string
   /** Pretérito perfecto неестественен (haber: «he habido») — не тренируем. */
   noPerfecto?: boolean
+  /** Неправильный gerundio, которого не даёт правило (ir → yendo, poder → pudiendo). */
+  gerund?: string
+  /** Estar + gerundio неестественно («estoy siendo», «estoy sabiendo») — не тренируем. */
+  noGerundio?: boolean
 }
 
 export interface DrillCard {
@@ -339,7 +343,7 @@ export const PERSONS: Person[] = ['yo', 'tú', 'él', 'nosotros', 'vosotros', 'e
 
 export const VERB_GROUPS: VerbGroup[] = ['ar', 'er', 'ir']
 
-export const TENSES: Tense[] = ['presente', 'indefinido', 'imperfecto', 'perfecto', 'imperativo']
+export const TENSES: Tense[] = ['presente', 'indefinido', 'imperfecto', 'perfecto', 'gerundio', 'imperativo']
 
 /**
  * Imperativo afirmativo: tú, usted, nosotros, vosotros, ustedes.
@@ -366,6 +370,7 @@ export const TENSE_LABELS: Record<Tense, string> = {
   indefinido: 'Pretérito indefinido',
   imperfecto: 'Pretérito imperfecto',
   perfecto: 'Pretérito perfecto',
+  gerundio: 'Estar + gerundio',
   imperativo: 'Imperativo',
 }
 
@@ -374,6 +379,7 @@ export const TENSE_SHORT: Record<Tense, string> = {
   indefinido: 'indef.',
   imperfecto: 'imperf.',
   perfecto: 'perf.',
+  gerundio: 'ger.',
   imperativo: 'imperat.',
 }
 

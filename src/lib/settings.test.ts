@@ -37,7 +37,7 @@ describe('settings', () => {
     saveSettings({
       track: 'book',
       bookSelection: { kind: 'theme', themes: [{ section: 'pronombres' }], excluded: [35] },
-      selected: { presente: true, indefinido: false, imperfecto: true, perfecto: false, imperativo: false },
+      selected: { presente: true, indefinido: false, imperfecto: true, perfecto: false, gerundio: false, imperativo: false },
       persons: { yo: true, tú: false, él: true, nosotros: true, vosotros: false, ellos: true },
       groups: { ar: true, er: false, ir: true },
       includeRegular: true,
@@ -104,7 +104,7 @@ describe('settings', () => {
     expect(loadSettings().mode).toBe('smart')
   })
 
-  it('turns on imperativo and perfecto for settings saved before they existed', () => {
+  it('turns on imperativo, perfecto and gerundio for settings saved before they existed', () => {
     localStorage.setItem(
       SETTINGS_KEY,
       JSON.stringify({ selected: { presente: true, indefinido: false, imperfecto: true } }),
@@ -114,6 +114,7 @@ describe('settings', () => {
       indefinido: false,
       imperfecto: true,
       perfecto: true,
+      gerundio: true,
       imperativo: true,
     })
   })

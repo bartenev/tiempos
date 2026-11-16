@@ -78,6 +78,7 @@ const TAB_LABELS: Record<Tense, string> = {
   indefinido: 'Indefinido',
   imperfecto: 'Imperfecto',
   perfecto: 'Perfecto',
+  gerundio: 'Gerundio',
   imperativo: 'Imperativo',
 }
 
@@ -87,6 +88,7 @@ const TAB_SHORT: Record<Tense, string> = {
   indefinido: 'Indef.',
   imperfecto: 'Imperf.',
   perfecto: 'Perf.',
+  gerundio: 'Ger.',
   imperativo: 'Imper.',
 }
 

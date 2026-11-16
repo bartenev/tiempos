@@ -2,11 +2,17 @@
 
 Минимальный тренажёр испанского: спряжение глаголов и упражнения по главам учебника.
 
-**Времена:** Presente · Pretérito indefinido · Pretérito imperfecto · Imperativo
+**Времена:** Presente · Pretérito indefinido · Pretérito imperfecto · Pretérito perfecto · Estar + gerundio · Imperativo
 
 Imperativo — утвердительный: tú, usted, nosotros, vosotros, ustedes (формы yo нет).
 Глаголы с неестественным императивом (haber, poder, querer, saber, parecer, necesitar,
 preferir, sentir, oír, caer, permitir) в нём не тренируются.
+
+Estar + gerundio (estoy hablando, estás pidiendo, está leyendo): по лицам меняется только estar,
+новое — сам gerundio. Неправильности — -ir с чередованием e→i / o→u (pidiendo, diciendo, durmiendo)
+и -yendo (yendo, leyendo, oyendo, trayendo). Где «estar + gerundio» звучит неестественно (ser, estar,
+haber, poder, saber, querer, parecer, creer, preferir, necesitar, permitir, encontrar, perder,
+conseguir, caer, agradecer), этого времени у глагола нет.
 
 ## Быстрый старт
 
@@ -27,9 +33,9 @@ npm run build
 «Прогресс» показывает тренажёр, открытый последним.
 
 «Справка» у глаголов начинается с поиска **«Формы глагола»**: начните печатать инфинитив (или перевод —
-«говор…» найдёт hablar), выберите глагол — и увидите все его формы во всех пяти временах в той же
+«говор…» найдёт hablar), выберите глагол — и увидите все его формы во всех шести временах в той же
 сетке, что в подсказке после ошибки (окончания по правилу выделены, неправильные формы целиком),
-плюс пометки: чередование, особая форма yo, основа indefinido, participio. Только глаголы из банка тренажёра.
+плюс пометки: чередование, особая форма yo, основа indefinido, participio, gerundio. Только глаголы из банка тренажёра.
 Ниже — таблицы окончаний.
 
 Вкладка «Настройки» — общее для всего приложения: режим (умная очередь или
@@ -130,6 +136,8 @@ npm run build
   лицу есть 2 верных ответа и нет слабых форм. Неправильности — тоже порции, от самых нужных:
   в presente ser → estar → ir → hay → yo на -go (tengo, hago) → sé/doy/veo → e→ie → o→ue → e→i → -zco,
   в indefinido fui/fue → основы на -u-, -i-, -j- → di/vi → pidió → leyó,
+  в estar + gerundio -ando/-iendo → diciendo/pidiendo → yendo/leyendo → durmiendo (лица gerundio
+  считаются вместе: порции хватает 4 верных),
   в imperativo ven/haz/di/pon → sea/vaya/esté → tenga/haga → piensa/vuelve/pide. Если выбраны только
   неправильные глаголы, их модели идут раньше правильных форм (pensamos, podéis).
   Внутри порции новые формы частотных глаголов выпадают раньше: tener и querer до regar

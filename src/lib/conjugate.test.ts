@@ -209,3 +209,31 @@ describe('pretérito perfecto', () => {
     expect(hasTense(mustFind('hablar'), 'perfecto')).toBe(true)
   })
 })
+
+describe('estar + gerundio', () => {
+  it('estar + -ando / -iendo, the gerund does not change by person', () => {
+    expect(conjugate(mustFind('hablar'), 'gerundio', 'yo')).toBe('estoy hablando')
+    expect(conjugate(mustFind('comer'), 'gerundio', 'vosotros')).toBe('estáis comiendo')
+    expect(conjugate(mustFind('vivir'), 'gerundio', 'ellos')).toBe('están viviendo')
+  })
+
+  it('-ir stem-changers shift e → i, o → u; -yendo and yendo come from the bank', () => {
+    expect(conjugate(mustFind('pedir'), 'gerundio', 'tú')).toBe('estás pidiendo')
+    expect(conjugate(mustFind('sentir'), 'gerundio', 'él')).toBe('está sintiendo')
+    expect(conjugate(mustFind('decir'), 'gerundio', 'yo')).toBe('estoy diciendo')
+    expect(conjugate(mustFind('venir'), 'gerundio', 'yo')).toBe('estoy viniendo')
+    expect(conjugate(mustFind('dormir'), 'gerundio', 'nosotros')).toBe('estamos durmiendo')
+    expect(conjugate(mustFind('leer'), 'gerundio', 'yo')).toBe('estoy leyendo')
+    expect(conjugate(mustFind('ir'), 'gerundio', 'yo')).toBe('estoy yendo')
+    // -er с чередованием gerundio не меняют
+    expect(conjugate(mustFind('volver'), 'gerundio', 'yo')).toBe('estoy volviendo')
+    expect(conjugate(mustFind('pensar'), 'gerundio', 'yo')).toBe('estoy pensando')
+  })
+
+  it('unnatural progressives are not trained', () => {
+    for (const inf of ['ser', 'estar', 'haber', 'saber', 'querer', 'poder']) {
+      expect(hasTense(mustFind(inf), 'gerundio'), inf).toBe(false)
+    }
+    expect(hasTense(mustFind('hablar'), 'gerundio')).toBe(true)
+  })
+})

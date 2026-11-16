@@ -11,6 +11,7 @@ export const TENSE_SHORT_NAMES: Record<Tense, string> = {
   indefinido: 'Indefinido',
   imperfecto: 'Imperfecto',
   perfecto: 'Perfecto',
+  gerundio: 'Gerundio',
   imperativo: 'Imperativo',
 }
 

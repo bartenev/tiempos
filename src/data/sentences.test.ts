@@ -24,6 +24,17 @@ describe('verb sentences', () => {
     }
   })
 
+  it('estar + gerundio: a «now» marker and no clashing complements', () => {
+    for (let i = 0; i < 3; i++) {
+      const pick = <T,>(items: T[]) => items[i % items.length]!
+      const built = buildVerbSentence('llegar', 'gerundio', 'yo', pick)!
+      expect(built.sentence).toMatch(/^(Ahora mismo|En este momento|Estos días) yo ___ /)
+      expect(built.sentence).not.toContain('a las ocho')
+    }
+    const last = <T,>(items: T[]) => items[items.length - 1]!
+    expect(buildVerbSentence('vivir', 'gerundio', 'yo', last)!.sentence).toContain('una gran aventura')
+  })
+
   it('uses the plural variant for plural persons', () => {
     const pick = <T,>(items: T[]) => items[items.length - 1]!
     expect(buildVerbSentence('parecer', 'presente', 'ellos', pick)!.sentence).toMatch(/contentos\.$/)

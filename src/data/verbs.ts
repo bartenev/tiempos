@@ -18,7 +18,7 @@ export const VERBS: Verb[] = [
   { infinitive: 'llegar', group: 'ar' },
   { infinitive: 'buscar', group: 'ar' },
   { infinitive: 'tomar', group: 'ar' },
-  { infinitive: 'necesitar', group: 'ar', noImperative: true },
+  { infinitive: 'necesitar', group: 'ar', noImperative: true, noGerundio: true },
 
   // Regular -er
   { infinitive: 'comer', group: 'er' },
@@ -36,24 +36,24 @@ export const VERBS: Verb[] = [
   { infinitive: 'subir', group: 'ir' },
   { infinitive: 'decidir', group: 'ir' },
   { infinitive: 'recibir', group: 'ir' },
-  { infinitive: 'permitir', group: 'ir', noImperative: true },
+  { infinitive: 'permitir', group: 'ir', noImperative: true, noGerundio: true },
 
   // Stem-changing presente
   { infinitive: 'pensar', group: 'ar', stemChange: 'e>ie' },
   { infinitive: 'empezar', group: 'ar', stemChange: 'e>ie' },
-  { infinitive: 'encontrar', group: 'ar', stemChange: 'o>ue' },
+  { infinitive: 'encontrar', group: 'ar', stemChange: 'o>ue', noGerundio: true },
   { infinitive: 'volver', group: 'er', stemChange: 'o>ue', participle: 'vuelto' },
   { infinitive: 'jugar', group: 'ar', stemChange: 'u>ue' },
   { infinitive: 'pedir', group: 'ir', stemChange: 'e>i' },
   { infinitive: 'servir', group: 'ir', stemChange: 'e>i' },
   { infinitive: 'dormir', group: 'ir', stemChange: 'o>ue' },
-  { infinitive: 'preferir', group: 'ir', stemChange: 'e>ie', noImperative: true },
+  { infinitive: 'preferir', group: 'ir', stemChange: 'e>ie', noImperative: true, noGerundio: true },
   { infinitive: 'sentir', group: 'ir', stemChange: 'e>ie', noImperative: true },
   { infinitive: 'cerrar', group: 'ar', stemChange: 'e>ie' },
   { infinitive: 'comenzar', group: 'ar', stemChange: 'e>ie' },
   { infinitive: 'recomendar', group: 'ar', stemChange: 'e>ie' },
   { infinitive: 'regar', group: 'ar', stemChange: 'e>ie' },
-  { infinitive: 'perder', group: 'er', stemChange: 'e>ie', noImperative: true },
+  { infinitive: 'perder', group: 'er', stemChange: 'e>ie', noImperative: true, noGerundio: true },
   { infinitive: 'entender', group: 'er', stemChange: 'e>ie', noImperative: true },
   { infinitive: 'contar', group: 'ar', stemChange: 'o>ue' },
   { infinitive: 'mostrar', group: 'ar', stemChange: 'o>ue' },
@@ -64,11 +64,12 @@ export const VERBS: Verb[] = [
   { infinitive: 'devolver', group: 'er', stemChange: 'o>ue', participle: 'devuelto' },
   { infinitive: 'resolver', group: 'er', stemChange: 'o>ue', participle: 'resuelto' },
   { infinitive: 'repetir', group: 'ir', stemChange: 'e>i' },
-  { infinitive: 'conseguir', group: 'ir', stemChange: 'e>i' },
+  { infinitive: 'conseguir', group: 'ir', stemChange: 'e>i', noGerundio: true },
 
   // Common irregulars
   {
     infinitive: 'ser',
+    noGerundio: true,
     group: 'er',
     forms: {
       presente: {
@@ -100,6 +101,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'estar',
+    noGerundio: true,
     group: 'ar',
     forms: {
       presente: {
@@ -116,6 +118,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'ir',
+    gerund: 'yendo',
     group: 'ir',
     forms: {
       presente: {
@@ -147,6 +150,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'haber',
+    noGerundio: true,
     noPerfecto: true,
     group: 'er',
     noImperative: true,
@@ -192,6 +196,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'poder',
+    noGerundio: true,
     group: 'er',
     noImperative: true,
     stemChange: 'o>ue',
@@ -220,6 +225,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'querer',
+    noGerundio: true,
     group: 'er',
     noImperative: true,
     stemChange: 'e>ie',
@@ -227,6 +233,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'saber',
+    noGerundio: true,
     group: 'er',
     noImperative: true,
     presentYo: 'sé',
@@ -306,6 +313,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'traer',
+    gerund: 'trayendo',
     group: 'er',
     presentYo: 'traigo',
     indefinidoStem: 'traj',
@@ -317,12 +325,14 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'parecer',
+    noGerundio: true,
     group: 'er',
     noImperative: true,
     presentYo: 'parezco',
   },
   {
     infinitive: 'leer',
+    gerund: 'leyendo',
     group: 'er',
     forms: {
       indefinido: {
@@ -337,6 +347,7 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'oír',
+    gerund: 'oyendo',
     group: 'ir',
     noImperative: true,
     forms: {
@@ -360,6 +371,8 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'caer',
+    gerund: 'cayendo',
+    noGerundio: true,
     group: 'er',
     noImperative: true,
     presentYo: 'caigo',
@@ -398,11 +411,14 @@ export const VERBS: Verb[] = [
   },
   {
     infinitive: 'agradecer',
+    noGerundio: true,
     group: 'er',
     presentYo: 'agradezco',
   },
   {
     infinitive: 'creer',
+    gerund: 'creyendo',
+    noGerundio: true,
     group: 'er',
     noImperative: true,
     forms: {

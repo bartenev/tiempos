@@ -75,6 +75,7 @@ export const DEFAULT_SETTINGS: SetupSettings = {
     indefinido: true,
     imperfecto: true,
     perfecto: true,
+    gerundio: true,
     imperativo: true,
   },
   persons: {

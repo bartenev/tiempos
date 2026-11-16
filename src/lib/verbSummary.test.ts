@@ -32,7 +32,7 @@ describe('describeVerbFilters', () => {
   it('lists partial picks', () => {
     const summary = describeVerbFilters(
       make({
-        selected: { presente: true, indefinido: false, imperfecto: true, perfecto: false, imperativo: false },
+        selected: { presente: true, indefinido: false, imperfecto: true, perfecto: false, gerundio: false, imperativo: false },
         persons: { yo: true, tú: true, él: false, nosotros: false, vosotros: false, ellos: false },
         groups: { ar: true, er: false, ir: true },
       }),
@@ -56,7 +56,7 @@ describe('describeVerbFilters', () => {
 
   it('shows a dash when nothing is picked', () => {
     const summary = describeVerbFilters(
-      make({ selected: { presente: false, indefinido: false, imperfecto: false, perfecto: false, imperativo: false } }),
+      make({ selected: { presente: false, indefinido: false, imperfecto: false, perfecto: false, gerundio: false, imperativo: false } }),
     )
     expect(summary.tenses).toBe('—')
   })

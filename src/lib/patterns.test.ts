@@ -10,6 +10,16 @@ function pattern(infinitive: string, tense: Tense, person: Person) {
 }
 
 describe('patternOf', () => {
+  it('estar + gerundio: e → i, -yendo, o → u; regular gerunds have no pattern', () => {
+    expect(pattern('hablar', 'gerundio', 'yo')).toBeNull()
+    expect(pattern('volver', 'gerundio', 'yo')).toBeNull()
+    expect(pattern('pedir', 'gerundio', 'yo')).toBe('gerund-i')
+    expect(pattern('decir', 'gerundio', 'ellos')).toBe('gerund-i')
+    expect(pattern('leer', 'gerundio', 'tú')).toBe('gerund-y')
+    expect(pattern('ir', 'gerundio', 'tú')).toBe('gerund-y')
+    expect(pattern('dormir', 'gerundio', 'él')).toBe('gerund-u')
+  })
+
   it('regular forms of irregular verbs have no pattern', () => {
     expect(pattern('tener', 'presente', 'nosotros')).toBeNull() // tenemos
     expect(pattern('pensar', 'indefinido', 'yo')).toBeNull() // pensé

@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { VERBS, isRegularIn, isRegularVerb } from '../data/verbs'
 import { VERB_RU } from '../data/verbRu'
-import { hasTense } from '../lib/conjugate'
+import { gerundOf, hasTense } from '../lib/conjugate'
 import { explainForm } from '../lib/explain'
 import { stripDiacritics } from '../lib/normalize'
 import type { Verb } from '../types'
@@ -56,6 +56,7 @@ const tags = computed<string[]>(() => {
   if (verb.presentYo) out.push(`yo: ${verb.presentYo}`)
   if (verb.indefinidoStem) out.push(`indefinido: ${verb.indefinidoStem}-`)
   if (verb.participle) out.push(`participio: ${verb.participle}`)
+  if (hasTense(verb, 'gerundio') && !isRegularIn(verb, 'gerundio')) out.push(`gerundio: ${gerundOf(verb)}`)
   if (verb.forms) out.push('неправильные формы')
   return out
 })

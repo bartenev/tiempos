@@ -1,6 +1,7 @@
 import type { HintStep, Person, StemChange, Tense, Verb } from '../types'
 import { PERSONS, personLabel, personsFor } from '../types'
 import {
+  ESTAR_PRESENT,
   HABER_PRESENT,
   IMPERATIVE_ENDINGS,
   IMPERFECT_ENDINGS,
@@ -11,6 +12,7 @@ import {
   STEM_CHANGED_PERSONS,
   applyStemChange,
   conjugate,
+  gerundOf,
   indefinidoShift,
   infinitiveStem,
   paradigmOf,
@@ -60,6 +62,7 @@ const TENSE_NAME: Record<Tense, string> = {
   indefinido: 'Indefinido',
   imperfecto: 'Imperfecto',
   perfecto: 'Perfecto',
+  gerundio: 'Estar + gerundio',
   imperativo: 'Imperativo',
 }
 
@@ -108,6 +111,12 @@ function regularEndings(verb: Verb, tense: Tense): string[] {
       return INDEFINIDO_REGULAR[verb.group]
     case 'perfecto':
       return PERSONS.map(() => (verb.participle ? '' : participleEnding(verb)))
+    case 'gerundio': {
+      const gerund = gerundOf(verb)
+      const ending = verb.group === 'ar' ? 'ando' : 'iendo'
+      // правильный gerundio — от основы инфинитива; leyendo, pidiendo — целиком
+      return PERSONS.map(() => (gerund === infinitiveStem(verb) + ending ? ending : ''))
+    }
     case 'imperativo':
       return IMPERATIVE_ENDINGS[verb.group]
   }
@@ -194,6 +203,30 @@ function explainPerfecto(verb: Verb, person: Person): FormHint {
   return withRow({ rule, note }, verb, 'perfecto', person, regularEndings(verb, 'perfecto'))
 }
 
+function explainGerundio(verb: Verb, person: Person): FormHint {
+  const estar = ESTAR_PRESENT.join(', ')
+  const gerund = gerundOf(verb)
+  const regular = verb.group === 'ar' ? 'ando' : 'iendo'
+  const stem = infinitiveStem(verb)
+  let rule: string
+  let note: string | undefined
+  if (gerund === stem + regular) {
+    rule = `estar (${estar}) + gerundio: ${stem}- + -${regular}.`
+    note = 'Gerundio не меняется по лицам — меняется только estar.'
+  } else if (gerund === 'yendo') {
+    rule = `estar (${estar}) + gerundio от ir: yendo — запомните.`
+  } else if (gerund.endsWith('yendo')) {
+    rule = `estar (${estar}) + gerundio: после гласной основы -yendo (${gerund}).`
+    note = 'Так же leyendo, oyendo, trayendo, creyendo, cayendo.'
+  } else {
+    const shift = indefinidoShift(verb)
+    const change = shift ? STEM_CHANGE_TEXT[shift] : ''
+    rule = `estar (${estar}) + gerundio: -ir с чередованием ${change} (${gerund}).`
+    note = 'Как в indefinido él / ellos: pidió → pidiendo, durmió → durmiendo; так же diciendo, viniendo.'
+  }
+  return withRow({ rule, note }, verb, 'gerundio', person, regularEndings(verb, 'gerundio'))
+}
+
 /**
  * Объяснить, как строится форма. Для полностью неправильных форм
  * показываем всю парадигму — её нужно запомнить.
@@ -201,6 +234,7 @@ function explainPerfecto(verb: Verb, person: Person): FormHint {
 export function explainForm(verb: Verb, tense: Tense, person: Person): FormHint {
   if (tense === 'imperativo') return explainImperative(verb, person)
   if (tense === 'perfecto') return explainPerfecto(verb, person)
+  if (tense === 'gerundio') return explainGerundio(verb, person)
 
   const endings = regularEndings(verb, tense)
 

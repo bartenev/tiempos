@@ -11,6 +11,19 @@ function current(hint: FormHint) {
 }
 
 describe('explainForm', () => {
+  it('estar + gerundio: regular ending highlighted, stem change explained', () => {
+    const regular = explainForm(findVerb('comer')!, 'gerundio', 'tú')
+    expect(regular.rule).toContain('-iendo')
+    expect(current(regular)).toMatchObject({ stem: 'estás com', ending: 'iendo' })
+
+    const pedir = explainForm(findVerb('pedir')!, 'gerundio', 'yo')
+    expect(pedir.rule).toContain('e → i')
+    expect(current(pedir)).toMatchObject({ stem: 'estoy pidiendo', ending: '' })
+
+    expect(explainForm(findVerb('leer')!, 'gerundio', 'yo').rule).toContain('-yendo')
+    expect(explainForm(findVerb('ir')!, 'gerundio', 'yo').rule).toContain('yendo')
+  })
+
   it('regular: stem + ending, full forms with highlighted endings', () => {
     const hint = explainForm(findVerb('hablar')!, 'indefinido', 'tú')
     expect(current(hint)).toMatchObject({ stem: 'habl', ending: 'aste', person: 'tú' })
