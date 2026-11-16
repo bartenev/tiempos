@@ -172,7 +172,7 @@ function smartCards(
   return shuffle(picked)
 }
 
-/** Сессия из готовых карточек колоды: умная очередь, только слабые или случайно. */
+/** Сессия из готовых карточек колоды: умная очередь, только слабые или проверка (случайно). */
 export function buildDeckSession(
   cards: BookCard[],
   config: { mode: SessionMode; size: number },

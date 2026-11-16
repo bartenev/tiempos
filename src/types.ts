@@ -48,7 +48,7 @@ export interface DrillCard {
 /**
  * smart — чаще показывать слабые формы;
  * weak — только слабые («красные зоны»);
- * random — равномерно случайно.
+ * random — «Проверка»: равномерно случайно, без учёта прогресса и без повтора ошибок.
  */
 export type SessionMode = 'smart' | 'weak' | 'random'
 
@@ -332,7 +332,7 @@ export type Screen = 'hub' | 'setup' | 'settings' | 'drill' | 'summary' | 'table
 export const MODE_LABELS: Record<SessionMode, string> = {
   smart: 'Умная очередь',
   weak: 'Только слабые',
-  random: 'Случайно',
+  random: 'Проверка',
 }
 
 export const PERSONS: Person[] = ['yo', 'tú', 'él', 'nosotros', 'vosotros', 'ellos']
