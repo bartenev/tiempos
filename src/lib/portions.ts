@@ -1,3 +1,4 @@
+import { isRegularIn } from '../data/verbs'
 import type { Person, Tense, Verb } from '../types'
 import { TENSES, VERB_GROUPS } from '../types'
 import type { PortionId } from './patterns'
@@ -98,7 +99,8 @@ function isAhead(a: PortionProgress, b: PortionProgress): boolean {
 
 /**
  * Статусы порций в порядке изучения: времена как в TENSES, внутри времени —
- * окончания -ar → -er → -ir, затем модели неправильности (PATTERNS_BY_TENSE).
+ * окончания -ar → -er → -ir, затем модели неправильности (PATTERNS_BY_TENSE);
+ * если в фильтре этого времени одни неправильные глаголы — наоборот.
  */
 export function portionStatuses(cells: PortionCell[]): PortionStatus[] {
   const byPortion = new Map<string, PortionCell[]>()
@@ -111,7 +113,13 @@ export function portionStatuses(cells: PortionCell[]): PortionStatus[] {
 
   const portions: PortionProgress[] = []
   for (const tense of TENSES) {
-    for (const portion of [...VERB_GROUPS, ...PATTERNS_BY_TENSE[tense]]) {
+    // Одни неправильные глаголы в этом времени — сначала их модели, а правильные формы
+    // (pensamos, podéis) потом: иначе первые сессии уходят не на то, что выбрали.
+    const onlyIrregular = !cells.some((c) => c.tense === tense && isRegularIn(c.verb, tense))
+    const order = onlyIrregular
+      ? [...PATTERNS_BY_TENSE[tense], ...VERB_GROUPS]
+      : [...VERB_GROUPS, ...PATTERNS_BY_TENSE[tense]]
+    for (const portion of order) {
       const inPortion = byPortion.get(portionKey(tense, portion))
       if (!inPortion) continue
 

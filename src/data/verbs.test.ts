@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { REGULAR_VERBS, VERBS, findVerb, isRegularIn, isRegularVerb } from './verbs'
+import { REGULAR_VERBS, VERBS, VERB_FREQUENCY, findVerb, frequencyFactor, isRegularIn, isRegularVerb } from './verbs'
 
 describe('isRegularVerb', () => {
   it('marks plain -ar/-er/-ir as regular', () => {
@@ -48,5 +48,21 @@ describe('isRegularIn: regular or not, tense by tense', () => {
 
   it('only ser, ir, ver are irregular in imperfecto', () => {
     expect(VERBS.filter((v) => !isRegularIn(v, 'imperfecto')).map((v) => v.infinitive).sort()).toEqual(['ir', 'ser', 'ver'])
+  })
+})
+
+describe('VERB_FREQUENCY', () => {
+  it('ranks every verb of the bank exactly once', () => {
+    expect(new Set(VERB_FREQUENCY).size).toBe(VERB_FREQUENCY.length)
+    expect([...VERB_FREQUENCY].sort()).toEqual(VERBS.map((v) => v.infinitive).sort())
+  })
+
+  it('ser weighs most, regar least, about 1 on average', () => {
+    const factors = VERBS.map(frequencyFactor)
+    expect(frequencyFactor(findVerb('ser')!)).toBe(Math.max(...factors))
+    expect(frequencyFactor(findVerb('regar')!)).toBe(Math.min(...factors))
+    const mean = factors.reduce((a, b) => a + b, 0) / factors.length
+    expect(mean).toBeGreaterThan(0.8)
+    expect(mean).toBeLessThan(1.3)
   })
 })

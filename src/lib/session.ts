@@ -1,6 +1,6 @@
 import { framesFor } from '../data/frames'
 import { buildVerbSentence } from '../data/sentences'
-import { VERBS, isRegularIn } from '../data/verbs'
+import { VERBS, frequencyFactor, isRegularIn } from '../data/verbs'
 import type { DrillCard, Person, SessionConfig, Tense, Verb } from '../types'
 import { personsFor } from '../types'
 import { conjugate, hasTense } from './conjugate'
@@ -94,7 +94,9 @@ export interface Cell {
 
 function toCell(verb: Verb, tense: Tense, person: Person, stats: StatsStore): Cell {
   const stat = stats[cellKey(verb.infinitive, tense, person)]
-  return { verb, tense, person, stat, weight: cellWeight(stat), weak: isWeak(stat) }
+  // новая форма частотного глагола выпадает раньше редкого (tengo до riego)
+  const weight = cellWeight(stat) * (stat ? 1 : frequencyFactor(verb))
+  return { verb, tense, person, stat, weight, weak: isWeak(stat) }
 }
 
 /** Лица времени, отмеченные в настройках (в императиве нет yo). */
@@ -345,6 +347,7 @@ function allotNew(statuses: PortionStatus[], budget: number): Map<string, number
  * - порции, до которых доля не дошла, ждут: у начатых в повторение идут только уже
  *   отвеченные формы, не начатые не берутся совсем;
  * - новые формы освоенных порций идут с весом повторения;
+ * - новые формы частотных глаголов выпадают раньше редких (frequencyFactor);
  * - повторять нечего — вся сессия раздаётся по очереди.
  * `cards` — сколько карточек сессии разыгрывается из этого пула.
  */
@@ -365,7 +368,7 @@ function smartPool(cells: Cell[], cards: number): Cell[] {
       })
       .map((c) =>
         !c.stat && state.get(cellPortionKey(c)) === 'mastered'
-          ? { ...c, weight: KNOWN_PATTERN_NEW_WEIGHT }
+          ? { ...c, weight: KNOWN_PATTERN_NEW_WEIGHT * frequencyFactor(c.verb) }
           : c,
       )
     return { allot, bucketOf, pool }

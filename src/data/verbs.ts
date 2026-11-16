@@ -458,3 +458,30 @@ export const REGULAR_INFINITIVES: Set<string> = new Set(
 export const IRREGULAR_INFINITIVES: string[] = IRREGULAR_VERBS.map(
   (v) => v.infinitive,
 )
+
+/**
+ * Глаголы банка от самых нужных к редким — примерно по частотным словарям испанского
+ * (ser, haber, estar, tener… в начале, regar и colgar в конце). Умная очередь показывает
+ * новые формы частотных глаголов раньше: в порции e→ie tener и querer идут до regar.
+ */
+export const VERB_FREQUENCY: string[] = [
+  'ser', 'haber', 'estar', 'tener', 'hacer', 'poder', 'decir', 'ir', 'ver', 'dar',
+  'saber', 'querer', 'llegar', 'poner', 'parecer', 'creer', 'hablar', 'encontrar', 'venir', 'pensar',
+  'salir', 'volver', 'tomar', 'conocer', 'vivir', 'sentir', 'mirar', 'contar', 'empezar', 'buscar',
+  'trabajar', 'escribir', 'perder', 'entender', 'pedir', 'recibir', 'permitir', 'conseguir', 'comenzar', 'servir',
+  'necesitar', 'leer', 'caer', 'abrir', 'oír', 'traer', 'comprender', 'preferir', 'estudiar', 'correr',
+  'jugar', 'escuchar', 'decidir', 'mostrar', 'responder', 'comer', 'aprender', 'dormir', 'conducir', 'cerrar',
+  'subir', 'comprar', 'resolver', 'proponer', 'repetir', 'mover', 'probar', 'devolver', 'recomendar', 'traducir',
+  'vender', 'agradecer', 'caminar', 'beber', 'cantar', 'cocinar', 'bailar', 'almorzar', 'colgar', 'regar',
+]
+
+const FREQUENCY_RANK = new Map(VERB_FREQUENCY.map((infinitive, i) => [infinitive, i]))
+
+/**
+ * Множитель веса новой формы по частотности глагола: ser — 4, десятый — 2, тридцатый — 1,
+ * последние — около 0,5. В среднем по банку ≈ 1, так что доля нового в сессии не меняется.
+ */
+export function frequencyFactor(verb: Verb): number {
+  const rank = FREQUENCY_RANK.get(verb.infinitive) ?? VERB_FREQUENCY.length
+  return 4 / (1 + rank / 10)
+}

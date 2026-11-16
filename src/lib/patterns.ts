@@ -36,21 +36,25 @@ export type Pattern =
   | 'short-tu'
   | 'special'
 
-/** Порядок моделей внутри времени (после правильных -ar → -er → -ir). */
+/**
+ * Порядок моделей внутри времени — от самых нужных: ser, estar, ir, hay, tengo/hago раньше
+ * e→ie; в indefinido fui/fue первым. Правильные -ar → -er → -ir идут до них, а если
+ * в фильтре одни неправильные глаголы — после (см. portionStatuses).
+ */
 export const PATTERNS_BY_TENSE: Record<Tense, Pattern[]> = {
   presente: [
     'verb-ser',
     'verb-estar',
     'verb-ir',
+    'verb-haber',
+    'yo-go',
+    'minor',
     'e>ie',
     'o>ue',
     'e>i',
-    'yo-go',
     'yo-zco',
-    'verb-haber',
-    'minor',
   ],
-  indefinido: ['stem-u', 'stem-i', 'stem-j', 'shift-3', 'y', 'fui', 'di-vi'],
+  indefinido: ['fui', 'stem-u', 'stem-i', 'stem-j', 'di-vi', 'shift-3', 'y'],
   imperfecto: ['era-iba-veia'],
   perfecto: ['participle'],
   imperativo: ['vowel', 'from-yo', 'short-tu', 'special'],

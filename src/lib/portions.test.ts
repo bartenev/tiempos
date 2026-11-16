@@ -256,18 +256,71 @@ describe('smart mode with portions', () => {
       selectedIrregular: [...IRREGULAR_INFINITIVES],
     }
     const statuses = portionStatuses(cellsForConfig(withIrregular, {}))
+    // fui/fue — самое нужное в indefinido, первым из неправильностей
     expect(statuses.map((s) => s.portion)).toEqual([
       'ar',
       'er',
       'ir',
+      'fui',
       'stem-u',
       'stem-i',
       'stem-j',
+      'di-vi',
       'shift-3',
       'y',
-      'fui',
-      'di-vi',
     ])
+  })
+
+  it('with only irregular verbs, their patterns come before the regular endings', () => {
+    const onlyIrregular = {
+      ...learning,
+      includeRegular: false,
+      includeIrregular: true,
+      selectedIrregular: [...IRREGULAR_INFINITIVES],
+    }
+    const statuses = portionStatuses(cellsForConfig(onlyIrregular, {}))
+    expect(statuses.map((s) => s.portion)).toEqual([
+      'fui',
+      'stem-u',
+      'stem-i',
+      'stem-j',
+      'di-vi',
+      'shift-3',
+      'y',
+      // pensar, jugar в indefinido правильные целиком — в «только неправильные» не входят
+      'er',
+      'ir',
+    ])
+    // первая сессия — fui/fue, а не pensé / pedimos
+    const cards = buildSession({ ...onlyIrregular, size: 20 }, {})
+    expect(cards.some((c) => c.verb.infinitive === 'ser' || c.verb.infinitive === 'ir')).toBe(true)
+  })
+
+  it('in presente, hay and tengo/hago come before stem changes', () => {
+    const presente = { ...learning, tenses: ['presente' as const], includeIrregular: true, selectedIrregular: [...IRREGULAR_INFINITIVES] }
+    const order = portionStatuses(cellsForConfig(presente, {})).map((s) => s.portion)
+    expect(order.slice(0, 7)).toEqual(['ar', 'er', 'ir', 'verb-ser', 'verb-estar', 'verb-ir', 'verb-haber'])
+    expect(order.indexOf('yo-go')).toBeLessThan(order.indexOf('e>ie'))
+  })
+
+  it('new forms of frequent verbs come first inside a portion', () => {
+    // освоены ser, estar, ir, hay, yo-go, прочие — текущая порция e→ie (13 глаголов)
+    const presente = {
+      ...learning,
+      tenses: ['presente' as const],
+      includeRegular: false,
+      includeIrregular: true,
+      selectedIrregular: ['tener', 'querer', 'regar', 'cerrar', 'recomendar', 'preferir', 'comenzar'],
+    }
+    let frequent = 0
+    let rare = 0
+    for (let i = 0; i < 40; i++) {
+      for (const c of buildSession({ ...presente, size: 10 }, {})) {
+        if (['tener', 'querer'].includes(c.verb.infinitive) && c.person !== 'yo') frequent += 1
+        if (['regar', 'recomendar'].includes(c.verb.infinitive)) rare += 1
+      }
+    }
+    expect(frequent).toBeGreaterThan(rare * 2)
   })
 
   it('an irregular form counts towards its pattern, not its ending', () => {
