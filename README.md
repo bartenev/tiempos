@@ -136,8 +136,10 @@ npm run build
   лицу есть 2 верных ответа и нет слабых форм. Неправильности — тоже порции, от самых нужных:
   в presente ser → estar → ir → hay → yo на -go (tengo, hago) → sé/doy/veo → e→ie → o→ue → e→i → -zco,
   в indefinido fui/fue → основы на -u-, -i-, -j- → di/vi → pidió → leyó,
-  в estar + gerundio -ando/-iendo → diciendo/pidiendo → yendo/leyendo → durmiendo (лица gerundio
-  считаются вместе: порции хватает 4 верных),
+  в estar + gerundio -ando/-iendo → diciendo/pidiendo → yendo/leyendo → durmiendo.
+  В составных временах (perfecto, estar + gerundio) по лицам меняется только вспомогательный глагол,
+  поэтому по лицам считается лишь первая порция времени — на ней учатся he/has/ha… и estoy/estás/está;
+  в следующих лица считаются вместе: порции хватает 4 верных (`COMPOUND_OK` в `src/lib/portions.ts`),
   в imperativo ven/haz/di/pon → sea/vaya/esté → tenga/haga → piensa/vuelve/pide. Если выбраны только
   неправильные глаголы, их модели идут раньше правильных форм (pensamos, podéis).
   Внутри порции новые формы частотных глаголов выпадают раньше: tener и querer до regar

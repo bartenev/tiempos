@@ -378,17 +378,40 @@ describe('estar + gerundio portions', () => {
     selectedIrregular: [...IRREGULAR_INFINITIVES],
   }
 
-  it('persons count together: 4 correct answers master a portion', () => {
+  it('the first portion goes by persons (estar), the rest count persons together', () => {
     const fresh = portionStatuses(cellsForConfig(gerundio, {}))
     expect(fresh.map((s) => s.portion)).toEqual(['ar', 'er', 'ir', 'gerund-i', 'gerund-y', 'gerund-u'])
-    expect(fresh[0]).toMatchObject({ state: 'current', personsDone: 0, personsTotal: 1, need: 4 })
+    expect(fresh[0]).toMatchObject({ state: 'current', personsDone: 0, personsTotal: 6, need: 12 })
+    expect(fresh[1]).toMatchObject({ personsTotal: 1, need: 4 })
 
+    const arDone = Object.fromEntries(PERSONS.map((p) => [`hablar|gerundio|${p}`, ok(2)]))
     const stats = {
-      'hablar|gerundio|yo': ok(1),
-      'cantar|gerundio|tú': ok(1),
-      'tomar|gerundio|nosotros': ok(2),
+      ...arDone,
+      'comer|gerundio|yo': ok(1),
+      'beber|gerundio|tú': ok(1),
+      'correr|gerundio|nosotros': ok(2),
     }
-    expect(portionStatuses(cellsForConfig(gerundio, stats))[0]!.state).toBe('mastered')
+    expect(portionStatuses(cellsForConfig(gerundio, stats)).slice(0, 3).map((s) => s.state)).toEqual([
+      'mastered',
+      'mastered',
+      'current',
+    ])
+  })
+
+  it('perfecto follows the same rule; only irregulars — participles go by persons', () => {
+    const perfecto = { ...gerundio, tenses: ['perfecto' as const] }
+    const statuses = portionStatuses(cellsForConfig(perfecto, {}))
+    expect(statuses.map((s) => [s.portion, s.personsTotal])).toEqual([
+      ['ar', 6],
+      ['er', 1],
+      ['ir', 1],
+      ['participle', 1],
+    ])
+    const onlyIrregular = { ...perfecto, includeRegular: false }
+    expect(portionStatuses(cellsForConfig(onlyIrregular, {}))[0]).toMatchObject({
+      portion: 'participle',
+      personsTotal: 6,
+    })
   })
 
   it('a session from scratch starts with -ando', () => {

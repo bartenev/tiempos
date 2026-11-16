@@ -28,10 +28,17 @@ export interface PortionCell {
 export const PERSON_OK = 2
 
 /**
- * В estar + gerundio по лицам меняется только estar, а он уже знаком: новое — сам
- * gerundio. Поэтому лица порции считаются вместе, и хватает GERUND_OK верных на всю порцию.
+ * Составные времена: по лицам меняется только вспомогательный глагол (he, has, ha… /
+ * estoy, estás, está…), а participio / gerundio у всех лиц один.
  */
-export const GERUND_OK = 4
+export const COMPOUND_TENSES: ReadonlySet<Tense> = new Set<Tense>(['perfecto', 'gerundio'])
+
+/**
+ * Первая порция составного времени считается по лицам (PERSON_OK в каждом) — так
+ * выучивается вспомогательный глагол. В следующих новое — только participio / gerundio,
+ * поэтому лица считаются вместе и хватает COMPOUND_OK верных на всю порцию.
+ */
+export const COMPOUND_OK = 4
 
 /**
  * mastered — освоена (её новые формы — уже повторение);
@@ -124,13 +131,16 @@ export function portionStatuses(cells: PortionCell[]): PortionStatus[] {
     const order = onlyIrregular
       ? [...PATTERNS_BY_TENSE[tense], ...VERB_GROUPS]
       : [...VERB_GROUPS, ...PATTERNS_BY_TENSE[tense]]
+    let first = true
     for (const portion of order) {
       const inPortion = byPortion.get(portionKey(tense, portion))
       if (!inPortion) continue
 
-      // у gerundio все лица — одна группа (см. GERUND_OK)
-      const target = tense === 'gerundio' ? GERUND_OK : PERSON_OK
-      const persons = tense === 'gerundio' ? [null] : [...new Set(inPortion.map((c) => c.person))]
+      // в составном времени после первой порции лица считаются вместе (см. COMPOUND_OK)
+      const pooled = COMPOUND_TENSES.has(tense) && !first
+      first = false
+      const target = pooled ? COMPOUND_OK : PERSON_OK
+      const persons = pooled ? [null] : [...new Set(inPortion.map((c) => c.person))]
       const byPerson = persons.map((p) => inPortion.filter((c) => p === null || c.person === p))
       const needs = byPerson.map((list) => personNeed(list, target))
       portions.push({
