@@ -46,6 +46,8 @@ export interface PortionStatus {
   need: number
   /** Место в очереди изучения: 0 — текущая, 1 — следующая…; у освоенных — null. */
   rank: number | null
+  /** Сколько разных глаголов в порции (ser — 1, e→ie — много). */
+  verbs: number
 }
 
 export function portionKey(tense: Tense, portion: PortionId): string {
@@ -80,6 +82,7 @@ interface PortionProgress {
   /** Верных ответов по всем формам порции. */
   ok: number
   started: boolean
+  verbs: number
 }
 
 /** Какая порция изучается: из начатых — самая продвинутая (при равенстве — первая по порядку). */
@@ -133,6 +136,7 @@ export function portionStatuses(cells: PortionCell[]): PortionStatus[] {
         need: byPerson.reduce((sum, list) => sum + personNeed(list), 0),
         ok: inPortion.reduce((sum, c) => sum + (c.stat?.ok ?? 0), 0),
         started: inPortion.some((c) => c.stat),
+        verbs: new Set(inPortion.map((c) => c.verb.infinitive)).size,
       })
     }
   }
@@ -147,7 +151,7 @@ export function portionStatuses(cells: PortionCell[]): PortionStatus[] {
   }
 
   return portions.map((p) => {
-    const { tense, portion, personsDone, personsTotal, need, started } = p
+    const { tense, portion, personsDone, personsTotal, need, started, verbs } = p
     const at = queue.indexOf(p)
     const rank = at === -1 ? null : at
     let state: PortionState
@@ -155,6 +159,6 @@ export function portionStatuses(cells: PortionCell[]): PortionStatus[] {
     else if (rank === 0) state = 'current'
     else if (rank === 1) state = 'next'
     else state = started ? 'open' : 'locked'
-    return { tense, portion, state, personsDone, personsTotal, need, rank }
+    return { tense, portion, state, personsDone, personsTotal, need, rank, verbs }
   })
 }

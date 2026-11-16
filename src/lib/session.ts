@@ -309,7 +309,11 @@ export const KNOWN_PATTERN_NEW_WEIGHT = 1.25
 /** Доля сессии на текущую порцию; остальное — повторение уже открытого. */
 export const CURRENT_PORTION_SHARE = 0.6
 
-/** Карточек на каждый недостающий до освоения верный ответ — с запасом на ошибки. */
+/**
+ * Карточек на каждый недостающий до освоения верный ответ — с запасом на ошибки.
+ * Только в порциях из нескольких глаголов: у ser запас дал бы четыре одинаковые формы
+ * подряд, а ошибку и так вернёт повтор через пару карточек.
+ */
 export const NEAR_DONE_MARGIN = 2
 
 /** Корзина пула: порция из очереди (её ключ) или всё повторение. */
@@ -327,7 +331,8 @@ function allotNew(statuses: PortionStatus[], budget: number): Map<string, number
   let last = ''
   for (const s of queue) {
     if (budget <= 0) break
-    const give = Math.min(s.need * NEAR_DONE_MARGIN, budget)
+    const margin = s.verbs > 1 ? NEAR_DONE_MARGIN : 1
+    const give = Math.min(s.need * margin, budget)
     last = portionKey(s.tense, s.portion)
     allot.set(last, give)
     budget -= give

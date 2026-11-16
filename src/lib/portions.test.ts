@@ -303,6 +303,27 @@ describe('smart mode with portions', () => {
     expect(order.indexOf('yo-go')).toBeLessThan(order.indexOf('e>ie'))
   })
 
+  it('a one-verb portion takes only what it needs, the next one joins the same session', () => {
+    const presente = {
+      ...learning,
+      tenses: ['presente' as const],
+      includeRegular: false,
+      includeIrregular: true,
+      selectedIrregular: [...IRREGULAR_INFINITIVES],
+    }
+    // ser: 6 лиц × 2 верных = 12 карточек без запаса (раньше 24 — вся сессия); остальное — estar
+    let ser = 0
+    let estar = 0
+    for (let i = 0; i < 20; i++) {
+      const cards = buildSession({ ...presente, size: 20 }, {})
+      ser += cards.filter((c) => c.verb.infinitive === 'ser').length
+      estar += cards.filter((c) => c.verb.infinitive === 'estar').length
+    }
+    expect(ser / 20).toBeGreaterThan(9)
+    expect(ser / 20).toBeLessThan(15)
+    expect(estar / 20).toBeGreaterThan(5)
+  })
+
   it('new forms of frequent verbs come first inside a portion', () => {
     // освоены ser, estar, ir, hay, yo-go, прочие — текущая порция e→ie (13 глаголов)
     const presente = {
