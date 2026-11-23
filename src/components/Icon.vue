@@ -18,6 +18,7 @@ export type IconName =
   | 'practice'
   | 'progress'
   | 'tables'
+  | 'clock'
 
 defineProps<{
   name: IconName
@@ -69,6 +70,10 @@ defineProps<{
       d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"
     />
     <path v-else-if="name === 'progress'" d="M18 20V10M12 20V4M6 20v-6" />
+    <template v-else-if="name === 'clock'">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 6v6l4 2" />
+    </template>
     <template v-else-if="name === 'tables'">
       <rect x="3" y="3" width="7" height="7" rx="1" />
       <rect x="14" y="3" width="7" height="7" rx="1" />

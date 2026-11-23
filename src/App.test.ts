@@ -143,6 +143,8 @@ describe('App — бесконечная умная сессия', () => {
     await flushPromises()
     const summary = wrapper.findComponent(SummaryPanel)
     expect(summary.props('result')).toMatchObject({ correct: 2, total: 2 })
+    // в фильтре одни -ar в presente: два быстрых ответа в одной группе — уже «было → стало»
+    expect(Array.isArray(summary.props('result').tempo)).toBe(true)
     expect(summary.props('previous')).toBe(false)
     expect(loadLastSession()).toBeNull()
   })

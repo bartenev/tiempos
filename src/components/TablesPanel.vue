@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { TenseHeat } from '../lib/heat'
-import { heatByCell, repsToGreen, sumByTensePerson } from '../lib/heat'
+import { FADE_FROM_DAYS, heatByCell, lastByCell, repsToGreen, sumByTensePerson } from '../lib/heat'
 import { pluralRu } from '../lib/plural'
 import { GREEN_RUN, loadRuns } from '../lib/runs'
 import { loadStats } from '../lib/stats'
 import { endingsRow } from '../lib/tables'
+import { slowTableCells } from '../lib/tempo'
+import Icon from './Icon.vue'
 import { theme } from '../lib/theme'
 import type { Person, Tense, Verb } from '../types'
 import { TENSES, TENSE_LABELS, personLabel, personsFor } from '../types'
@@ -29,13 +31,15 @@ const PERSON_SHORT: Record<Person, string> = {
 // Панель создаётся заново при каждом открытии вкладки — счётчики свежие.
 const stats = loadStats()
 const runs = loadRuns()
+/** Темп и давность: медленные клетки не зеленее жёлтой, давно не тренированные бледнеют. */
+const extras = { slow: slowTableCells(), last: lastByCell(stats) }
 
 const heat = computed(() => {
   // theme — пересчёт оттенков
   void theme.value
   const map = {} as Record<Tense, TenseHeat>
   for (const tense of TENSES) {
-    map[tense] = heatByCell(runs, tense)
+    map[tense] = heatByCell(runs, tense, extras)
   }
   return map
 })
@@ -56,11 +60,17 @@ function cellStyle(tense: Tense, person: Person, verb: Verb): { backgroundColor:
   return { backgroundColor: heat.value[tense][person]![verb.group].color }
 }
 
+function heatOf(tense: Tense, person: Person, verb: Verb) {
+  return heat.value[tense][person]![verb.group]
+}
+
 function cellTitle(tense: Tense, person: Person, verb: Verb): string {
-  const run = heat.value[tense][person]![verb.group].run
+  const { run, slow, days } = heatOf(tense, person, verb)
   if (run === undefined) return 'Ответов ещё не было'
-  if (run === 0) return 'Последний ответ — ошибка'
-  return `${Math.min(run, GREEN_RUN)} из ${GREEN_RUN} верных подряд`
+  const parts = [run === 0 ? 'Последний ответ — ошибка' : `${Math.min(run, GREEN_RUN)} из ${GREEN_RUN} верных подряд`]
+  if (slow) parts.push('вспоминается медленно')
+  if (days !== null && days >= FADE_FROM_DAYS) parts.push(`не было ${days} ${pluralRu(days, 'день', 'дня', 'дней')}`)
+  return parts.join(' · ')
 }
 
 /** Итог строки под местоимением: верные минус ошибки по всем трём группам. */
@@ -87,6 +97,10 @@ function rowSum(tense: Tense, person: Person): number {
       <span class="tables__legend-note">
         Цвет ячейки — серия верных ответов подряд в правильных глаголах на -ar / -er / -ir
         для этого времени и лица; ошибка обнуляет серию. Число под лицом — верные минус ошибки по строке.
+      </span>
+      <span class="tables__legend-note tables__legend-tempo">
+        <Icon name="clock" class="tables__legend-clock" /> верно, но медленно — клетка не зеленее жёлтой,
+        пока не разгонитесь. Давно не тренировали — клетка бледнеет.
       </span>
     </p>
     <p class="tables__shared-note">
@@ -130,6 +144,11 @@ function rowSum(tense: Tense, person: Person): number {
                 :style="cellStyle(tense, person, EXAMPLES[i]!)"
                 :title="cellTitle(tense, person, EXAMPLES[i]!)"
               >
+                <Icon
+                  v-if="heatOf(tense, person, EXAMPLES[i]!).slow"
+                  name="clock"
+                  class="tables__slow"
+                />
                 <span class="tables__form-stem">{{ cell.stem }}</span><span
                   class="tables__form-ending"
                   :class="{ 'tables__form-ending--shared': cell.shared }"
@@ -183,6 +202,26 @@ function rowSum(tense: Tense, person: Person): number {
 .tables__legend-note {
   width: 100%;
   font-size: var(--text-xs);
+}
+
+.tables__legend-clock {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+}
+
+/* медленная клетка: часики в углу */
+.tables__form {
+  position: relative;
+}
+
+.tables__slow {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--muted);
 }
 
 .tables__shared-note {

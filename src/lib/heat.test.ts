@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { heatByCell, repsToGreen, runColor, sumByTensePerson } from './heat'
+import { FADE_FULL_DAYS, fadeOf, heatByCell, lastByCell, repsToGreen, runColor, sumByTensePerson } from './heat'
 import { GREEN_RUN } from './runs'
 import type { CellStat, StatsStore } from './stats'
 
@@ -57,5 +57,42 @@ describe('heat / sums', () => {
       for (const group of ['ar', 'er', 'ir']) runs[`${group}|presente|${person}`] = GREEN_RUN
     }
     expect(repsToGreen(heatByCell(runs, 'presente'))).toBe(0)
+  })
+})
+
+describe('heat / темп и давность', () => {
+  const DAY = 24 * 60 * 60 * 1000
+
+  it('a slow cell is never greener than yellow', () => {
+    expect(runColor(GREEN_RUN, { slow: true })).toMatch(/^hsl\(60(\.0)? /)
+    expect(runColor(0, { slow: true })).toBe(runColor(0))
+  })
+
+  it('a cell fades the longer it was not trained', () => {
+    expect(fadeOf(null)).toBe(0)
+    expect(fadeOf(1)).toBe(0)
+    expect(fadeOf(8)).toBeCloseTo(0.5)
+    expect(fadeOf(FADE_FULL_DAYS + 30)).toBe(1)
+    expect(runColor(GREEN_RUN, { fade: 1 })).not.toBe(runColor(GREEN_RUN))
+  })
+
+  it('heatByCell marks slow cells and counts days since the last answer', () => {
+    const now = 100 * DAY
+    const heat = heatByCell({ 'ar|presente|yo': GREEN_RUN }, 'presente', {
+      slow: new Set(['ar|presente|yo']),
+      last: new Map([['ar|presente|yo', now - 10 * DAY]]),
+      now,
+    })
+    expect(heat.yo!.ar).toMatchObject({ run: GREEN_RUN, slow: true, days: 10 })
+    expect(heat.yo!.er).toMatchObject({ slow: false, days: null })
+  })
+
+  it('lastByCell takes the latest answer among regular verbs of the cell', () => {
+    const last = lastByCell({
+      'hablar|presente|yo': { ok: 1, bad: 0, streak: 1, last: 5 },
+      'cantar|presente|yo': { ok: 1, bad: 0, streak: 1, last: 9 },
+      'pensar|presente|yo': { ok: 1, bad: 0, streak: 1, last: 50 },
+    })
+    expect(last.get('ar|presente|yo')).toBe(9)
   })
 })

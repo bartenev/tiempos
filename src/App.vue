@@ -27,12 +27,12 @@ import { buildSession } from './lib/session'
 import { articleConfigFromSettings, bookConfigFromSettings, configFromSettings } from './lib/settings'
 import { settings } from './lib/settingsState'
 import type { CellStat } from './lib/stats'
-import type { TempoSession } from './lib/tempo'
-import { createTempoSession } from './lib/tempo'
+import type { TempoRow, TempoSession } from './lib/tempo'
+import { createTempoSession, sessionTempo } from './lib/tempo'
 import { pluralRu } from './lib/plural'
 import { initTheme } from './lib/theme'
 import type { AnswerTiming } from './lib/timing'
-import { dropTiming, recordTiming } from './lib/timing'
+import { dropTiming, loadTimings, recordTiming } from './lib/timing'
 import type {
   AnswerMode,
   AnyCard,
@@ -100,6 +100,8 @@ const finishedAt = ref(0)
 const startError = ref('')
 /** Итог сессии, которую в прошлый раз закрыли, не дойдя до итогов. */
 const previous = ref(false)
+/** Темп за сессию по группам — считается, когда сессия закончена. */
+const tempoRows = ref<TempoRow[]>([])
 
 /** Темп текущей сессии глаголов (умный режим); null — карточки кусками. */
 let tempo: TempoSession | null = null
@@ -151,6 +153,7 @@ const result = computed<SessionResult>(() => ({
   bestStreak: bestStreak.value,
   seconds: Math.round((finishedAt.value - startedAt.value) / 1000),
   mistakes: mistakes.value,
+  tempo: tempoRows.value,
 }))
 
 function begin(next: Run) {
@@ -231,6 +234,7 @@ function openTrainer(track: Track) {
 
 function finish() {
   finishedAt.value = Date.now()
+  tempoRows.value = sessionTempo(loadTimings(), startedAt.value, finishedAt.value)
   clearLastSession()
   screen.value = 'summary'
 }
@@ -441,6 +445,7 @@ function restoreLastSession() {
   mistakes.value = saved.mistakes
   startedAt.value = saved.startedAt
   finishedAt.value = saved.lastAt
+  tempoRows.value = sessionTempo(loadTimings(), saved.startedAt, saved.lastAt)
   previous.value = true
   screen.value = 'summary'
 }

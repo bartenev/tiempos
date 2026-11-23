@@ -26,6 +26,13 @@ const duration = computed(() => {
 })
 
 
+/** Секунды с одним знаком: «2,4 с». */
+function seconds(ms: number): string {
+  return `${(ms / 1000).toFixed(1).replace('.', ',')} с`
+}
+
+const tempo = computed(() => props.result.tempo ?? [])
+
 /** Ошибки без дублей (повтор той же формы). */
 const uniqueMistakes = computed(() => {
   const seen = new Set<string>()
@@ -64,6 +71,24 @@ const uniqueMistakes = computed(() => {
       <span class="summary__count summary__count--bad">{{ result.wrong }} {{ pluralRu(result.wrong, 'ошибка', 'ошибки', 'ошибок') }}</span>
       <span v-if="result.skipped > 0" class="summary__count summary__count--skipped">{{ result.skipped }} пропущено</span>
     </p>
+
+    <template v-if="tempo.length > 0">
+      <h2 class="screen__section-title summary__tempo-title">Темп</h2>
+      <p class="summary__tempo-note">Сколько вспоминали форму: первый верный ответ в группе → последний.</p>
+      <ul class="form-list summary__tempo">
+        <li v-for="row in tempo" :key="row.key" class="form-list__item summary__tempo-row">
+          <span class="form-list__meta summary__tempo-group">{{ row.label }}</span>
+          <span class="form-list__forms summary__tempo-times">
+            <span class="summary__tempo-before">{{ seconds(row.before) }}</span>
+            →
+            <b
+              class="summary__tempo-after"
+              :class="{ 'summary__tempo-after--faster': row.after < row.before }"
+            >{{ seconds(row.after) }}</b>
+          </span>
+        </li>
+      </ul>
+    </template>
 
     <template v-if="uniqueMistakes.length > 0">
       <h2 class="screen__section-title summary__mistakes-title">Над чем поработать</h2>
@@ -124,5 +149,25 @@ const uniqueMistakes = computed(() => {
 
 .summary__count--bad {
   color: var(--bad);
+}
+
+.summary__tempo-note {
+  margin: calc(-1 * var(--space-2)) 0 var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.summary__tempo-times {
+  flex: none;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.summary__tempo-after {
+  color: var(--ink);
+}
+
+.summary__tempo-after--faster {
+  color: var(--ok);
 }
 </style>

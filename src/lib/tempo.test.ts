@@ -11,8 +11,11 @@ import {
   PROBE_LIMIT,
   baseline,
   createTempoSession,
+  groupLabel,
   groupOf,
   groupTempos,
+  sessionTempo,
+  slowTableCells,
   isTired,
   slowness,
   tempoState,
@@ -179,5 +182,39 @@ describe('isTired', () => {
     expect(isTired(steady, NOW)).toBe(false)
     const tired = [...steady, ...Array.from({ length: 10 }, (_, i) => timing('cantar|presente|tú', NOW + 100 + i, 5000))]
     expect(isTired(tired, NOW)).toBe(true)
+  })
+})
+
+describe('темп в «Таблицах» и в итоге', () => {
+  it('slow table cells by runKey; irregular models are not table cells', () => {
+    const slow = [
+      timing('hablar|presente|tú', 1, 12000),
+      timing('cantar|presente|tú', 2, 12000),
+      timing('tener|presente|yo', 3, 12000),
+    ]
+    expect([...slowTableCells(slow)]).toEqual(['ar|presente|tú'])
+  })
+
+  it('labels groups for people', () => {
+    expect(groupLabel('presente|ar|yo')).toBe('Presente · -ar · yo')
+    expect(groupLabel('imperativo|er|él')).toBe('Imperativo · -er · usted')
+    expect(groupLabel('presente|e>ie')).toBe('Presente · e → ie')
+  })
+
+  it('before → after per group in the session, the most sped-up first', () => {
+    const timings = [
+      timing('hablar|presente|yo', NOW - 10, 9000), // до сессии
+      timing('hablar|presente|yo', NOW + 1, 6000),
+      timing('cantar|presente|yo', NOW + 2, 5000, { retry: true }),
+      timing('bailar|presente|yo', NOW + 3, 2000),
+      timing('hablar|presente|tú', NOW + 4, 3000),
+      timing('cantar|presente|tú', NOW + 5, 2900),
+      timing('hablar|presente|él', NOW + 6, 4000, { ok: false }),
+      timing('cantar|presente|él', NOW + 7, 4000),
+    ]
+    expect(sessionTempo(timings, NOW)).toEqual([
+      { key: 'presente|ar|yo', label: 'Presente · -ar · yo', before: 6000, after: 2000 },
+      { key: 'presente|ar|tú', label: 'Presente · -ar · tú', before: 3000, after: 2900 },
+    ])
   })
 })

@@ -40,6 +40,36 @@ export type Pattern =
   | 'short-tu'
   | 'special'
 
+/** Название модели по-человечески: итог сессии («Темп»). */
+export const PATTERN_LABELS: Record<Pattern, string> = {
+  'e>ie': 'e → ie',
+  'o>ue': 'o → ue',
+  'e>i': 'e → i',
+  'yo-go': 'yo на -go',
+  'yo-zco': 'yo на -zco',
+  'verb-ser': 'ser',
+  'verb-estar': 'estar',
+  'verb-ir': 'ir',
+  'verb-haber': 'haber',
+  minor: 'особые формы',
+  'stem-u': 'основа на -u-',
+  'stem-i': 'основа на -i-',
+  'stem-j': 'основа на -j-',
+  'shift-3': 'e → i, o → u в 3-м лице',
+  y: 'y в 3-м лице',
+  fui: 'fui, fue',
+  'di-vi': 'di, vi',
+  'era-iba-veia': 'era, iba, veía',
+  participle: 'неправильный participio',
+  'gerund-i': 'e → i (diciendo)',
+  'gerund-y': 'y (leyendo)',
+  'gerund-u': 'o → u (durmiendo)',
+  vowel: 'чередование (piensa)',
+  'from-yo': 'от yo (tenga, haga)',
+  'short-tu': 'короткое tú (ven, haz)',
+  special: 'sea, vaya, esté',
+}
+
 /**
  * Порядок моделей внутри времени — от самых нужных: ser, estar, ir, hay, tengo/hago раньше
  * e→ie; в indefinido fui/fue первым, в imperativo — ven, haz, di. Правильные -ar → -er → -ir идут до них, а если

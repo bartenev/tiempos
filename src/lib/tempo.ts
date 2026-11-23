@@ -1,6 +1,7 @@
 import type { CardReason, DrillCard, Person, SessionConfig, Tense, Verb, VerbGroup } from '../types'
-import { VERB_GROUPS } from '../types'
-import { portionOf } from './patterns'
+import { TENSE_LABELS, VERB_GROUPS, personLabel } from '../types'
+import type { Pattern } from './patterns'
+import { PATTERN_LABELS, portionOf } from './patterns'
 import type { Cell } from './session'
 import { buildSession, cellsForConfig, makeCard, shuffle } from './session'
 import type { RunStore } from './runs'
@@ -374,4 +375,65 @@ export function createTempoSession(
       return { ...tempoState(ctx), tired: isTired(ctx.timings, sessionStart) }
     },
   }
+}
+
+/**
+ * Медленные клетки «Таблиц» (в разогреве) по всему логу — ключи runKey (`ar|presente|yo`):
+ * такая клетка не зеленее жёлтой, пока не разгонитесь.
+ */
+export function slowTableCells(timings: Timing[] = loadTimings()): Set<string> {
+  const slow = new Set<string>()
+  for (const [key, tempo] of groupTempos(timings, Infinity)) {
+    if (!tempo.hot || !isTableGroup(key)) continue
+    const [tense, group, person] = key.split('|')
+    slow.add(`${group}|${tense}|${person}`)
+  }
+  return slow
+}
+
+/** Подпись группы: «Presente · -ar · yo», «Presente · e → ie». */
+export function groupLabel(key: string): string {
+  const parts = key.split('|')
+  const tense = parts[0] as Tense
+  if (parts.length === 3) {
+    return `${TENSE_LABELS[tense]} · -${parts[1]} · ${personLabel(tense, parts[2] as Person)}`
+  }
+  return `${TENSE_LABELS[tense]} · ${PATTERN_LABELS[parts[1] as Pattern] ?? parts[1]}`
+}
+
+/** Темп группы за сессию: время вспоминания первого и последнего верного ответа, ms. */
+export interface TempoRow {
+  key: string
+  label: string
+  before: number
+  after: number
+}
+
+/** Сколько групп показывать в итоге: самые ускорившиеся. */
+export const TEMPO_ROWS = 5
+
+/**
+ * «Было → стало» по группам за сессию: группы, где было хотя бы два верных ответа
+ * (без повторов после ошибки), — самые ускорившиеся первыми.
+ */
+export function sessionTempo(
+  timings: Timing[],
+  sessionStart: number,
+  sessionEnd: number = Infinity,
+): TempoRow[] {
+  const byGroup = new Map<string, Timing[]>()
+  for (const t of timings) {
+    if (t.at < sessionStart || t.at > sessionEnd || t.retry || !t.ok) continue
+    const key = groupOfKey(t.k)
+    if (!key) continue
+    const list = byGroup.get(key)
+    if (list) list.push(t)
+    else byGroup.set(key, [t])
+  }
+  const rows: TempoRow[] = []
+  for (const [key, list] of byGroup) {
+    if (list.length < 2) continue
+    rows.push({ key, label: groupLabel(key), before: list[0]!.ms, after: list[list.length - 1]!.ms })
+  }
+  return rows.sort((a, b) => b.before - b.after - (a.before - a.after)).slice(0, TEMPO_ROWS)
 }

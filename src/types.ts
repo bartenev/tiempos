@@ -345,6 +345,8 @@ export interface SessionResult {
   /** Длительность в секундах. */
   seconds: number
   mistakes: SessionMistake[]
+  /** Темп за сессию по группам: было → стало (глаголы). */
+  tempo?: { key: string; label: string; before: number; after: number }[]
 }
 
 export type Screen = 'hub' | 'setup' | 'settings' | 'drill' | 'summary' | 'tables' | 'progress'
