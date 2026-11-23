@@ -3,9 +3,9 @@ import { computed, ref } from 'vue'
 import { VERBS, isRegularIn } from '../data/verbs'
 import { conjugate, hasTense } from '../lib/conjugate'
 import type { CellStat, Mastery } from '../lib/stats'
-import { cellKey, errorRate, loadStats, masteryOf, recoveryStreak } from '../lib/stats'
+import { cellKey, loadStats, masteryOf, recoveryStreak } from '../lib/stats'
 import type { Person, Tense, Verb } from '../types'
-import { TENSES, TENSE_SHORT, personLabel, personsFor } from '../types'
+import { TENSES, personLabel, personsFor } from '../types'
 
 const stats = loadStats()
 
@@ -54,20 +54,6 @@ const totals = computed(() => {
     total: cells.length,
   }
 })
-
-/** Топ слабых: больше ошибок и выше доля ошибок — выше в списке. */
-const topWeak = computed(() =>
-  cells
-    .filter((c) => c.mastery === 'weak')
-    .sort((a, b) => {
-      // у слабых форм stat всегда есть
-      const sa = a.stat!.bad * (1 + errorRate(a.stat!))
-      const sb = b.stat!.bad * (1 + errorRate(b.stat!))
-      if (sb !== sa) return sb - sa
-      return (b.stat?.last ?? 0) - (a.stat?.last ?? 0)
-    })
-    .slice(0, 12),
-)
 
 const TAB_LABELS: Record<Tense, string> = {
   presente: 'Presente',
@@ -168,27 +154,6 @@ function statLine(c: CellInfo): string {
       </div>
     </div>
 
-    <h2 class="screen__section-title progress__weak-title">
-      Слабые формы
-      <span class="badge progress__weak-count" :class="{ 'badge--hot': totals.counts.weak > 0 }">{{ totals.counts.weak }}</span>
-    </h2>
-    <p v-if="topWeak.length === 0" class="progress__weak-empty">
-      Пока нет — ошибки появятся здесь, и умная очередь будет показывать их чаще.
-    </p>
-    <ul v-else class="form-list progress__weak-list">
-      <li
-        v-for="c in topWeak"
-        :key="cellKey(c.verb.infinitive, c.tense, c.person)"
-        class="form-list__item progress__weak-item"
-      >
-        <span class="form-list__meta progress__weak-meta">{{ c.verb.infinitive }} · {{ TENSE_SHORT[c.tense] }} · {{ personLabel(c.tense, c.person) }}</span>
-        <span class="form-list__forms progress__weak-forms">
-          <b class="form-list__answer progress__weak-answer">{{ conjugate(c.verb, c.tense, c.person) }}</b>
-          <small class="form-list__stat progress__weak-stat">{{ statLine(c) }}</small>
-        </span>
-      </li>
-    </ul>
-
     <h2 class="screen__section-title progress__grid-title">Сетка форм</h2>
     <div class="tabs progress__tabs" role="tablist">
       <button
@@ -273,12 +238,6 @@ function statLine(c: CellInfo): string {
 }
 
 /* ===== progress ===== */
-
-.progress__weak-empty {
-  margin: 0;
-  font-size: var(--text-sm);
-  color: var(--muted);
-}
 
 .progress__legend {
   display: flex;

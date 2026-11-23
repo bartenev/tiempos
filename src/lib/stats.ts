@@ -235,9 +235,3 @@ export function cellWeight(stat: CellStat | undefined, now: number = Date.now())
   if (isDue(stat, now)) return 2.5
   return Math.max(0.4, 2.5 / (1 + stat.streak * 0.5))
 }
-
-/** Доля ошибок — для сортировки «топ слабых». */
-export function errorRate(stat: CellStat): number {
-  const total = stat.ok + stat.bad
-  return total === 0 ? 0 : stat.bad / total
-}
