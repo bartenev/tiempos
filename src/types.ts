@@ -30,7 +30,7 @@ export interface Verb {
   noPerfecto?: boolean
   /** Неправильный gerundio, которого не даёт правило (ir → yendo, poder → pudiendo). */
   gerund?: string
-  /** Estar + gerundio неестественно («estoy siendo», «estoy sabiendo») — не тренируем. */
+  /** Gerundio в живой речи неестествен («estoy siendo», «sigo sabiendo») — не тренируем. */
   noGerundio?: boolean
 }
 
@@ -351,13 +351,22 @@ export const TENSES: Tense[] = ['presente', 'indefinido', 'imperfecto', 'perfect
  */
 export const IMPERATIVE_PERSONS: Person[] = ['tú', 'él', 'nosotros', 'vosotros', 'ellos']
 
+/**
+ * Gerundio по лицам не меняется: у глагола одна форма (hablando). Хранится в ячейке yo,
+ * подлежащее и вспомогательный глагол (estoy, estaba, sigo, llevo) — в предложении.
+ */
+export const GERUND_PERSONS: Person[] = ['yo']
+
 /** Лица, у которых есть форма в этом времени. */
 export function personsFor(tense: Tense): Person[] {
-  return tense === 'imperativo' ? IMPERATIVE_PERSONS : PERSONS
+  if (tense === 'imperativo') return IMPERATIVE_PERSONS
+  if (tense === 'gerundio') return GERUND_PERSONS
+  return PERSONS
 }
 
-/** Подпись лица: в императиве él → usted, ellos → ustedes. */
+/** Подпись лица: в императиве él → usted, ellos → ustedes; у gerundio лиц нет. */
 export function personLabel(tense: Tense, person: Person): string {
+  if (tense === 'gerundio') return 'все лица'
   if (tense === 'imperativo') {
     if (person === 'él') return 'usted'
     if (person === 'ellos') return 'ustedes'
@@ -370,7 +379,7 @@ export const TENSE_LABELS: Record<Tense, string> = {
   indefinido: 'Pretérito indefinido',
   imperfecto: 'Pretérito imperfecto',
   perfecto: 'Pretérito perfecto',
-  gerundio: 'Estar + gerundio',
+  gerundio: 'Gerundio',
   imperativo: 'Imperativo',
 }
 

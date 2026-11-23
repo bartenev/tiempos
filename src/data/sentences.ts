@@ -1,4 +1,5 @@
 import type { Person, Tense } from '../types'
+import { PERSONS } from '../types'
 
 /**
  * Предложения под конкретный глагол:
@@ -25,7 +26,7 @@ interface Phrase {
 }
 
 /** Маркеры времени: подсказывают, какое время нужно. */
-export const TIME_MARKERS: Record<Exclude<Tense, 'imperativo'>, Phrase[]> = {
+export const TIME_MARKERS: Record<Exclude<Tense, 'imperativo' | 'gerundio'>, Phrase[]> = {
   presente: [
     { es: 'Hoy', ru: 'Сегодня' },
     { es: 'Normalmente', ru: 'Обычно' },
@@ -53,13 +54,50 @@ export const TIME_MARKERS: Record<Exclude<Tense, 'imperativo'>, Phrase[]> = {
     { es: 'Este mes', ru: 'В этом месяце' },
     { es: 'Este año', ru: 'В этом году' },
   ],
-  // Действие идёт сейчас или в эти дни.
-  gerundio: [
-    { es: 'Ahora mismo', ru: 'Прямо сейчас' },
-    { es: 'En este momento', ru: 'В данный момент' },
-    { es: 'Estos días', ru: 'В эти дни' },
-  ],
 }
+
+/**
+ * Gerundio: вспомогательный глагол стоит в предложении, в пропуск — только gerundio.
+ * `{s}` — подлежащее, `{a}` — вспомогательный глагол в нужном лице, `{c}` — дополнение.
+ */
+interface GerundConstruction {
+  /** Вспомогательный глагол по лицам (PERSONS). */
+  aux: string[]
+  es: string
+  ru: string
+  /** Только для этих глаголов (иначе — для всех). */
+  only?: ReadonlySet<string>
+}
+
+const ESTAR = ['estoy', 'estás', 'está', 'estamos', 'estáis', 'están']
+const ESTABA = ['estaba', 'estabas', 'estaba', 'estábamos', 'estabais', 'estaban']
+const SEGUIR = ['sigo', 'sigues', 'sigue', 'seguimos', 'seguís', 'siguen']
+const LLEVAR = ['llevo', 'llevas', 'lleva', 'llevamos', 'lleváis', 'llevan']
+
+/** «Sigo …» — то, что может продолжаться или повторяться (не «sigo abriendo la ventana»). */
+const ONGOING = new Set([
+  'hablar', 'estudiar', 'trabajar', 'caminar', 'comprar', 'mirar', 'escuchar', 'cantar', 'bailar',
+  'cocinar', 'buscar', 'tomar', 'comer', 'correr', 'aprender', 'vivir', 'escribir', 'recibir',
+  'pensar', 'jugar', 'dormir', 'sentir', 'repetir', 'contar', 'ir', 'tener', 'hacer', 'decir',
+  'venir', 'poner', 'ver', 'salir', 'leer', 'oír', 'conducir', 'traducir',
+])
+
+/** «Llevo una hora …» — действие, которое длится час (не «llevo una hora volviendo»). */
+const DURATIVE = new Set([
+  'hablar', 'estudiar', 'trabajar', 'caminar', 'mirar', 'escuchar', 'cantar', 'bailar', 'cocinar',
+  'buscar', 'comer', 'correr', 'aprender', 'escribir', 'pensar', 'jugar', 'dormir', 'regar',
+  'contar', 'almorzar', 'resolver', 'hacer', 'ver', 'leer', 'conducir', 'traducir',
+])
+
+export const GERUND_CONSTRUCTIONS: GerundConstruction[] = [
+  { aux: ESTAR, es: 'Ahora mismo {s} {a} ___ {c}.', ru: 'Прямо сейчас {s} … {c}.' },
+  { aux: ESTAR, es: 'En este momento {s} {a} ___ {c}.', ru: 'В данный момент {s} … {c}.' },
+  { aux: ESTAR, es: 'Estos días {s} {a} ___ {c}.', ru: 'В эти дни {s} … {c}.' },
+  { aux: ESTABA, es: 'Cuando sonó el teléfono, {s} {a} ___ {c}.', ru: 'Когда зазвонил телефон, {s} … {c}.' },
+  { aux: ESTABA, es: 'Ayer a las ocho {s} {a} ___ {c}.', ru: 'Вчера в восемь {s} … {c}.' },
+  { aux: SEGUIR, es: '{s} {a} ___ {c}.', ru: '{s} всё ещё … {c}.', only: ONGOING },
+  { aux: LLEVAR, es: '{s} {a} una hora ___ {c}.', ru: '{s} уже час … {c}.', only: DURATIVE },
+]
 
 export const SUBJECTS: Record<Person, Phrase[]> = {
   yo: [{ es: 'yo', ru: 'я' }],
@@ -495,6 +533,37 @@ function fitsTense(c: Complement, tense: Tense): boolean {
   return (!c.tenses || c.tenses.includes(tense)) && !c.except?.includes(tense)
 }
 
+/** Конструкции gerundio, которые подходят глаголу. */
+export function gerundConstructions(infinitive: string): GerundConstruction[] {
+  return GERUND_CONSTRUCTIONS.filter((c) => !c.only || c.only.has(infinitive))
+}
+
+/** Gerundio по лицам не меняется — подлежащее (и с ним вспомогательный глагол) выбираем сами. */
+function buildGerundSentence(infinitive: string, pick: Pick): BuiltSentence | null {
+  const complements = (VERB_COMPLEMENTS[infinitive] ?? []).filter((c) => fitsTense(c, 'gerundio'))
+  if (complements.length === 0) return null
+
+  const person = pick(PERSONS)
+  const construction = pick(gerundConstructions(infinitive))
+  const subject = pick(SUBJECTS[person])
+  const comp = pick(complements)
+  const plural = PLURAL.has(person)
+  const compEs = plural && comp.esPl ? comp.esPl : comp.es
+  const compRu = plural && comp.ruPl ? comp.ruPl : comp.ru
+  const fill = (text: string, s: string, c: string) =>
+    capitalize(
+      text
+        .replace('{s}', s)
+        .replace('{a}', construction.aux[PERSONS.indexOf(person)]!)
+        .replace('{c}', c)
+        .replace(' .', '.'),
+    )
+  return {
+    sentence: fill(construction.es, subject.es, compEs),
+    translation: fill(construction.ru, subject.ru, compRu),
+  }
+}
+
 export function imperativeComplements(infinitive: string): Complement[] {
   return (
     IMPERATIVE_COMPLEMENTS[infinitive] ??
@@ -552,6 +621,7 @@ export function buildVerbSentence(
   pick: Pick = firstPick,
 ): BuiltSentence | null {
   if (tense === 'imperativo') return buildImperativeSentence(infinitive, person, pick)
+  if (tense === 'gerundio') return buildGerundSentence(infinitive, pick)
 
   const special = SPECIAL_SENTENCES[infinitive]?.[tense]
   if (special && special.length > 0) {

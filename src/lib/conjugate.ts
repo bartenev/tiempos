@@ -45,9 +45,6 @@ export function participleOf(verb: Verb): string {
   return verb.participle ?? infinitiveStem(verb) + participleEnding(verb)
 }
 
-/** Presente de estar — вспомогательный глагол estar + gerundio. */
-export const ESTAR_PRESENT = ['estoy', 'estás', 'está', 'estamos', 'estáis', 'están']
-
 /**
  * Gerundio: -ar → -ando, -er / -ir → -iendo; -ir с чередованием меняют e → i, o → u
  * (pidiendo, sintiendo, durmiendo, diciendo). -yendo после гласной (leyendo, oyendo, yendo)
@@ -223,13 +220,6 @@ function conjugatePerfecto(verb: Verb, person: Person): string {
   return `${HABER_PRESENT[personIndex(person)]} ${participleOf(verb)}`
 }
 
-/** Estar + gerundio: estoy hablando, estás comiendo. */
-function conjugateGerundio(verb: Verb, person: Person): string {
-  const override = verb.forms?.gerundio?.[person]
-  if (override) return override
-  return `${ESTAR_PRESENT[personIndex(person)]} ${gerundOf(verb)}`
-}
-
 /** Есть ли у глагола это время в тренажёре. */
 export function hasTense(verb: Verb, tense: Tense): boolean {
   if (tense === 'imperativo') return !verb.noImperative
@@ -254,7 +244,8 @@ export function conjugate(verb: Verb, tense: Tense, person: Person): string {
     case 'perfecto':
       return conjugatePerfecto(verb, person)
     case 'gerundio':
-      return conjugateGerundio(verb, person)
+      // по лицам не меняется: estoy / sigo / llevo una hora — hablando
+      return gerundOf(verb)
     case 'imperativo':
       return conjugateImperativo(verb, person)
   }

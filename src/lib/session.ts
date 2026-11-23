@@ -99,8 +99,9 @@ function toCell(verb: Verb, tense: Tense, person: Person, stats: StatsStore): Ce
   return { verb, tense, person, stat, weight, weak: isWeak(stat) }
 }
 
-/** Лица времени, отмеченные в настройках (в императиве нет yo). */
+/** Лица времени, отмеченные в настройках (в императиве нет yo; gerundio от лиц не зависит). */
 function personsOf(config: SessionConfig, tense: Tense): Person[] {
+  if (tense === 'gerundio') return config.persons.length > 0 ? personsFor(tense) : []
   return personsFor(tense).filter((p) => config.persons.includes(p))
 }
 

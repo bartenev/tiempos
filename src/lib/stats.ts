@@ -103,7 +103,13 @@ function loadStore(storageKey: string): StatsStore {
 }
 
 export function loadStats(): StatsStore {
-  return loadStore(STATS_KEY)
+  const store = loadStore(STATS_KEY)
+  // gerundio раньше хранился по лицам (estoy / estás hablando) — теперь одна ячейка yo
+  for (const key of Object.keys(store)) {
+    const { tense, person } = parseCellKey(key)
+    if (tense === 'gerundio' && person !== 'yo') delete store[key]
+  }
+  return store
 }
 
 export function saveStats(store: StatsStore): void {

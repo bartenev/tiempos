@@ -122,3 +122,14 @@ describe('stats', () => {
     expect(loadBookStats()).toEqual({ '18.1.1': newer })
   })
 })
+
+describe('gerundio stats', () => {
+  it('drops the old per-person gerundio cells, keeps yo', () => {
+    const stat = { ok: 1, bad: 0, streak: 1, last: 0 }
+    localStorage.setItem(
+      STATS_KEY,
+      JSON.stringify({ 'leer|gerundio|yo': stat, 'leer|gerundio|tú': stat, 'leer|presente|tú': stat }),
+    )
+    expect(Object.keys(loadStats()).sort()).toEqual(['leer|gerundio|yo', 'leer|presente|tú'])
+  })
+})

@@ -11,14 +11,15 @@ function current(hint: FormHint) {
 }
 
 describe('explainForm', () => {
-  it('estar + gerundio: regular ending highlighted, stem change explained', () => {
-    const regular = explainForm(findVerb('comer')!, 'gerundio', 'tú')
+  it('gerundio: one form, regular ending highlighted, stem change explained', () => {
+    const regular = explainForm(findVerb('comer')!, 'gerundio', 'yo')
     expect(regular.rule).toContain('-iendo')
-    expect(current(regular)).toMatchObject({ stem: 'estás com', ending: 'iendo' })
+    expect(regular.row).toHaveLength(1)
+    expect(current(regular)).toMatchObject({ label: 'все лица', stem: 'com', ending: 'iendo' })
 
     const pedir = explainForm(findVerb('pedir')!, 'gerundio', 'yo')
     expect(pedir.rule).toContain('e → i')
-    expect(current(pedir)).toMatchObject({ stem: 'estoy pidiendo', ending: '' })
+    expect(current(pedir)).toMatchObject({ stem: 'pidiendo', ending: '' })
 
     expect(explainForm(findVerb('leer')!, 'gerundio', 'yo').rule).toContain('-yendo')
     expect(explainForm(findVerb('ir')!, 'gerundio', 'yo').rule).toContain('yendo')

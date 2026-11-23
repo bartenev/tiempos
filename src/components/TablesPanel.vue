@@ -119,7 +119,7 @@ function rowSum(tense: Tense, person: Person): number {
           <tbody class="tables__tbody">
             <tr v-for="person in personsFor(tense)" :key="person" class="tables__row">
               <th class="tables__cell tables__person" scope="row">
-                {{ tense === 'imperativo' ? personLabel(tense, person) : PERSON_SHORT[person] }}
+                {{ tense === 'imperativo' || tense === 'gerundio' ? personLabel(tense, person) : PERSON_SHORT[person] }}
                 <span class="tables__sum">{{ rowSum(tense, person) }}</span>
               </th>
               <td

@@ -71,19 +71,11 @@ export const FRAMES: SentenceFrame[] = [
   { tense: 'perfecto', person: 'ellos', template: 'Ellos ___ esta semana.', translation: 'Они … на этой неделе.' },
   { tense: 'perfecto', person: 'ellos', template: 'Este año mis amigos ___ en Madrid.', translation: 'В этом году мои друзья … в Мадриде.' },
 
-  // —— Estar + gerundio ——
-  { tense: 'gerundio', person: 'yo', template: 'Ahora mismo yo ___ en casa.', translation: 'Прямо сейчас я … дома.' },
-  { tense: 'gerundio', person: 'yo', template: 'Estos días yo ___ mucho.', translation: 'В эти дни я … много.' },
-  { tense: 'gerundio', person: 'tú', template: '¿Tú ___ ahora?', translation: 'Ты … сейчас?' },
-  { tense: 'gerundio', person: 'tú', template: 'Ahora mismo tú ___ con Ana.', translation: 'Прямо сейчас ты … с Аной.' },
-  { tense: 'gerundio', person: 'él', template: 'Él ___ en este momento.', translation: 'Он … в данный момент.' },
-  { tense: 'gerundio', person: 'él', template: 'Estos días Ana ___ mucho.', translation: 'В эти дни Ана … много.' },
-  { tense: 'gerundio', person: 'nosotros', template: 'Ahora mismo nosotros ___ juntos.', translation: 'Прямо сейчас мы … вместе.' },
-  { tense: 'gerundio', person: 'nosotros', template: 'Estos días nosotros ___ mucho.', translation: 'В эти дни мы … много.' },
-  { tense: 'gerundio', person: 'vosotros', template: '¿Vosotros ___ ahora?', translation: 'Вы (vosotros) … сейчас?' },
-  { tense: 'gerundio', person: 'vosotros', template: 'Estos días vosotros ___ aquí.', translation: 'В эти дни вы (vosotros) … здесь.' },
-  { tense: 'gerundio', person: 'ellos', template: 'Ellos ___ en este momento.', translation: 'Они … в данный момент.' },
-  { tense: 'gerundio', person: 'ellos', template: 'Ahora mismo mis amigos ___ en Madrid.', translation: 'Прямо сейчас мои друзья … в Мадриде.' },
+  // —— Gerundio (по лицам не меняется: одна ячейка yo, вспомогательный глагол — в рамке) ——
+  { tense: 'gerundio', person: 'yo', template: 'Ahora mismo yo estoy ___.', translation: 'Прямо сейчас я …' },
+  { tense: 'gerundio', person: 'yo', template: 'Ana sigue ___.', translation: 'Ана всё ещё …' },
+  { tense: 'gerundio', person: 'yo', template: 'Cuando sonó el teléfono, nosotros estábamos ___.', translation: 'Когда зазвонил телефон, мы …' },
+  { tense: 'gerundio', person: 'yo', template: 'Mis amigos llevan una hora ___.', translation: 'Мои друзья уже час …' },
 
   // —— Imperativo (yo нет; él / ellos = usted / ustedes) ——
   { tense: 'imperativo', person: 'tú', template: '(tú) ¡___ ahora!', translation: '(ты) … сейчас!' },

@@ -1,7 +1,6 @@
 import type { HintStep, Person, StemChange, Tense, Verb } from '../types'
 import { PERSONS, personLabel, personsFor } from '../types'
 import {
-  ESTAR_PRESENT,
   HABER_PRESENT,
   IMPERATIVE_ENDINGS,
   IMPERFECT_ENDINGS,
@@ -62,7 +61,7 @@ const TENSE_NAME: Record<Tense, string> = {
   indefinido: 'Indefinido',
   imperfecto: 'Imperfecto',
   perfecto: 'Perfecto',
-  gerundio: 'Estar + gerundio',
+  gerundio: 'Gerundio',
   imperativo: 'Imperativo',
 }
 
@@ -204,24 +203,23 @@ function explainPerfecto(verb: Verb, person: Person): FormHint {
 }
 
 function explainGerundio(verb: Verb, person: Person): FormHint {
-  const estar = ESTAR_PRESENT.join(', ')
   const gerund = gerundOf(verb)
   const regular = verb.group === 'ar' ? 'ando' : 'iendo'
   const stem = infinitiveStem(verb)
   let rule: string
   let note: string | undefined
   if (gerund === stem + regular) {
-    rule = `estar (${estar}) + gerundio: ${stem}- + -${regular}.`
-    note = 'Gerundio не меняется по лицам — меняется только estar.'
+    rule = `Gerundio: ${stem}- + -${regular} (-ar → -ando, -er / -ir → -iendo).`
+    note = `По лицам не меняется: estoy / sigo / llevo una hora ${gerund}.`
   } else if (gerund === 'yendo') {
-    rule = `estar (${estar}) + gerundio от ir: yendo — запомните.`
+    rule = 'Gerundio от ir: yendo — запомните.'
   } else if (gerund.endsWith('yendo')) {
-    rule = `estar (${estar}) + gerundio: после гласной основы -yendo (${gerund}).`
+    rule = `После гласной основы -yendo: ${gerund}.`
     note = 'Так же leyendo, oyendo, trayendo, creyendo, cayendo.'
   } else {
     const shift = indefinidoShift(verb)
     const change = shift ? STEM_CHANGE_TEXT[shift] : ''
-    rule = `estar (${estar}) + gerundio: -ir с чередованием ${change} (${gerund}).`
+    rule = `-ir с чередованием: ${change} (${gerund}).`
     note = 'Как в indefinido él / ellos: pidió → pidiendo, durmió → durmiendo; так же diciendo, viniendo.'
   }
   return withRow({ rule, note }, verb, 'gerundio', person, regularEndings(verb, 'gerundio'))

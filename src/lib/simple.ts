@@ -8,6 +8,7 @@ import { personLabel } from '../types'
  */
 export function simplePrompt(card: DrillCard): { sentence: string; translation: string } {
   const label = personLabel(card.tense, card.person)
-  const sentence = card.tense === 'imperativo' ? `(${label}) ¡___!` : `${label} ___`
+  const sentence =
+    card.tense === 'imperativo' ? `(${label}) ¡___!` : card.tense === 'gerundio' ? 'estoy ___' : `${label} ___`
   return { sentence, translation: VERB_RU[card.verb.infinitive] ?? '' }
 }

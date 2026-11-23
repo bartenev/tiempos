@@ -30,7 +30,7 @@ export type Pattern =
   | 'era-iba-veia'
   // perfecto
   | 'participle'
-  // estar + gerundio
+  // gerundio
   | 'gerund-i'
   | 'gerund-y'
   | 'gerund-u'

@@ -56,7 +56,7 @@ const trainers = computed(() => {
     {
       track: 'verbs',
       title: 'Глаголы',
-      lead: 'Спряжение: presente, indefinido, imperfecto, perfecto, estar + gerundio, imperativo',
+      lead: 'Спряжение: presente, indefinido, imperfecto, perfecto, gerundio, imperativo',
       progress: progressLine(null, loadStats()),
     },
     {

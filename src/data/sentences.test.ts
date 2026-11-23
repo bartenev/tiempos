@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { TENSES, personsFor } from '../types'
 import { hasTense } from '../lib/conjugate'
-import { VERB_COMPLEMENTS, buildVerbSentence } from './sentences'
+import { VERB_COMPLEMENTS, buildVerbSentence, gerundConstructions } from './sentences'
 import { VERBS } from './verbs'
 
 describe('verb sentences', () => {
@@ -24,12 +24,32 @@ describe('verb sentences', () => {
     }
   })
 
-  it('estar + gerundio: a «now» marker and no clashing complements', () => {
-    for (let i = 0; i < 3; i++) {
-      const pick = <T,>(items: T[]) => items[i % items.length]!
-      const built = buildVerbSentence('llegar', 'gerundio', 'yo', pick)!
-      expect(built.sentence).toMatch(/^(Ahora mismo|En este momento|Estos días) yo ___ /)
-      expect(built.sentence).not.toContain('a las ocho')
+  it('gerundio: the auxiliary is in the sentence, only the gerund goes into the gap', () => {
+    const first = buildVerbSentence('hablar', 'gerundio', 'yo')!
+    expect(first.sentence).toBe('Ahora mismo yo estoy ___ con Ana.')
+    expect(first.translation).toBe('Прямо сейчас я … с Аной.')
+
+    // любые лица и конструкции: estoy / estaba / sigo / llevo una hora
+    const sentences: string[] = []
+    for (let i = 0; i < 300; i++) {
+      const pick = <T,>(items: T[]) => items[Math.floor(Math.random() * items.length)]!
+      const built = buildVerbSentence('leer', 'gerundio', 'yo', pick)!
+      expect(built.sentence.split('___').length - 1).toBe(1)
+      sentences.push(built.sentence)
+    }
+    for (const aux of [/\best(oy|ás|á|amos|áis|án) ___/, /\bestab/, /\b(sigo|sigues|sigue|seguimos|seguís|siguen) ___/, /\bllev\w+ una hora ___/]) {
+      expect(sentences.some((s) => aux.test(s)), String(aux)).toBe(true)
+    }
+  })
+
+  it('gerundio: «llevo una hora» and «sigo» only where they make sense', () => {
+    expect(gerundConstructions('leer').some((c) => c.es.includes('una hora'))).toBe(true)
+    expect(gerundConstructions('abrir').some((c) => c.es.includes('una hora'))).toBe(false)
+    expect(gerundConstructions('abrir').some((c) => c.aux[0] === 'sigo')).toBe(false)
+    expect(gerundConstructions('abrir').length).toBeGreaterThan(0)
+    for (let i = 0; i < 50; i++) {
+      const pick = <T,>(items: T[]) => items[Math.floor(Math.random() * items.length)]!
+      expect(buildVerbSentence('llegar', 'gerundio', 'yo', pick)!.sentence).not.toContain('a casa a las ocho')
     }
     const last = <T,>(items: T[]) => items[items.length - 1]!
     expect(buildVerbSentence('vivir', 'gerundio', 'yo', last)!.sentence).toContain('una gran aventura')

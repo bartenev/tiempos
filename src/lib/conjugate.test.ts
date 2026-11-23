@@ -210,24 +210,24 @@ describe('pretérito perfecto', () => {
   })
 })
 
-describe('estar + gerundio', () => {
-  it('estar + -ando / -iendo, the gerund does not change by person', () => {
-    expect(conjugate(mustFind('hablar'), 'gerundio', 'yo')).toBe('estoy hablando')
-    expect(conjugate(mustFind('comer'), 'gerundio', 'vosotros')).toBe('estáis comiendo')
-    expect(conjugate(mustFind('vivir'), 'gerundio', 'ellos')).toBe('están viviendo')
+describe('gerundio', () => {
+  it('-ando / -iendo, the same for every person', () => {
+    expect(conjugate(mustFind('hablar'), 'gerundio', 'yo')).toBe('hablando')
+    expect(conjugate(mustFind('comer'), 'gerundio', 'vosotros')).toBe('comiendo')
+    expect(conjugate(mustFind('vivir'), 'gerundio', 'ellos')).toBe('viviendo')
   })
 
   it('-ir stem-changers shift e → i, o → u; -yendo and yendo come from the bank', () => {
-    expect(conjugate(mustFind('pedir'), 'gerundio', 'tú')).toBe('estás pidiendo')
-    expect(conjugate(mustFind('sentir'), 'gerundio', 'él')).toBe('está sintiendo')
-    expect(conjugate(mustFind('decir'), 'gerundio', 'yo')).toBe('estoy diciendo')
-    expect(conjugate(mustFind('venir'), 'gerundio', 'yo')).toBe('estoy viniendo')
-    expect(conjugate(mustFind('dormir'), 'gerundio', 'nosotros')).toBe('estamos durmiendo')
-    expect(conjugate(mustFind('leer'), 'gerundio', 'yo')).toBe('estoy leyendo')
-    expect(conjugate(mustFind('ir'), 'gerundio', 'yo')).toBe('estoy yendo')
+    expect(conjugate(mustFind('pedir'), 'gerundio', 'yo')).toBe('pidiendo')
+    expect(conjugate(mustFind('sentir'), 'gerundio', 'yo')).toBe('sintiendo')
+    expect(conjugate(mustFind('decir'), 'gerundio', 'yo')).toBe('diciendo')
+    expect(conjugate(mustFind('venir'), 'gerundio', 'yo')).toBe('viniendo')
+    expect(conjugate(mustFind('dormir'), 'gerundio', 'yo')).toBe('durmiendo')
+    expect(conjugate(mustFind('leer'), 'gerundio', 'yo')).toBe('leyendo')
+    expect(conjugate(mustFind('ir'), 'gerundio', 'yo')).toBe('yendo')
     // -er с чередованием gerundio не меняют
-    expect(conjugate(mustFind('volver'), 'gerundio', 'yo')).toBe('estoy volviendo')
-    expect(conjugate(mustFind('pensar'), 'gerundio', 'yo')).toBe('estoy pensando')
+    expect(conjugate(mustFind('volver'), 'gerundio', 'yo')).toBe('volviendo')
+    expect(conjugate(mustFind('pensar'), 'gerundio', 'yo')).toBe('pensando')
   })
 
   it('unnatural progressives are not trained', () => {

@@ -7,7 +7,7 @@ import { conjugate, hasTense } from './conjugate'
 /**
  * Эталон: все формы всех глаголов банка, проверенные вручную.
  * Порядок лиц: yo, tú, él, nosotros, vosotros, ellos;
- * imperativo: tú, usted, nosotros, vosotros, ustedes.
+ * imperativo: tú, usted, nosotros, vosotros, ustedes; gerundio — одна форма.
  * Новый глагол в банке → добавить сюда его проверенные формы.
  */
 const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
@@ -16,7 +16,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['hablé', 'hablaste', 'habló', 'hablamos', 'hablasteis', 'hablaron'],
     imperfecto: ['hablaba', 'hablabas', 'hablaba', 'hablábamos', 'hablabais', 'hablaban'],
     perfecto: ['he hablado', 'has hablado', 'ha hablado', 'hemos hablado', 'habéis hablado', 'han hablado'],
-    gerundio: ['estoy hablando', 'estás hablando', 'está hablando', 'estamos hablando', 'estáis hablando', 'están hablando'],
+    gerundio: ['hablando'],
     imperativo: ['habla', 'hable', 'hablemos', 'hablad', 'hablen'],
   },
   estudiar: {
@@ -24,7 +24,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['estudié', 'estudiaste', 'estudió', 'estudiamos', 'estudiasteis', 'estudiaron'],
     imperfecto: ['estudiaba', 'estudiabas', 'estudiaba', 'estudiábamos', 'estudiabais', 'estudiaban'],
     perfecto: ['he estudiado', 'has estudiado', 'ha estudiado', 'hemos estudiado', 'habéis estudiado', 'han estudiado'],
-    gerundio: ['estoy estudiando', 'estás estudiando', 'está estudiando', 'estamos estudiando', 'estáis estudiando', 'están estudiando'],
+    gerundio: ['estudiando'],
     imperativo: ['estudia', 'estudie', 'estudiemos', 'estudiad', 'estudien'],
   },
   trabajar: {
@@ -32,7 +32,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['trabajé', 'trabajaste', 'trabajó', 'trabajamos', 'trabajasteis', 'trabajaron'],
     imperfecto: ['trabajaba', 'trabajabas', 'trabajaba', 'trabajábamos', 'trabajabais', 'trabajaban'],
     perfecto: ['he trabajado', 'has trabajado', 'ha trabajado', 'hemos trabajado', 'habéis trabajado', 'han trabajado'],
-    gerundio: ['estoy trabajando', 'estás trabajando', 'está trabajando', 'estamos trabajando', 'estáis trabajando', 'están trabajando'],
+    gerundio: ['trabajando'],
     imperativo: ['trabaja', 'trabaje', 'trabajemos', 'trabajad', 'trabajen'],
   },
   caminar: {
@@ -40,7 +40,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['caminé', 'caminaste', 'caminó', 'caminamos', 'caminasteis', 'caminaron'],
     imperfecto: ['caminaba', 'caminabas', 'caminaba', 'caminábamos', 'caminabais', 'caminaban'],
     perfecto: ['he caminado', 'has caminado', 'ha caminado', 'hemos caminado', 'habéis caminado', 'han caminado'],
-    gerundio: ['estoy caminando', 'estás caminando', 'está caminando', 'estamos caminando', 'estáis caminando', 'están caminando'],
+    gerundio: ['caminando'],
     imperativo: ['camina', 'camine', 'caminemos', 'caminad', 'caminen'],
   },
   comprar: {
@@ -48,7 +48,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['compré', 'compraste', 'compró', 'compramos', 'comprasteis', 'compraron'],
     imperfecto: ['compraba', 'comprabas', 'compraba', 'comprábamos', 'comprabais', 'compraban'],
     perfecto: ['he comprado', 'has comprado', 'ha comprado', 'hemos comprado', 'habéis comprado', 'han comprado'],
-    gerundio: ['estoy comprando', 'estás comprando', 'está comprando', 'estamos comprando', 'estáis comprando', 'están comprando'],
+    gerundio: ['comprando'],
     imperativo: ['compra', 'compre', 'compremos', 'comprad', 'compren'],
   },
   mirar: {
@@ -56,7 +56,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['miré', 'miraste', 'miró', 'miramos', 'mirasteis', 'miraron'],
     imperfecto: ['miraba', 'mirabas', 'miraba', 'mirábamos', 'mirabais', 'miraban'],
     perfecto: ['he mirado', 'has mirado', 'ha mirado', 'hemos mirado', 'habéis mirado', 'han mirado'],
-    gerundio: ['estoy mirando', 'estás mirando', 'está mirando', 'estamos mirando', 'estáis mirando', 'están mirando'],
+    gerundio: ['mirando'],
     imperativo: ['mira', 'mire', 'miremos', 'mirad', 'miren'],
   },
   escuchar: {
@@ -64,7 +64,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['escuché', 'escuchaste', 'escuchó', 'escuchamos', 'escuchasteis', 'escucharon'],
     imperfecto: ['escuchaba', 'escuchabas', 'escuchaba', 'escuchábamos', 'escuchabais', 'escuchaban'],
     perfecto: ['he escuchado', 'has escuchado', 'ha escuchado', 'hemos escuchado', 'habéis escuchado', 'han escuchado'],
-    gerundio: ['estoy escuchando', 'estás escuchando', 'está escuchando', 'estamos escuchando', 'estáis escuchando', 'están escuchando'],
+    gerundio: ['escuchando'],
     imperativo: ['escucha', 'escuche', 'escuchemos', 'escuchad', 'escuchen'],
   },
   cantar: {
@@ -72,7 +72,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['canté', 'cantaste', 'cantó', 'cantamos', 'cantasteis', 'cantaron'],
     imperfecto: ['cantaba', 'cantabas', 'cantaba', 'cantábamos', 'cantabais', 'cantaban'],
     perfecto: ['he cantado', 'has cantado', 'ha cantado', 'hemos cantado', 'habéis cantado', 'han cantado'],
-    gerundio: ['estoy cantando', 'estás cantando', 'está cantando', 'estamos cantando', 'estáis cantando', 'están cantando'],
+    gerundio: ['cantando'],
     imperativo: ['canta', 'cante', 'cantemos', 'cantad', 'canten'],
   },
   bailar: {
@@ -80,7 +80,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['bailé', 'bailaste', 'bailó', 'bailamos', 'bailasteis', 'bailaron'],
     imperfecto: ['bailaba', 'bailabas', 'bailaba', 'bailábamos', 'bailabais', 'bailaban'],
     perfecto: ['he bailado', 'has bailado', 'ha bailado', 'hemos bailado', 'habéis bailado', 'han bailado'],
-    gerundio: ['estoy bailando', 'estás bailando', 'está bailando', 'estamos bailando', 'estáis bailando', 'están bailando'],
+    gerundio: ['bailando'],
     imperativo: ['baila', 'baile', 'bailemos', 'bailad', 'bailen'],
   },
   cocinar: {
@@ -88,7 +88,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['cociné', 'cocinaste', 'cocinó', 'cocinamos', 'cocinasteis', 'cocinaron'],
     imperfecto: ['cocinaba', 'cocinabas', 'cocinaba', 'cocinábamos', 'cocinabais', 'cocinaban'],
     perfecto: ['he cocinado', 'has cocinado', 'ha cocinado', 'hemos cocinado', 'habéis cocinado', 'han cocinado'],
-    gerundio: ['estoy cocinando', 'estás cocinando', 'está cocinando', 'estamos cocinando', 'estáis cocinando', 'están cocinando'],
+    gerundio: ['cocinando'],
     imperativo: ['cocina', 'cocine', 'cocinemos', 'cocinad', 'cocinen'],
   },
   llegar: {
@@ -96,7 +96,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['llegué', 'llegaste', 'llegó', 'llegamos', 'llegasteis', 'llegaron'],
     imperfecto: ['llegaba', 'llegabas', 'llegaba', 'llegábamos', 'llegabais', 'llegaban'],
     perfecto: ['he llegado', 'has llegado', 'ha llegado', 'hemos llegado', 'habéis llegado', 'han llegado'],
-    gerundio: ['estoy llegando', 'estás llegando', 'está llegando', 'estamos llegando', 'estáis llegando', 'están llegando'],
+    gerundio: ['llegando'],
     imperativo: ['llega', 'llegue', 'lleguemos', 'llegad', 'lleguen'],
   },
   buscar: {
@@ -104,7 +104,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['busqué', 'buscaste', 'buscó', 'buscamos', 'buscasteis', 'buscaron'],
     imperfecto: ['buscaba', 'buscabas', 'buscaba', 'buscábamos', 'buscabais', 'buscaban'],
     perfecto: ['he buscado', 'has buscado', 'ha buscado', 'hemos buscado', 'habéis buscado', 'han buscado'],
-    gerundio: ['estoy buscando', 'estás buscando', 'está buscando', 'estamos buscando', 'estáis buscando', 'están buscando'],
+    gerundio: ['buscando'],
     imperativo: ['busca', 'busque', 'busquemos', 'buscad', 'busquen'],
   },
   tomar: {
@@ -112,7 +112,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['tomé', 'tomaste', 'tomó', 'tomamos', 'tomasteis', 'tomaron'],
     imperfecto: ['tomaba', 'tomabas', 'tomaba', 'tomábamos', 'tomabais', 'tomaban'],
     perfecto: ['he tomado', 'has tomado', 'ha tomado', 'hemos tomado', 'habéis tomado', 'han tomado'],
-    gerundio: ['estoy tomando', 'estás tomando', 'está tomando', 'estamos tomando', 'estáis tomando', 'están tomando'],
+    gerundio: ['tomando'],
     imperativo: ['toma', 'tome', 'tomemos', 'tomad', 'tomen'],
   },
   necesitar: {
@@ -126,7 +126,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['comí', 'comiste', 'comió', 'comimos', 'comisteis', 'comieron'],
     imperfecto: ['comía', 'comías', 'comía', 'comíamos', 'comíais', 'comían'],
     perfecto: ['he comido', 'has comido', 'ha comido', 'hemos comido', 'habéis comido', 'han comido'],
-    gerundio: ['estoy comiendo', 'estás comiendo', 'está comiendo', 'estamos comiendo', 'estáis comiendo', 'están comiendo'],
+    gerundio: ['comiendo'],
     imperativo: ['come', 'coma', 'comamos', 'comed', 'coman'],
   },
   beber: {
@@ -134,7 +134,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['bebí', 'bebiste', 'bebió', 'bebimos', 'bebisteis', 'bebieron'],
     imperfecto: ['bebía', 'bebías', 'bebía', 'bebíamos', 'bebíais', 'bebían'],
     perfecto: ['he bebido', 'has bebido', 'ha bebido', 'hemos bebido', 'habéis bebido', 'han bebido'],
-    gerundio: ['estoy bebiendo', 'estás bebiendo', 'está bebiendo', 'estamos bebiendo', 'estáis bebiendo', 'están bebiendo'],
+    gerundio: ['bebiendo'],
     imperativo: ['bebe', 'beba', 'bebamos', 'bebed', 'beban'],
   },
   correr: {
@@ -142,7 +142,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['corrí', 'corriste', 'corrió', 'corrimos', 'corristeis', 'corrieron'],
     imperfecto: ['corría', 'corrías', 'corría', 'corríamos', 'corríais', 'corrían'],
     perfecto: ['he corrido', 'has corrido', 'ha corrido', 'hemos corrido', 'habéis corrido', 'han corrido'],
-    gerundio: ['estoy corriendo', 'estás corriendo', 'está corriendo', 'estamos corriendo', 'estáis corriendo', 'están corriendo'],
+    gerundio: ['corriendo'],
     imperativo: ['corre', 'corra', 'corramos', 'corred', 'corran'],
   },
   aprender: {
@@ -150,7 +150,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['aprendí', 'aprendiste', 'aprendió', 'aprendimos', 'aprendisteis', 'aprendieron'],
     imperfecto: ['aprendía', 'aprendías', 'aprendía', 'aprendíamos', 'aprendíais', 'aprendían'],
     perfecto: ['he aprendido', 'has aprendido', 'ha aprendido', 'hemos aprendido', 'habéis aprendido', 'han aprendido'],
-    gerundio: ['estoy aprendiendo', 'estás aprendiendo', 'está aprendiendo', 'estamos aprendiendo', 'estáis aprendiendo', 'están aprendiendo'],
+    gerundio: ['aprendiendo'],
     imperativo: ['aprende', 'aprenda', 'aprendamos', 'aprended', 'aprendan'],
   },
   comprender: {
@@ -158,7 +158,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['comprendí', 'comprendiste', 'comprendió', 'comprendimos', 'comprendisteis', 'comprendieron'],
     imperfecto: ['comprendía', 'comprendías', 'comprendía', 'comprendíamos', 'comprendíais', 'comprendían'],
     perfecto: ['he comprendido', 'has comprendido', 'ha comprendido', 'hemos comprendido', 'habéis comprendido', 'han comprendido'],
-    gerundio: ['estoy comprendiendo', 'estás comprendiendo', 'está comprendiendo', 'estamos comprendiendo', 'estáis comprendiendo', 'están comprendiendo'],
+    gerundio: ['comprendiendo'],
     imperativo: ['comprende', 'comprenda', 'comprendamos', 'comprended', 'comprendan'],
   },
   vender: {
@@ -166,7 +166,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['vendí', 'vendiste', 'vendió', 'vendimos', 'vendisteis', 'vendieron'],
     imperfecto: ['vendía', 'vendías', 'vendía', 'vendíamos', 'vendíais', 'vendían'],
     perfecto: ['he vendido', 'has vendido', 'ha vendido', 'hemos vendido', 'habéis vendido', 'han vendido'],
-    gerundio: ['estoy vendiendo', 'estás vendiendo', 'está vendiendo', 'estamos vendiendo', 'estáis vendiendo', 'están vendiendo'],
+    gerundio: ['vendiendo'],
     imperativo: ['vende', 'venda', 'vendamos', 'vended', 'vendan'],
   },
   responder: {
@@ -174,7 +174,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['respondí', 'respondiste', 'respondió', 'respondimos', 'respondisteis', 'respondieron'],
     imperfecto: ['respondía', 'respondías', 'respondía', 'respondíamos', 'respondíais', 'respondían'],
     perfecto: ['he respondido', 'has respondido', 'ha respondido', 'hemos respondido', 'habéis respondido', 'han respondido'],
-    gerundio: ['estoy respondiendo', 'estás respondiendo', 'está respondiendo', 'estamos respondiendo', 'estáis respondiendo', 'están respondiendo'],
+    gerundio: ['respondiendo'],
     imperativo: ['responde', 'responda', 'respondamos', 'responded', 'respondan'],
   },
   vivir: {
@@ -182,7 +182,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['viví', 'viviste', 'vivió', 'vivimos', 'vivisteis', 'vivieron'],
     imperfecto: ['vivía', 'vivías', 'vivía', 'vivíamos', 'vivíais', 'vivían'],
     perfecto: ['he vivido', 'has vivido', 'ha vivido', 'hemos vivido', 'habéis vivido', 'han vivido'],
-    gerundio: ['estoy viviendo', 'estás viviendo', 'está viviendo', 'estamos viviendo', 'estáis viviendo', 'están viviendo'],
+    gerundio: ['viviendo'],
     imperativo: ['vive', 'viva', 'vivamos', 'vivid', 'vivan'],
   },
   escribir: {
@@ -190,7 +190,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['escribí', 'escribiste', 'escribió', 'escribimos', 'escribisteis', 'escribieron'],
     imperfecto: ['escribía', 'escribías', 'escribía', 'escribíamos', 'escribíais', 'escribían'],
     perfecto: ['he escrito', 'has escrito', 'ha escrito', 'hemos escrito', 'habéis escrito', 'han escrito'],
-    gerundio: ['estoy escribiendo', 'estás escribiendo', 'está escribiendo', 'estamos escribiendo', 'estáis escribiendo', 'están escribiendo'],
+    gerundio: ['escribiendo'],
     imperativo: ['escribe', 'escriba', 'escribamos', 'escribid', 'escriban'],
   },
   abrir: {
@@ -198,7 +198,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['abrí', 'abriste', 'abrió', 'abrimos', 'abristeis', 'abrieron'],
     imperfecto: ['abría', 'abrías', 'abría', 'abríamos', 'abríais', 'abrían'],
     perfecto: ['he abierto', 'has abierto', 'ha abierto', 'hemos abierto', 'habéis abierto', 'han abierto'],
-    gerundio: ['estoy abriendo', 'estás abriendo', 'está abriendo', 'estamos abriendo', 'estáis abriendo', 'están abriendo'],
+    gerundio: ['abriendo'],
     imperativo: ['abre', 'abra', 'abramos', 'abrid', 'abran'],
   },
   subir: {
@@ -206,7 +206,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['subí', 'subiste', 'subió', 'subimos', 'subisteis', 'subieron'],
     imperfecto: ['subía', 'subías', 'subía', 'subíamos', 'subíais', 'subían'],
     perfecto: ['he subido', 'has subido', 'ha subido', 'hemos subido', 'habéis subido', 'han subido'],
-    gerundio: ['estoy subiendo', 'estás subiendo', 'está subiendo', 'estamos subiendo', 'estáis subiendo', 'están subiendo'],
+    gerundio: ['subiendo'],
     imperativo: ['sube', 'suba', 'subamos', 'subid', 'suban'],
   },
   decidir: {
@@ -214,7 +214,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['decidí', 'decidiste', 'decidió', 'decidimos', 'decidisteis', 'decidieron'],
     imperfecto: ['decidía', 'decidías', 'decidía', 'decidíamos', 'decidíais', 'decidían'],
     perfecto: ['he decidido', 'has decidido', 'ha decidido', 'hemos decidido', 'habéis decidido', 'han decidido'],
-    gerundio: ['estoy decidiendo', 'estás decidiendo', 'está decidiendo', 'estamos decidiendo', 'estáis decidiendo', 'están decidiendo'],
+    gerundio: ['decidiendo'],
     imperativo: ['decide', 'decida', 'decidamos', 'decidid', 'decidan'],
   },
   recibir: {
@@ -222,7 +222,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['recibí', 'recibiste', 'recibió', 'recibimos', 'recibisteis', 'recibieron'],
     imperfecto: ['recibía', 'recibías', 'recibía', 'recibíamos', 'recibíais', 'recibían'],
     perfecto: ['he recibido', 'has recibido', 'ha recibido', 'hemos recibido', 'habéis recibido', 'han recibido'],
-    gerundio: ['estoy recibiendo', 'estás recibiendo', 'está recibiendo', 'estamos recibiendo', 'estáis recibiendo', 'están recibiendo'],
+    gerundio: ['recibiendo'],
     imperativo: ['recibe', 'reciba', 'recibamos', 'recibid', 'reciban'],
   },
   permitir: {
@@ -236,7 +236,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['pensé', 'pensaste', 'pensó', 'pensamos', 'pensasteis', 'pensaron'],
     imperfecto: ['pensaba', 'pensabas', 'pensaba', 'pensábamos', 'pensabais', 'pensaban'],
     perfecto: ['he pensado', 'has pensado', 'ha pensado', 'hemos pensado', 'habéis pensado', 'han pensado'],
-    gerundio: ['estoy pensando', 'estás pensando', 'está pensando', 'estamos pensando', 'estáis pensando', 'están pensando'],
+    gerundio: ['pensando'],
     imperativo: ['piensa', 'piense', 'pensemos', 'pensad', 'piensen'],
   },
   empezar: {
@@ -244,7 +244,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['empecé', 'empezaste', 'empezó', 'empezamos', 'empezasteis', 'empezaron'],
     imperfecto: ['empezaba', 'empezabas', 'empezaba', 'empezábamos', 'empezabais', 'empezaban'],
     perfecto: ['he empezado', 'has empezado', 'ha empezado', 'hemos empezado', 'habéis empezado', 'han empezado'],
-    gerundio: ['estoy empezando', 'estás empezando', 'está empezando', 'estamos empezando', 'estáis empezando', 'están empezando'],
+    gerundio: ['empezando'],
     imperativo: ['empieza', 'empiece', 'empecemos', 'empezad', 'empiecen'],
   },
   encontrar: {
@@ -259,7 +259,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['volví', 'volviste', 'volvió', 'volvimos', 'volvisteis', 'volvieron'],
     imperfecto: ['volvía', 'volvías', 'volvía', 'volvíamos', 'volvíais', 'volvían'],
     perfecto: ['he vuelto', 'has vuelto', 'ha vuelto', 'hemos vuelto', 'habéis vuelto', 'han vuelto'],
-    gerundio: ['estoy volviendo', 'estás volviendo', 'está volviendo', 'estamos volviendo', 'estáis volviendo', 'están volviendo'],
+    gerundio: ['volviendo'],
     imperativo: ['vuelve', 'vuelva', 'volvamos', 'volved', 'vuelvan'],
   },
   jugar: {
@@ -267,7 +267,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['jugué', 'jugaste', 'jugó', 'jugamos', 'jugasteis', 'jugaron'],
     imperfecto: ['jugaba', 'jugabas', 'jugaba', 'jugábamos', 'jugabais', 'jugaban'],
     perfecto: ['he jugado', 'has jugado', 'ha jugado', 'hemos jugado', 'habéis jugado', 'han jugado'],
-    gerundio: ['estoy jugando', 'estás jugando', 'está jugando', 'estamos jugando', 'estáis jugando', 'están jugando'],
+    gerundio: ['jugando'],
     imperativo: ['juega', 'juegue', 'juguemos', 'jugad', 'jueguen'],
   },
   pedir: {
@@ -275,7 +275,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['pedí', 'pediste', 'pidió', 'pedimos', 'pedisteis', 'pidieron'],
     imperfecto: ['pedía', 'pedías', 'pedía', 'pedíamos', 'pedíais', 'pedían'],
     perfecto: ['he pedido', 'has pedido', 'ha pedido', 'hemos pedido', 'habéis pedido', 'han pedido'],
-    gerundio: ['estoy pidiendo', 'estás pidiendo', 'está pidiendo', 'estamos pidiendo', 'estáis pidiendo', 'están pidiendo'],
+    gerundio: ['pidiendo'],
     imperativo: ['pide', 'pida', 'pidamos', 'pedid', 'pidan'],
   },
   servir: {
@@ -283,7 +283,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['serví', 'serviste', 'sirvió', 'servimos', 'servisteis', 'sirvieron'],
     imperfecto: ['servía', 'servías', 'servía', 'servíamos', 'servíais', 'servían'],
     perfecto: ['he servido', 'has servido', 'ha servido', 'hemos servido', 'habéis servido', 'han servido'],
-    gerundio: ['estoy sirviendo', 'estás sirviendo', 'está sirviendo', 'estamos sirviendo', 'estáis sirviendo', 'están sirviendo'],
+    gerundio: ['sirviendo'],
     imperativo: ['sirve', 'sirva', 'sirvamos', 'servid', 'sirvan'],
   },
   dormir: {
@@ -291,7 +291,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['dormí', 'dormiste', 'durmió', 'dormimos', 'dormisteis', 'durmieron'],
     imperfecto: ['dormía', 'dormías', 'dormía', 'dormíamos', 'dormíais', 'dormían'],
     perfecto: ['he dormido', 'has dormido', 'ha dormido', 'hemos dormido', 'habéis dormido', 'han dormido'],
-    gerundio: ['estoy durmiendo', 'estás durmiendo', 'está durmiendo', 'estamos durmiendo', 'estáis durmiendo', 'están durmiendo'],
+    gerundio: ['durmiendo'],
     imperativo: ['duerme', 'duerma', 'durmamos', 'dormid', 'duerman'],
   },
   preferir: {
@@ -305,7 +305,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['sentí', 'sentiste', 'sintió', 'sentimos', 'sentisteis', 'sintieron'],
     imperfecto: ['sentía', 'sentías', 'sentía', 'sentíamos', 'sentíais', 'sentían'],
     perfecto: ['he sentido', 'has sentido', 'ha sentido', 'hemos sentido', 'habéis sentido', 'han sentido'],
-    gerundio: ['estoy sintiendo', 'estás sintiendo', 'está sintiendo', 'estamos sintiendo', 'estáis sintiendo', 'están sintiendo'],
+    gerundio: ['sintiendo'],
   },
   ser: {
     presente: ['soy', 'eres', 'es', 'somos', 'sois', 'son'],
@@ -326,7 +326,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['fui', 'fuiste', 'fue', 'fuimos', 'fuisteis', 'fueron'],
     imperfecto: ['iba', 'ibas', 'iba', 'íbamos', 'ibais', 'iban'],
     perfecto: ['he ido', 'has ido', 'ha ido', 'hemos ido', 'habéis ido', 'han ido'],
-    gerundio: ['estoy yendo', 'estás yendo', 'está yendo', 'estamos yendo', 'estáis yendo', 'están yendo'],
+    gerundio: ['yendo'],
     imperativo: ['ve', 'vaya', 'vamos', 'id', 'vayan'],
   },
   haber: {
@@ -339,7 +339,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['tuve', 'tuviste', 'tuvo', 'tuvimos', 'tuvisteis', 'tuvieron'],
     imperfecto: ['tenía', 'tenías', 'tenía', 'teníamos', 'teníais', 'tenían'],
     perfecto: ['he tenido', 'has tenido', 'ha tenido', 'hemos tenido', 'habéis tenido', 'han tenido'],
-    gerundio: ['estoy teniendo', 'estás teniendo', 'está teniendo', 'estamos teniendo', 'estáis teniendo', 'están teniendo'],
+    gerundio: ['teniendo'],
     imperativo: ['ten', 'tenga', 'tengamos', 'tened', 'tengan'],
   },
   hacer: {
@@ -347,7 +347,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['hice', 'hiciste', 'hizo', 'hicimos', 'hicisteis', 'hicieron'],
     imperfecto: ['hacía', 'hacías', 'hacía', 'hacíamos', 'hacíais', 'hacían'],
     perfecto: ['he hecho', 'has hecho', 'ha hecho', 'hemos hecho', 'habéis hecho', 'han hecho'],
-    gerundio: ['estoy haciendo', 'estás haciendo', 'está haciendo', 'estamos haciendo', 'estáis haciendo', 'están haciendo'],
+    gerundio: ['haciendo'],
     imperativo: ['haz', 'haga', 'hagamos', 'haced', 'hagan'],
   },
   poder: {
@@ -361,7 +361,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['dije', 'dijiste', 'dijo', 'dijimos', 'dijisteis', 'dijeron'],
     imperfecto: ['decía', 'decías', 'decía', 'decíamos', 'decíais', 'decían'],
     perfecto: ['he dicho', 'has dicho', 'ha dicho', 'hemos dicho', 'habéis dicho', 'han dicho'],
-    gerundio: ['estoy diciendo', 'estás diciendo', 'está diciendo', 'estamos diciendo', 'estáis diciendo', 'están diciendo'],
+    gerundio: ['diciendo'],
     imperativo: ['di', 'diga', 'digamos', 'decid', 'digan'],
   },
   venir: {
@@ -369,7 +369,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['vine', 'viniste', 'vino', 'vinimos', 'vinisteis', 'vinieron'],
     imperfecto: ['venía', 'venías', 'venía', 'veníamos', 'veníais', 'venían'],
     perfecto: ['he venido', 'has venido', 'ha venido', 'hemos venido', 'habéis venido', 'han venido'],
-    gerundio: ['estoy viniendo', 'estás viniendo', 'está viniendo', 'estamos viniendo', 'estáis viniendo', 'están viniendo'],
+    gerundio: ['viniendo'],
     imperativo: ['ven', 'venga', 'vengamos', 'venid', 'vengan'],
   },
   querer: {
@@ -389,7 +389,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['puse', 'pusiste', 'puso', 'pusimos', 'pusisteis', 'pusieron'],
     imperfecto: ['ponía', 'ponías', 'ponía', 'poníamos', 'poníais', 'ponían'],
     perfecto: ['he puesto', 'has puesto', 'ha puesto', 'hemos puesto', 'habéis puesto', 'han puesto'],
-    gerundio: ['estoy poniendo', 'estás poniendo', 'está poniendo', 'estamos poniendo', 'estáis poniendo', 'están poniendo'],
+    gerundio: ['poniendo'],
     imperativo: ['pon', 'ponga', 'pongamos', 'poned', 'pongan'],
   },
   ver: {
@@ -397,7 +397,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['vi', 'viste', 'vio', 'vimos', 'visteis', 'vieron'],
     imperfecto: ['veía', 'veías', 'veía', 'veíamos', 'veíais', 'veían'],
     perfecto: ['he visto', 'has visto', 'ha visto', 'hemos visto', 'habéis visto', 'han visto'],
-    gerundio: ['estoy viendo', 'estás viendo', 'está viendo', 'estamos viendo', 'estáis viendo', 'están viendo'],
+    gerundio: ['viendo'],
     imperativo: ['ve', 'vea', 'veamos', 'ved', 'vean'],
   },
   dar: {
@@ -405,7 +405,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['di', 'diste', 'dio', 'dimos', 'disteis', 'dieron'],
     imperfecto: ['daba', 'dabas', 'daba', 'dábamos', 'dabais', 'daban'],
     perfecto: ['he dado', 'has dado', 'ha dado', 'hemos dado', 'habéis dado', 'han dado'],
-    gerundio: ['estoy dando', 'estás dando', 'está dando', 'estamos dando', 'estáis dando', 'están dando'],
+    gerundio: ['dando'],
     imperativo: ['da', 'dé', 'demos', 'dad', 'den'],
   },
   salir: {
@@ -413,7 +413,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['salí', 'saliste', 'salió', 'salimos', 'salisteis', 'salieron'],
     imperfecto: ['salía', 'salías', 'salía', 'salíamos', 'salíais', 'salían'],
     perfecto: ['he salido', 'has salido', 'ha salido', 'hemos salido', 'habéis salido', 'han salido'],
-    gerundio: ['estoy saliendo', 'estás saliendo', 'está saliendo', 'estamos saliendo', 'estáis saliendo', 'están saliendo'],
+    gerundio: ['saliendo'],
     imperativo: ['sal', 'salga', 'salgamos', 'salid', 'salgan'],
   },
   traer: {
@@ -421,7 +421,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['traje', 'trajiste', 'trajo', 'trajimos', 'trajisteis', 'trajeron'],
     imperfecto: ['traía', 'traías', 'traía', 'traíamos', 'traíais', 'traían'],
     perfecto: ['he traído', 'has traído', 'ha traído', 'hemos traído', 'habéis traído', 'han traído'],
-    gerundio: ['estoy trayendo', 'estás trayendo', 'está trayendo', 'estamos trayendo', 'estáis trayendo', 'están trayendo'],
+    gerundio: ['trayendo'],
     imperativo: ['trae', 'traiga', 'traigamos', 'traed', 'traigan'],
   },
   conocer: {
@@ -429,7 +429,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['conocí', 'conociste', 'conoció', 'conocimos', 'conocisteis', 'conocieron'],
     imperfecto: ['conocía', 'conocías', 'conocía', 'conocíamos', 'conocíais', 'conocían'],
     perfecto: ['he conocido', 'has conocido', 'ha conocido', 'hemos conocido', 'habéis conocido', 'han conocido'],
-    gerundio: ['estoy conociendo', 'estás conociendo', 'está conociendo', 'estamos conociendo', 'estáis conociendo', 'están conociendo'],
+    gerundio: ['conociendo'],
     imperativo: ['conoce', 'conozca', 'conozcamos', 'conoced', 'conozcan'],
   },
   parecer: {
@@ -443,7 +443,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['leí', 'leíste', 'leyó', 'leímos', 'leísteis', 'leyeron'],
     imperfecto: ['leía', 'leías', 'leía', 'leíamos', 'leíais', 'leían'],
     perfecto: ['he leído', 'has leído', 'ha leído', 'hemos leído', 'habéis leído', 'han leído'],
-    gerundio: ['estoy leyendo', 'estás leyendo', 'está leyendo', 'estamos leyendo', 'estáis leyendo', 'están leyendo'],
+    gerundio: ['leyendo'],
     imperativo: ['lee', 'lea', 'leamos', 'leed', 'lean'],
   },
   oír: {
@@ -451,7 +451,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['oí', 'oíste', 'oyó', 'oímos', 'oísteis', 'oyeron'],
     imperfecto: ['oía', 'oías', 'oía', 'oíamos', 'oíais', 'oían'],
     perfecto: ['he oído', 'has oído', 'ha oído', 'hemos oído', 'habéis oído', 'han oído'],
-    gerundio: ['estoy oyendo', 'estás oyendo', 'está oyendo', 'estamos oyendo', 'estáis oyendo', 'están oyendo'],
+    gerundio: ['oyendo'],
   },
   caer: {
     presente: ['caigo', 'caes', 'cae', 'caemos', 'caéis', 'caen'],
@@ -464,7 +464,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['cerré', 'cerraste', 'cerró', 'cerramos', 'cerrasteis', 'cerraron'],
     imperfecto: ['cerraba', 'cerrabas', 'cerraba', 'cerrábamos', 'cerrabais', 'cerraban'],
     perfecto: ['he cerrado', 'has cerrado', 'ha cerrado', 'hemos cerrado', 'habéis cerrado', 'han cerrado'],
-    gerundio: ['estoy cerrando', 'estás cerrando', 'está cerrando', 'estamos cerrando', 'estáis cerrando', 'están cerrando'],
+    gerundio: ['cerrando'],
     imperativo: ['cierra', 'cierre', 'cerremos', 'cerrad', 'cierren'],
   },
   comenzar: {
@@ -472,7 +472,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['comencé', 'comenzaste', 'comenzó', 'comenzamos', 'comenzasteis', 'comenzaron'],
     imperfecto: ['comenzaba', 'comenzabas', 'comenzaba', 'comenzábamos', 'comenzabais', 'comenzaban'],
     perfecto: ['he comenzado', 'has comenzado', 'ha comenzado', 'hemos comenzado', 'habéis comenzado', 'han comenzado'],
-    gerundio: ['estoy comenzando', 'estás comenzando', 'está comenzando', 'estamos comenzando', 'estáis comenzando', 'están comenzando'],
+    gerundio: ['comenzando'],
     imperativo: ['comienza', 'comience', 'comencemos', 'comenzad', 'comiencen'],
   },
   recomendar: {
@@ -480,7 +480,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['recomendé', 'recomendaste', 'recomendó', 'recomendamos', 'recomendasteis', 'recomendaron'],
     imperfecto: ['recomendaba', 'recomendabas', 'recomendaba', 'recomendábamos', 'recomendabais', 'recomendaban'],
     perfecto: ['he recomendado', 'has recomendado', 'ha recomendado', 'hemos recomendado', 'habéis recomendado', 'han recomendado'],
-    gerundio: ['estoy recomendando', 'estás recomendando', 'está recomendando', 'estamos recomendando', 'estáis recomendando', 'están recomendando'],
+    gerundio: ['recomendando'],
     imperativo: ['recomienda', 'recomiende', 'recomendemos', 'recomendad', 'recomienden'],
   },
   regar: {
@@ -488,7 +488,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['regué', 'regaste', 'regó', 'regamos', 'regasteis', 'regaron'],
     imperfecto: ['regaba', 'regabas', 'regaba', 'regábamos', 'regabais', 'regaban'],
     perfecto: ['he regado', 'has regado', 'ha regado', 'hemos regado', 'habéis regado', 'han regado'],
-    gerundio: ['estoy regando', 'estás regando', 'está regando', 'estamos regando', 'estáis regando', 'están regando'],
+    gerundio: ['regando'],
     imperativo: ['riega', 'riegue', 'reguemos', 'regad', 'rieguen'],
   },
   perder: {
@@ -502,14 +502,14 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['entendí', 'entendiste', 'entendió', 'entendimos', 'entendisteis', 'entendieron'],
     imperfecto: ['entendía', 'entendías', 'entendía', 'entendíamos', 'entendíais', 'entendían'],
     perfecto: ['he entendido', 'has entendido', 'ha entendido', 'hemos entendido', 'habéis entendido', 'han entendido'],
-    gerundio: ['estoy entendiendo', 'estás entendiendo', 'está entendiendo', 'estamos entendiendo', 'estáis entendiendo', 'están entendiendo'],
+    gerundio: ['entendiendo'],
   },
   contar: {
     presente: ['cuento', 'cuentas', 'cuenta', 'contamos', 'contáis', 'cuentan'],
     indefinido: ['conté', 'contaste', 'contó', 'contamos', 'contasteis', 'contaron'],
     imperfecto: ['contaba', 'contabas', 'contaba', 'contábamos', 'contabais', 'contaban'],
     perfecto: ['he contado', 'has contado', 'ha contado', 'hemos contado', 'habéis contado', 'han contado'],
-    gerundio: ['estoy contando', 'estás contando', 'está contando', 'estamos contando', 'estáis contando', 'están contando'],
+    gerundio: ['contando'],
     imperativo: ['cuenta', 'cuente', 'contemos', 'contad', 'cuenten'],
   },
   mostrar: {
@@ -517,7 +517,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['mostré', 'mostraste', 'mostró', 'mostramos', 'mostrasteis', 'mostraron'],
     imperfecto: ['mostraba', 'mostrabas', 'mostraba', 'mostrábamos', 'mostrabais', 'mostraban'],
     perfecto: ['he mostrado', 'has mostrado', 'ha mostrado', 'hemos mostrado', 'habéis mostrado', 'han mostrado'],
-    gerundio: ['estoy mostrando', 'estás mostrando', 'está mostrando', 'estamos mostrando', 'estáis mostrando', 'están mostrando'],
+    gerundio: ['mostrando'],
     imperativo: ['muestra', 'muestre', 'mostremos', 'mostrad', 'muestren'],
   },
   probar: {
@@ -525,7 +525,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['probé', 'probaste', 'probó', 'probamos', 'probasteis', 'probaron'],
     imperfecto: ['probaba', 'probabas', 'probaba', 'probábamos', 'probabais', 'probaban'],
     perfecto: ['he probado', 'has probado', 'ha probado', 'hemos probado', 'habéis probado', 'han probado'],
-    gerundio: ['estoy probando', 'estás probando', 'está probando', 'estamos probando', 'estáis probando', 'están probando'],
+    gerundio: ['probando'],
     imperativo: ['prueba', 'pruebe', 'probemos', 'probad', 'prueben'],
   },
   colgar: {
@@ -533,7 +533,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['colgué', 'colgaste', 'colgó', 'colgamos', 'colgasteis', 'colgaron'],
     imperfecto: ['colgaba', 'colgabas', 'colgaba', 'colgábamos', 'colgabais', 'colgaban'],
     perfecto: ['he colgado', 'has colgado', 'ha colgado', 'hemos colgado', 'habéis colgado', 'han colgado'],
-    gerundio: ['estoy colgando', 'estás colgando', 'está colgando', 'estamos colgando', 'estáis colgando', 'están colgando'],
+    gerundio: ['colgando'],
     imperativo: ['cuelga', 'cuelgue', 'colguemos', 'colgad', 'cuelguen'],
   },
   almorzar: {
@@ -541,7 +541,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['almorcé', 'almorzaste', 'almorzó', 'almorzamos', 'almorzasteis', 'almorzaron'],
     imperfecto: ['almorzaba', 'almorzabas', 'almorzaba', 'almorzábamos', 'almorzabais', 'almorzaban'],
     perfecto: ['he almorzado', 'has almorzado', 'ha almorzado', 'hemos almorzado', 'habéis almorzado', 'han almorzado'],
-    gerundio: ['estoy almorzando', 'estás almorzando', 'está almorzando', 'estamos almorzando', 'estáis almorzando', 'están almorzando'],
+    gerundio: ['almorzando'],
     imperativo: ['almuerza', 'almuerce', 'almorcemos', 'almorzad', 'almuercen'],
   },
   mover: {
@@ -549,7 +549,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['moví', 'moviste', 'movió', 'movimos', 'movisteis', 'movieron'],
     imperfecto: ['movía', 'movías', 'movía', 'movíamos', 'movíais', 'movían'],
     perfecto: ['he movido', 'has movido', 'ha movido', 'hemos movido', 'habéis movido', 'han movido'],
-    gerundio: ['estoy moviendo', 'estás moviendo', 'está moviendo', 'estamos moviendo', 'estáis moviendo', 'están moviendo'],
+    gerundio: ['moviendo'],
     imperativo: ['mueve', 'mueva', 'movamos', 'moved', 'muevan'],
   },
   devolver: {
@@ -557,7 +557,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['devolví', 'devolviste', 'devolvió', 'devolvimos', 'devolvisteis', 'devolvieron'],
     imperfecto: ['devolvía', 'devolvías', 'devolvía', 'devolvíamos', 'devolvíais', 'devolvían'],
     perfecto: ['he devuelto', 'has devuelto', 'ha devuelto', 'hemos devuelto', 'habéis devuelto', 'han devuelto'],
-    gerundio: ['estoy devolviendo', 'estás devolviendo', 'está devolviendo', 'estamos devolviendo', 'estáis devolviendo', 'están devolviendo'],
+    gerundio: ['devolviendo'],
     imperativo: ['devuelve', 'devuelva', 'devolvamos', 'devolved', 'devuelvan'],
   },
   resolver: {
@@ -565,7 +565,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['resolví', 'resolviste', 'resolvió', 'resolvimos', 'resolvisteis', 'resolvieron'],
     imperfecto: ['resolvía', 'resolvías', 'resolvía', 'resolvíamos', 'resolvíais', 'resolvían'],
     perfecto: ['he resuelto', 'has resuelto', 'ha resuelto', 'hemos resuelto', 'habéis resuelto', 'han resuelto'],
-    gerundio: ['estoy resolviendo', 'estás resolviendo', 'está resolviendo', 'estamos resolviendo', 'estáis resolviendo', 'están resolviendo'],
+    gerundio: ['resolviendo'],
     imperativo: ['resuelve', 'resuelva', 'resolvamos', 'resolved', 'resuelvan'],
   },
   repetir: {
@@ -573,7 +573,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['repetí', 'repetiste', 'repitió', 'repetimos', 'repetisteis', 'repitieron'],
     imperfecto: ['repetía', 'repetías', 'repetía', 'repetíamos', 'repetíais', 'repetían'],
     perfecto: ['he repetido', 'has repetido', 'ha repetido', 'hemos repetido', 'habéis repetido', 'han repetido'],
-    gerundio: ['estoy repitiendo', 'estás repitiendo', 'está repitiendo', 'estamos repitiendo', 'estáis repitiendo', 'están repitiendo'],
+    gerundio: ['repitiendo'],
     imperativo: ['repite', 'repita', 'repitamos', 'repetid', 'repitan'],
   },
   conseguir: {
@@ -588,7 +588,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['propuse', 'propusiste', 'propuso', 'propusimos', 'propusisteis', 'propusieron'],
     imperfecto: ['proponía', 'proponías', 'proponía', 'proponíamos', 'proponíais', 'proponían'],
     perfecto: ['he propuesto', 'has propuesto', 'ha propuesto', 'hemos propuesto', 'habéis propuesto', 'han propuesto'],
-    gerundio: ['estoy proponiendo', 'estás proponiendo', 'está proponiendo', 'estamos proponiendo', 'estáis proponiendo', 'están proponiendo'],
+    gerundio: ['proponiendo'],
     imperativo: ['propón', 'proponga', 'propongamos', 'proponed', 'propongan'],
   },
   conducir: {
@@ -596,7 +596,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['conduje', 'condujiste', 'condujo', 'condujimos', 'condujisteis', 'condujeron'],
     imperfecto: ['conducía', 'conducías', 'conducía', 'conducíamos', 'conducíais', 'conducían'],
     perfecto: ['he conducido', 'has conducido', 'ha conducido', 'hemos conducido', 'habéis conducido', 'han conducido'],
-    gerundio: ['estoy conduciendo', 'estás conduciendo', 'está conduciendo', 'estamos conduciendo', 'estáis conduciendo', 'están conduciendo'],
+    gerundio: ['conduciendo'],
     imperativo: ['conduce', 'conduzca', 'conduzcamos', 'conducid', 'conduzcan'],
   },
   traducir: {
@@ -604,7 +604,7 @@ const EXPECTED: Record<string, Partial<Record<Tense, string[]>>> = {
     indefinido: ['traduje', 'tradujiste', 'tradujo', 'tradujimos', 'tradujisteis', 'tradujeron'],
     imperfecto: ['traducía', 'traducías', 'traducía', 'traducíamos', 'traducíais', 'traducían'],
     perfecto: ['he traducido', 'has traducido', 'ha traducido', 'hemos traducido', 'habéis traducido', 'han traducido'],
-    gerundio: ['estoy traduciendo', 'estás traduciendo', 'está traduciendo', 'estamos traduciendo', 'estáis traduciendo', 'están traduciendo'],
+    gerundio: ['traduciendo'],
     imperativo: ['traduce', 'traduzca', 'traduzcamos', 'traducid', 'traduzcan'],
   },
   agradecer: {

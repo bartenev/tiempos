@@ -37,16 +37,16 @@ describe('VerbLookup', () => {
       'Pretérito indefinido',
       'Pretérito imperfecto',
       'Pretérito perfecto',
-      'Estar + gerundio',
+      'Gerundio',
       'Imperativo',
     ])
     const forms = wrapper.findAll('.rule-hint__form').map((w) => w.text())
     expect(forms).toContain('pido')
     expect(forms).toContain('pidió')
     expect(forms).toContain('he pedido')
-    expect(forms).toContain('estoy pidiendo')
-    // императив без yo: 5 форм, остальные времена по 6
-    expect(forms).toHaveLength(6 * 5 + 5)
+    expect(forms).toContain('pidiendo')
+    // императив без yo: 5 форм, gerundio — одна, остальные времена по 6
+    expect(forms).toHaveLength(6 * 4 + 1 + 5)
     expect(wrapper.find('.verb-lookup__tags').text()).toContain('e → i')
     expect(wrapper.find('.verb-lookup__tags').text()).toContain('gerundio: pidiendo')
   })

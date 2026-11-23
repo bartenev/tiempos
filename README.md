@@ -2,15 +2,19 @@
 
 Минимальный тренажёр испанского: спряжение глаголов и упражнения по главам учебника.
 
-**Времена:** Presente · Pretérito indefinido · Pretérito imperfecto · Pretérito perfecto · Estar + gerundio · Imperativo
+**Времена:** Presente · Pretérito indefinido · Pretérito imperfecto · Pretérito perfecto · Gerundio · Imperativo
 
 Imperativo — утвердительный: tú, usted, nosotros, vosotros, ustedes (формы yo нет).
 Глаголы с неестественным императивом (haber, poder, querer, saber, parecer, necesitar,
 preferir, sentir, oír, caer, permitir) в нём не тренируются.
 
-Estar + gerundio (estoy hablando, estás pidiendo, está leyendo): по лицам меняется только estar,
-новое — сам gerundio. Неправильности — -ir с чередованием e→i / o→u (pidiendo, diciendo, durmiendo)
-и -yendo (yendo, leyendo, oyendo, trayendo). Где «estar + gerundio» звучит неестественно (ser, estar,
+Gerundio (hablando, pidiendo, leyendo) по лицам не меняется, поэтому вписывается только он, а
+вспомогательный глагол уже стоит в предложении и меняется от карточки к карточке: estoy / estaba
+(«Cuando sonó el teléfono, yo estaba ___»), sigo («всё ещё»), llevo una hora («уже час»; sigo и llevo —
+только у глаголов, где это звучит естественно). Лицо — любое, фильтр лиц gerundio не касается; у глагола
+одна форма (в статистике — ячейка yo), в «Таблицах» — одна строка. Неправильности — -ir с чередованием
+e→i / o→u (pidiendo, diciendo, durmiendo) и -yendo (yendo, leyendo, oyendo, trayendo). Где gerundio
+звучит неестественно (ser, estar,
 haber, poder, saber, querer, parecer, creer, preferir, necesitar, permitir, encontrar, perder,
 conseguir, caer, agradecer), этого времени у глагола нет.
 
@@ -136,12 +140,12 @@ npm run build
   лицу есть 2 верных ответа и нет слабых форм. Неправильности — тоже порции, от самых нужных:
   в presente ser → estar → ir → hay → yo на -go (tengo, hago) → sé/doy/veo → e→ie → o→ue → e→i → -zco,
   в indefinido fui/fue → основы на -u-, -i-, -j- → di/vi → pidió → leyó,
-  в estar + gerundio -ando/-iendo → diciendo/pidiendo → yendo/leyendo → durmiendo.
-  В составных временах (perfecto, estar + gerundio) по лицам меняется только вспомогательный глагол,
-  поэтому по лицам считается лишь первая порция времени — на ней учатся he/has/ha… и estoy/estás/está;
-  в следующих лица считаются вместе: порции хватает 4 верных (`COMPOUND_OK` в `src/lib/portions.ts`),
+  в gerundio -ando/-iendo → diciendo/pidiendo → yendo/leyendo → durmiendo,
   в imperativo ven/haz/di/pon → sea/vaya/esté → tenga/haga → piensa/vuelve/pide. Если выбраны только
   неправильные глаголы, их модели идут раньше правильных форм (pensamos, podéis).
+  В perfecto по лицам меняется только haber, поэтому по лицам считается лишь первая порция времени —
+  на ней учатся he/has/ha…; в следующих лица считаются вместе: порции хватает 4 верных
+  (`POOLED_OK` в `src/lib/portions.ts`). У gerundio так все порции: у глагола одна форма.
   Внутри порции новые формы частотных глаголов выпадают раньше: tener и querer до regar
   (`VERB_FREQUENCY` в `src/data/verbs.ts`). Текущей порции — ~60% сессии, остальное —
   повторение уже открытого. На главной видно, что сейчас новое.
