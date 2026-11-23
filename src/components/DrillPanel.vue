@@ -28,6 +28,8 @@ const props = defineProps<{
   canUndo?: boolean
   /** К карточке вернулись отменой — ответ сразу открыт, ждём новую оценку. */
   reopened?: boolean
+  /** Подсказка над карточкой: «Разогрев пройден», «похоже на усталость». */
+  notice?: string | null
 }>()
 
 const emit = defineEmits<{
@@ -214,6 +216,8 @@ onBeforeUnmount(() => {
       </span>
     </div>
 
+    <p v-if="notice" class="notice notice--muted drill__notice" role="status">{{ notice }}</p>
+
     <DrillPrompt
       :card="card"
       :oral="oral"
@@ -254,6 +258,10 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 /* ===== drill: верх экрана ===== */
+
+.drill__notice {
+  margin: 0 0 var(--space-3);
+}
 
 .drill__score {
   display: inline-flex;

@@ -27,6 +27,9 @@ import { buildSession } from './lib/session'
 import { articleConfigFromSettings, bookConfigFromSettings, configFromSettings } from './lib/settings'
 import { settings } from './lib/settingsState'
 import type { CellStat } from './lib/stats'
+import type { TempoSession } from './lib/tempo'
+import { createTempoSession } from './lib/tempo'
+import { pluralRu } from './lib/plural'
 import { initTheme } from './lib/theme'
 import type { AnswerTiming } from './lib/timing'
 import { dropTiming, recordTiming } from './lib/timing'
@@ -34,6 +37,7 @@ import type {
   AnswerMode,
   AnyCard,
   ArticleConfig,
+  DrillCard,
   BookConfig,
   Screen,
   SessionConfig,
@@ -59,6 +63,15 @@ const SIBLING_GAP = 2
 const CHUNK = 10
 const REFILL_AT = 3
 
+/**
+ * Глаголы в умном режиме: каждая карточка выбирается по свежему темпу (src/lib/tempo.ts),
+ * впереди держим LOOKAHEAD — чтобы повтор после ошибки встал через RETRY_GAP карточек.
+ */
+const LOOKAHEAD = 3
+
+/** Сколько карточек держится подсказка над карточкой («Разогрев пройден»). */
+const NOTICE_CARDS = 4
+
 /** Запуск сессии: как отвечаем и как собрать карточки (для «Ещё раз» — заново). */
 interface Run {
   mode: SessionMode
@@ -67,6 +80,8 @@ interface Run {
   build: (size: number) => AnyCard[]
   /** null — бесконечная сессия, иначе её длина («Проверка»). */
   size: number | null
+  /** Глаголы в умном режиме: выбор карточек на ходу по темпу. */
+  tempo?: (sessionStart: number) => TempoSession
 }
 
 /** Начало — список тренажёров; из него — главная выбранного тренажёра. */
@@ -85,6 +100,16 @@ const finishedAt = ref(0)
 const startError = ref('')
 /** Итог сессии, которую в прошлый раз закрыли, не дойдя до итогов. */
 const previous = ref(false)
+
+/** Темп текущей сессии глаголов (умный режим); null — карточки кусками. */
+let tempo: TempoSession | null = null
+/** Подсказка над карточкой и до какого ответа она держится. */
+const notice = ref<string | null>(null)
+let noticeUntil = 0
+/** Разогрев шёл в этой сессии / уже сказали, что он пройден / что похоже на усталость. */
+let warming = false
+let warmedSaid = false
+let tiredSaid = false
 
 /** Состояние до последнего ответа: отмена самооценки и «Мой ответ верный». */
 interface GradeSnapshot {
@@ -129,9 +154,13 @@ const result = computed<SessionResult>(() => ({
 }))
 
 function begin(next: Run) {
+  const now = Date.now()
   try {
-    cards.value = next.build(next.size ?? CHUNK)
+    tempo = next.tempo?.(now) ?? null
+    cards.value = tempo ? [] : next.build(next.size ?? CHUNK)
+    if (tempo) topUp()
   } catch (e) {
+    tempo = null
     startError.value = e instanceof Error ? e.message : String(e)
     screen.value = 'setup'
     return
@@ -148,7 +177,12 @@ function begin(next: Run) {
   lastGrade.value = null
   reopenedIndex.value = null
   previous.value = false
-  startedAt.value = Date.now()
+  startedAt.value = now
+  notice.value = null
+  warming = false
+  warmedSaid = false
+  tiredSaid = false
+  if (tempo) checkTempo()
   clearLastSession()
   screen.value = 'drill'
 }
@@ -159,7 +193,13 @@ function sizeOf(cfg: { mode: SessionMode; size: number }): number | null {
 }
 
 function start(cfg: SessionConfig) {
-  begin({ mode: cfg.mode, answer: cfg.answer, size: sizeOf(cfg), build: (size) => buildSession({ ...cfg, size }) })
+  begin({
+    mode: cfg.mode,
+    answer: cfg.answer,
+    size: sizeOf(cfg),
+    build: (size) => buildSession({ ...cfg, size }),
+    tempo: cfg.mode === 'smart' ? (sessionStart) => createTempoSession(cfg, sessionStart) : undefined,
+  })
 }
 
 function startBook(cfg: BookConfig) {
@@ -209,9 +249,52 @@ function refill() {
   cards.value.push(...more)
 }
 
+/** Темп: держать впереди LOOKAHEAD карточек, каждую — по свежему логу ответов. */
+function topUp() {
+  const t = tempo!
+  while (cards.value.length - (index.value + 1) < LOOKAHEAD) {
+    const verbs = cards.value as DrillCard[]
+    const upcoming = verbs.slice(index.value + 1)
+    const recent = verbs.slice(Math.max(0, index.value - 2), index.value + 1)
+    cards.value.push(t.next(upcoming, recent))
+  }
+}
+
+function say(text: string) {
+  notice.value = text
+  noticeUntil = answered.value + NOTICE_CARDS
+}
+
+/** Вехи темпа: начало разогрева, разогрев пройден, похоже на усталость. */
+function checkTempo() {
+  const state = tempo!.state()
+  if (notice.value && answered.value >= noticeUntil) notice.value = null
+  if (state.pool.length > 0 && !warming) {
+    warming = true
+    if (answered.value === 0) {
+      const n = state.slow + state.cold
+      say(`Сначала разогрев: ${n} ${pluralRu(n, 'группа медленная или остыла', 'группы медленные или остыли', 'групп медленные или остыли')}.`)
+    }
+  } else if (state.pool.length === 0 && warming && !warmedSaid) {
+    warmedSaid = true
+    say('Разогрев пройден — дальше новое и повторение.')
+  }
+  if (state.tired && !tiredSaid) {
+    tiredSaid = true
+    say('Темп упал сразу везде — похоже на усталость. Хорошая точка, чтобы закончить.')
+  }
+}
+
 function goNext() {
   reopenedIndex.value = null
-  if (run.value?.size === null && cards.value.length - (index.value + 1) <= REFILL_AT) refill()
+  if (tempo) {
+    try {
+      topUp()
+      checkTempo()
+    } catch {
+      /* выбрать не из чего — сессия закончится на последней карточке */
+    }
+  } else if (run.value?.size === null && cards.value.length - (index.value + 1) <= REFILL_AT) refill()
   if (index.value + 1 >= cards.value.length) {
     finish()
     return
@@ -397,6 +480,7 @@ restoreLastSession()
       :oral="run?.answer === 'oral'"
       :can-undo="lastGrade !== null"
       :reopened="reopenedIndex === index"
+      :notice="notice"
       @correct="onCorrect"
       @wrong="onWrong"
       @skip="onSkip"

@@ -1,6 +1,6 @@
 import type { VueWrapper } from '@vue/test-utils'
 import { flushPromises, mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App.vue'
 import DrillPanel from './components/DrillPanel.vue'
 import HomePanel from './components/HomePanel.vue'
@@ -10,7 +10,7 @@ import { loadLastSession } from './lib/lastSession'
 import { loadBookStats } from './lib/stats'
 import type { AnswerTiming } from './lib/timing'
 import { loadTimings } from './lib/timing'
-import type { BookConfig, BookCard, SessionConfig } from './types'
+import type { BookConfig, BookCard, DrillCard, SessionConfig } from './types'
 import { PERSONS, VERB_GROUPS } from './types'
 
 const config: BookConfig = { units: [22], size: 10, mode: 'smart', answer: 'text' }
@@ -169,6 +169,23 @@ describe('App — бесконечная умная сессия', () => {
     expect(again.findComponent(DrillPanel).exists()).toBe(true)
 
     expect(mount(App).findComponent(SummaryPanel).exists()).toBe(false)
+  })
+
+  it('starts with a warm-up of what cooled down, labelled on the card', async () => {
+    const old = Date.now() - 10 * 24 * 60 * 60 * 1000
+    localStorage.setItem(
+      'tiempos.stats.v1',
+      JSON.stringify({ 'hablar|presente|tú': { ok: 4, bad: 0, streak: 4, last: old } }),
+    )
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0)
+    const wrapper = await startVerbs({ ...verbs, persons: ['tú'] })
+    const drill = wrapper.findComponent(DrillPanel)
+    expect(drill.props('notice')).toBe('Сначала разогрев: 1 группа медленная или остыла.')
+    expect((drill.props('card') as DrillCard).reason).toBe('cold')
+    // проба быстрая — группа сразу вышла из разогрева
+    await answer(wrapper)
+    expect(wrapper.findComponent(DrillPanel).props('notice')).toBe('Разогрев пройден — дальше новое и повторение.')
+    random.mockRestore()
   })
 
   it('«Проверка» keeps its length', async () => {

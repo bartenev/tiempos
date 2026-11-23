@@ -34,6 +34,20 @@ export interface Verb {
   noGerundio?: boolean
 }
 
+/**
+ * Почему карточка пришла (подпись на карточке): cold — давно не было, probe — замер темпа,
+ * slow — вспоминается медленно, new — новое, weak — недавно была ошибка.
+ */
+export type CardReason = 'cold' | 'probe' | 'slow' | 'new' | 'weak'
+
+export const REASON_LABELS: Record<CardReason, string> = {
+  cold: 'остыло',
+  probe: 'замер темпа',
+  slow: 'медленно',
+  new: 'новое',
+  weak: 'была ошибка',
+}
+
 export interface DrillCard {
   type: 'verb'
   verb: Verb
@@ -47,6 +61,8 @@ export interface DrillCard {
   answer: string
   /** Повтор карточки после ошибки в этой же сессии. */
   retry?: boolean
+  /** Почему пришла: умная очередь с темпом. */
+  reason?: CardReason
 }
 
 /**

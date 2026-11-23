@@ -5,7 +5,7 @@ import type { AnswerCheck } from '../lib/normalize'
 import { settings } from '../lib/settingsState'
 import { simplePrompt } from '../lib/simple'
 import type { AnyCard } from '../types'
-import { TENSE_LABELS, isBookCard } from '../types'
+import { REASON_LABELS, TENSE_LABELS, isBookCard } from '../types'
 import ZoomImage from './ZoomImage.vue'
 
 const props = defineProps<{
@@ -82,6 +82,7 @@ function blankClass(i: number): string | undefined {
     <div class="drill__tense">
       {{ label }}
       <span v-if="card.retry" class="drill__retry">повтор</span>
+      <span v-else-if="!isBookCard(card) && card.reason" class="drill__retry drill__reason">{{ REASON_LABELS[card.reason] }}</span>
     </div>
     <p v-if="book?.task" class="drill__task">{{ book.task }}</p>
     <p v-if="book?.bank" class="drill__bank" lang="es">{{ book.bank }}</p>

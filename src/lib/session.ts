@@ -24,7 +24,7 @@ function pickRandom<T>(items: T[]): T {
   return items[Math.floor(Math.random() * items.length)]!
 }
 
-function makeCard(verb: Verb, tense: Tense, person: Person): DrillCard {
+export function makeCard(verb: Verb, tense: Tense, person: Person): DrillCard {
   const answer = conjugate(verb, tense, person)
   const own = buildVerbSentence(verb.infinitive, tense, person, pickRandom)
   if (own) return { type: 'verb', verb, tense, person, ...own, answer }
