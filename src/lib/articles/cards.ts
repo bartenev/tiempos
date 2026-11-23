@@ -156,7 +156,7 @@ export function buildArticleSession(
   now: number = Date.now(),
 ): BookCard[] {
   if (config.rules.length === 0) throw new Error('Выберите хотя бы одно правило')
-  return buildDeckSession(cardsForRules(config.rules), config, stats, now, 'Слабых заданий в выбранном нет')
+  return buildDeckSession(cardsForRules(config.rules), config, stats, now)
 }
 
 export type TopicProgress = Record<Mastery, number>

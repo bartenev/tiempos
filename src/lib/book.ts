@@ -98,10 +98,6 @@ export function cardsForUnits(units: number[], chapters: Chapter[] = CHAPTERS): 
   return chapters.filter((c) => units.includes(c.unit)).flatMap(chapterCards)
 }
 
-export function bookWeakCount(units: number[], stats: StatsStore = loadBookStats()): number {
-  return cardsForUnits(units).filter((c) => isWeak(stats[c.key])).length
-}
-
 export type ChapterProgress = Record<Mastery, number>
 
 export function chapterProgress(
@@ -172,19 +168,13 @@ function smartCards(
   return shuffle(picked)
 }
 
-/** Сессия из готовых карточек колоды: умная очередь, только слабые или проверка (случайно). */
+/** Сессия из готовых карточек колоды: умная очередь или проверка (случайно). */
 export function buildDeckSession(
   cards: BookCard[],
   config: { mode: SessionMode; size: number },
   stats: StatsStore,
   now: number = Date.now(),
-  noWeak = 'Слабых упражнений в выбранном нет',
 ): BookCard[] {
-  if (config.mode === 'weak') {
-    const weak = cards.filter((c) => isWeak(stats[c.key]))
-    if (weak.length === 0) throw new Error(noWeak)
-    return shuffle(weak).slice(0, config.size)
-  }
   if (config.mode === 'random') return shuffle(cards).slice(0, config.size)
   return smartCards(cards, stats, config.size, now)
 }
@@ -196,7 +186,7 @@ export function buildBookSession(
 ): BookCard[] {
   if (config.units.length === 0) throw new Error('Выберите хотя бы одну главу')
   const cards = cardsForUnits(config.units)
-  return buildDeckSession(cards, config, stats, now, 'Слабых упражнений в выбранных главах нет')
+  return buildDeckSession(cards, config, stats, now)
 }
 
 /** Та же карточка ещё раз — повтор после ошибки. */

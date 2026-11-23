@@ -144,32 +144,8 @@ describe('smart / weak modes', () => {
     expect(sessionsWithWeak).toBeGreaterThan(50)
   })
 
-  it('weak mode uses only weak forms', () => {
-    const stats = {
-      'hablar|presente|yo': { ok: 0, bad: 1, streak: 0, last: 0 },
-      'comer|presente|tú': { ok: 1, bad: 2, streak: 1, last: 0 },
-      'vivir|presente|él': { ok: 5, bad: 1, streak: 4, last: 0 },
-    }
-    const cards = buildSession({ ...regularOnly, mode: 'weak', size: 10 }, stats)
-    for (const c of cards) {
-      expect(['hablar|yo', 'comer|tú']).toContain(`${c.verb.infinitive}|${c.person}`)
-    }
-    // без двух одинаковых подряд
-    for (let i = 1; i < cards.length; i++) {
-      expect(cards[i]!.verb.infinitive + cards[i]!.person).not.toBe(
-        cards[i - 1]!.verb.infinitive + cards[i - 1]!.person,
-      )
-    }
-  })
 
-  it('weak mode caps the session at a few repeats per weak form', () => {
-    const stats = { 'hablar|presente|yo': { ok: 0, bad: 1, streak: 0, last: 0 } }
-    expect(buildSession({ ...regularOnly, mode: 'weak', size: 20 }, stats)).toHaveLength(3)
-  })
 
-  it('weak mode throws when nothing is weak', () => {
-    expect(() => buildSession({ ...regularOnly, mode: 'weak' }, {})).toThrow()
-  })
 })
 
 describe('imperativo in sessions', () => {

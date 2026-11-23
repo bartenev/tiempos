@@ -22,6 +22,8 @@ const emit = defineEmits<{
   skip: []
   /** Ответ не совпал с вариантами, но он верный. */
   own: []
+  /** Первая буква в поле: с этого момента форма вспомнена, дальше — печать. */
+  type: []
 }>()
 
 /** Буквы, которых нет на русской/английской раскладке. */
@@ -98,6 +100,14 @@ watch(
     focusField(0)
   },
   { immediate: true },
+)
+
+watch(
+  inputs,
+  (values) => {
+    if (values.some((value) => value.length > 0)) emit('type')
+  },
+  { deep: true },
 )
 
 watch(

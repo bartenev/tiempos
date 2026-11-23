@@ -33,7 +33,7 @@ describe('DrillPanel', () => {
     const wrapper = mountDrill()
     await wrapper.find('#answer').setValue('hablas')
     await wrapper.find('form').trigger('submit')
-    expect(wrapper.emitted('wrong')).toEqual([['hablas']])
+    expect(wrapper.emitted('wrong')).toEqual([['hablas', expect.any(Object)]])
     expect(wrapper.emitted('next')).toBeUndefined()
     expect(wrapper.find('.rule-hint').exists()).toBe(true)
     // после проверки клавиши с ударениями не нужны
@@ -103,7 +103,7 @@ describe('DrillPanel — textbook exercises', () => {
     const wrapper = mountExercise('¿Dónde está Andrés?')
     await wrapper.find('#answer').setValue('la')
     await wrapper.find('form').trigger('submit')
-    expect(wrapper.emitted('wrong')).toEqual([['la']])
+    expect(wrapper.emitted('wrong')).toEqual([['la', expect.any(Object)]])
     expect(wrapper.find('.rule-hint__rule').text().length).toBeGreaterThan(0)
     expect(wrapper.find('.rule-hint__row').exists()).toBe(false)
   })
@@ -121,7 +121,7 @@ describe('DrillPanel — textbook exercises', () => {
   it('a wrong choice marks both buttons and waits for «Дальше»', async () => {
     const wrapper = mountExercise('—¿Quieres este libro?')
     await wrapper.findAll('.drill__option').find((b) => b.text() === 'le')!.trigger('click')
-    expect(wrapper.emitted('wrong')).toEqual([['le']])
+    expect(wrapper.emitted('wrong')).toEqual([['le', expect.any(Object)]])
     expect(wrapper.emitted('next')).toBeUndefined()
     expect(wrapper.find('.drill__option--ok').text()).toBe('lo')
     expect(wrapper.find('.drill__option--bad').text()).toBe('le')
@@ -187,7 +187,7 @@ describe('DrillPanel — several blanks', () => {
     await fields[0]!.setValue('mi')
     await fields[1]!.setValue('mi')
     await wrapper.find('form').trigger('submit')
-    expect(wrapper.emitted('wrong')).toEqual([['mi; mi']])
+    expect(wrapper.emitted('wrong')).toEqual([['mi; mi', expect.any(Object)]])
     expect(fields[0]!.classes()).toContain('drill__input--ok')
     expect(fields[1]!.classes()).toContain('drill__input--bad')
     expect(wrapper.findAll('.drill__blank').map((b) => b.classes().at(-1))).toEqual([
@@ -318,7 +318,7 @@ describe('DrillPanel — oral (self-check)', () => {
     await wrapper.find('.drill__reveal').trigger('click')
     vi.advanceTimersByTime(400)
     await wrapper.find('.drill__grade--bad').trigger('click')
-    expect(wrapper.emitted('wrong')).toEqual([['']])
+    expect(wrapper.emitted('wrong')).toEqual([['', expect.any(Object)]])
     expect(wrapper.emitted('next')).toHaveLength(1)
   })
 
@@ -381,5 +381,77 @@ describe('DrillPanel — oral (self-check)', () => {
     wrapper = undefined
     expect(off).toHaveBeenCalledWith('keydown', expect.any(Function))
     off.mockRestore()
+  })
+})
+
+describe('DrillPanel — время ответа', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(0)
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  function mountTimed(extra: { oral?: boolean; reopened?: boolean } = {}) {
+    return mount(DrillPanel, {
+      attachTo: document.body,
+      props: {
+        card: buildCard(findVerb('hablar')!, 'presente', 'yo'),
+        index: 0,
+        total: null,
+        correct: 0,
+        wrong: 0,
+        streak: 0,
+        ...extra,
+      },
+    })
+  }
+
+  it('text: recall ends at the first letter, typing is not counted', async () => {
+    const wrapper = mountTimed()
+    vi.advanceTimersByTime(1500)
+    await wrapper.find('#answer').setValue('h')
+    vi.advanceTimersByTime(2000)
+    await wrapper.find('#answer').setValue('hablo')
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('correct')).toEqual([[{ ms: 1500, total: 3500 }]])
+    wrapper.unmount()
+  })
+
+  it('oral: recall ends when the answer is opened', async () => {
+    const wrapper = mountTimed({ oral: true })
+    vi.advanceTimersByTime(2000)
+    await wrapper.find('.drill__reveal').trigger('click')
+    vi.advanceTimersByTime(800)
+    await wrapper.find('.drill__grade--bad').trigger('click')
+    expect(wrapper.emitted('wrong')).toEqual([['', { ms: 2000, total: 2800 }]])
+    wrapper.unmount()
+  })
+
+  it('no time after the tab was hidden or for a reopened card', async () => {
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(true)
+    const wrapper = mountTimed()
+    document.dispatchEvent(new Event('visibilitychange'))
+    hidden.mockRestore()
+    await wrapper.find('#answer').setValue('hablo')
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('correct')).toEqual([[null]])
+    wrapper.unmount()
+
+    const reopened = mountTimed({ oral: true, reopened: true })
+    vi.advanceTimersByTime(400)
+    await reopened.find('.drill__grade--ok').trigger('click')
+    expect(reopened.emitted('correct')).toEqual([[null]])
+    reopened.unmount()
+  })
+
+  it('endless session: no «N / total» and no progress bar', () => {
+    const wrapper = mountTimed()
+    expect(wrapper.find('.drill__counter').text()).toBe('1')
+    expect(wrapper.find('.drill__meter-track').exists()).toBe(false)
+    expect(wrapper.find('.drill__quit').text()).toContain('выход')
+    wrapper.unmount()
   })
 })

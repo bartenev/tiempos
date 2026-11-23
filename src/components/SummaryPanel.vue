@@ -5,6 +5,8 @@ import type { SessionResult } from '../types'
 
 const props = defineProps<{
   result: SessionResult
+  /** Итог сессии, которую закрыли в прошлый раз, не дойдя до итогов. */
+  previous?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -39,7 +41,7 @@ const uniqueMistakes = computed(() => {
   <section class="summary">
     <h1 class="screen__title summary__title">¡Listo!</h1>
     <p class="screen__lead summary__lead">
-      Сессия завершена.
+      {{ previous ? 'Итог прошлой сессии.' : 'Сессия завершена.' }}
     </p>
 
     <div class="stat-tiles summary__tiles">

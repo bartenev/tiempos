@@ -122,11 +122,6 @@ export function cellsForConfig(
   return cells
 }
 
-export function weakCount(config: SessionConfig): number {
-  if (config.tenses.length === 0) return 0
-  return cellsForConfig(config).filter((c) => c.weak).length
-}
-
 /**
  * Взвешенная выборка без подряд идущих повторов:
  * после выбора вес формы падает, чтобы очередь не залипала на одной.
@@ -178,7 +173,7 @@ function validate(config: SessionConfig): void {
   }
 }
 
-/** Максимум показов одной слабой формы в режиме «только слабые». */
+/** Максимум показов одной слабой формы, когда в фильтре одни слабые. */
 export const WEAK_REPEATS = 3
 
 /** Доля умной сессии, гарантированная слабым формам (если они есть). */
@@ -295,7 +290,7 @@ function smartQueue(cells: Cell[], size: number, runs: RunStore): Cell[] {
   const slots = Math.min(Math.floor(size * WEAK_SMART_SHARE), weak.length * WEAK_SMART_REPEATS, left)
   const rest = smartPool(cells, left - slots).filter((c) => !c.weak)
   if (rest.length === 0) {
-    // всё в фильтре слабое — добираем как в режиме «только слабые»
+    // всё в фильтре слабое — добираем одними слабыми, не больше WEAK_REPEATS показов на форму
     const allWeak = cells.filter((c) => c.weak)
     const fill = Math.min(left, allWeak.length * WEAK_REPEATS)
     return spread([...fromTables, ...weightedQueue(allWeak, fill)])
@@ -409,7 +404,7 @@ export function buildSession(
     throw new Error('Нет глаголов для выбранного фильтра')
   }
 
-  let cells = cellsForConfig(config, stats)
+  const cells = cellsForConfig(config, stats)
   if (cells.length === 0) {
     throw new Error('Нет форм для выбранного фильтра')
   }
@@ -430,22 +425,7 @@ export function buildSession(
     return shuffle(cards)
   }
 
-  if (config.mode === 'smart') {
-    return smartQueue(cells, config.size, runs).map((c) => makeCard(c.verb, c.tense, c.person))
-  }
-
-  let size = config.size
-  if (config.mode === 'weak') {
-    cells = cells.filter((c) => c.weak)
-    if (cells.length === 0) {
-      throw new Error('Слабых форм нет — отличная работа!')
-    }
-    // Не гонять 2–3 формы по 10 раз подряд.
-    size = Math.min(size, cells.length * WEAK_REPEATS)
-  }
-  return weightedQueue(cells, size).map((c) =>
-    makeCard(c.verb, c.tense, c.person),
-  )
+  return smartQueue(cells, config.size, runs).map((c) => makeCard(c.verb, c.tense, c.person))
 }
 
 /** Deterministic helper for tests (берёт первый шаблон). */

@@ -12,9 +12,10 @@ const MODES: { mode: SettingsMode; label: string; hint: Record<Track, string> }[
     mode: 'smart',
     label: 'Умная',
     hint: {
-      verbs: 'Новое — порциями, ошибки — всегда, выученное — реже.',
-      articles: 'Новое — упражнение за упражнением, ошибки — всегда, выученное — реже.',
-      book: 'Новое — глава за главой, ошибки — всегда, выученное — реже.',
+      verbs: 'Новое — порциями, ошибки — всегда, выученное — реже. Без конца: закончите, когда захотите.',
+      articles:
+        'Новое — упражнение за упражнением, ошибки — всегда, выученное — реже. Без конца: закончите, когда захотите.',
+      book: 'Новое — глава за главой, ошибки — всегда, выученное — реже. Без конца: закончите, когда захотите.',
     },
   },
   {
@@ -71,9 +72,10 @@ const answerNote = computed(() => ANSWER_NOTES[settings.track][settings.answer])
       <p class="group__note settings__mode-note">{{ modeHint }}</p>
     </fieldset>
 
-    <fieldset class="group settings__size">
-      <legend class="group__legend settings__size-legend">Длина сессии</legend>
-      <div class="segmented settings__size-switch" role="radiogroup" aria-label="Длина сессии">
+    <!-- умная сессия бесконечная — длина только у проверки -->
+    <fieldset v-if="settings.mode === 'random'" class="group settings__size">
+      <legend class="group__legend settings__size-legend">Длина проверки</legend>
+      <div class="segmented settings__size-switch" role="radiogroup" aria-label="Длина проверки">
         <button
           v-for="n in SIZES"
           :key="n"

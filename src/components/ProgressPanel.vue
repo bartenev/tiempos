@@ -7,10 +7,6 @@ import { cellKey, errorRate, loadStats, masteryOf, recoveryStreak } from '../lib
 import type { Person, Tense, Verb } from '../types'
 import { TENSES, TENSE_SHORT, personLabel, personsFor } from '../types'
 
-const emit = defineEmits<{
-  'train-weak': []
-}>()
-
 const stats = loadStats()
 
 interface CellInfo {
@@ -192,16 +188,6 @@ function statLine(c: CellInfo): string {
         </span>
       </li>
     </ul>
-    <div class="screen__actions progress__actions">
-      <button
-        class="button button--primary progress__train"
-        type="button"
-        :disabled="totals.counts.weak === 0"
-        @click="emit('train-weak')"
-      >
-        Тренировать слабые
-      </button>
-    </div>
 
     <h2 class="screen__section-title progress__grid-title">Сетка форм</h2>
     <div class="tabs progress__tabs" role="tablist">

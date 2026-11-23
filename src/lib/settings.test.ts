@@ -161,9 +161,9 @@ describe('textbook settings', () => {
 
   it('builds a session config from the selection', () => {
     const settings = { ...DEFAULT_SETTINGS, bookSelection: onlyUnits([35, 36]), size: 10 }
-    const config = bookConfigFromSettings(settings, { mode: 'weak' })
+    const config = bookConfigFromSettings(settings, { mode: 'random' })
     expect(config.units).toEqual([35, 36])
-    expect(config).toMatchObject({ size: 10, mode: 'weak', answer: 'text' })
+    expect(config).toMatchObject({ size: 10, mode: 'random', answer: 'text' })
   })
 
   it('keeps the textbook hidden until turned on in Лаборатория', () => {

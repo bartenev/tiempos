@@ -50,14 +50,14 @@ export interface DrillCard {
 }
 
 /**
- * smart — чаще показывать слабые формы;
- * weak — только слабые («красные зоны»);
- * random — «Проверка»: равномерно случайно, без учёта прогресса и без повтора ошибок.
+ * smart — умная очередь: бесконечная, слабые и новое по порядку, выученное — реже;
+ * random — «Проверка»: заданной длины, равномерно случайно, без учёта прогресса
+ * и без повтора ошибок.
  */
-export type SessionMode = 'smart' | 'weak' | 'random'
+export type SessionMode = 'smart' | 'random'
 
-/** Режим в настройках: «только слабые» — не постоянный режим, а разовая сессия с «Прогресса». */
-export type SettingsMode = Exclude<SessionMode, 'weak'>
+/** Режим в настройках. */
+export type SettingsMode = SessionMode
 
 /** Тренажёр: спряжение глаголов, артикли или главы учебника (местоимения, «Лаборатория»). */
 export type Track = 'verbs' | 'articles' | 'book'
@@ -335,7 +335,6 @@ export type Screen = 'hub' | 'setup' | 'settings' | 'drill' | 'summary' | 'table
 
 export const MODE_LABELS: Record<SessionMode, string> = {
   smart: 'Умная очередь',
-  weak: 'Только слабые',
   random: 'Проверка',
 }
 

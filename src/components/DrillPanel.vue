@@ -5,6 +5,7 @@ import { explainForm } from '../lib/explain'
 import type { AnswerCheck } from '../lib/normalize'
 import { checkBlanks, overallCheck } from '../lib/normalize'
 import { settings } from '../lib/settingsState'
+import type { AnswerTiming } from '../lib/timing'
 import type { AnyCard } from '../types'
 import { isBookCard } from '../types'
 import AnswerForm from './AnswerForm.vue'
@@ -16,7 +17,8 @@ import RuleHint from './RuleHint.vue'
 const props = defineProps<{
   card: AnyCard
   index: number
-  total: number
+  /** Сколько карточек в сессии; null — бесконечная сессия (умный режим). */
+  total: number | null
   correct: number
   wrong: number
   streak: number
@@ -29,8 +31,9 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  correct: []
-  wrong: [given: string]
+  /** timing — сколько заняла карточка; null — время не годится (вкладка была скрыта, повторная оценка). */
+  correct: [timing: AnswerTiming | null]
+  wrong: [given: string, timing: AnswerTiming | null]
   skip: []
   quit: []
   next: []
@@ -49,11 +52,34 @@ const shown = ref(false)
  */
 const GRADE_GUARD_MS = 350
 let shownAt = 0
+
+/** Когда карточка появилась, когда начали печатать / открыли ответ — время ответа. */
+let cardAt = 0
+let recalledAt: number | null = null
+/** Вкладку скрывали, пока карточка была на экране: время не о вспоминании. */
+let away = false
+
+function onVisibility() {
+  if (document.hidden) away = true
+}
+
+/** Время ответа на текущую карточку; null, если его нельзя считать честным. */
+function timing(): AnswerTiming | null {
+  if (away || props.reopened) return null
+  const now = Date.now()
+  return { ms: (recalledAt ?? now) - cardAt, total: now - cardAt }
+}
+
+function onType() {
+  recalledAt ??= Date.now()
+}
 /** Короткая зелёная вспышка: прошлый ответ верный, уже следующая карточка. */
 const flashOk = ref(false)
 let flashTimer: ReturnType<typeof setTimeout> | undefined
 
-const progress = computed(() => `${props.index + 1} / ${props.total}`)
+const progress = computed(() =>
+  props.total === null ? `${props.index + 1}` : `${props.index + 1} / ${props.total}`,
+)
 const answered = computed(() => props.correct + props.wrong)
 const accuracy = computed(() =>
   answered.value === 0 ? null : Math.round((props.correct / answered.value) * 100),
@@ -77,13 +103,16 @@ watch(
     checks.value = null
     shown.value = Boolean(props.oral && props.reopened)
     shownAt = Date.now()
+    cardAt = shownAt
+    recalledAt = null
+    away = false
   },
   { immediate: true },
 )
 
 /** Верно — сразу к следующему заданию, без «Дальше». */
-function acceptCorrect() {
-  emit('correct')
+function acceptCorrect(time: AnswerTiming | null = timing()) {
+  emit('correct', time)
   emit('next')
   flashOk.value = false
   clearTimeout(flashTimer)
@@ -101,13 +130,13 @@ function check(inputs: string[]) {
     return
   }
   checks.value = result
-  emit('wrong', inputs.length > 1 ? inputs.map((value) => value || '—').join('; ') : inputs[0]!)
+  emit('wrong', inputs.length > 1 ? inputs.map((value) => value || '—').join('; ') : inputs[0]!, timing())
 }
 
 /** Ответ верный, просто его нет среди вариантов: ошибка не считается. */
 function acceptOwn() {
   emit('revert')
-  acceptCorrect()
+  acceptCorrect(null)
 }
 
 function skip() {
@@ -119,6 +148,7 @@ function reveal() {
   if (!props.oral || shown.value) return
   shown.value = true
   shownAt = Date.now()
+  recalledAt = shownAt
 }
 
 /** Самооценка в устном режиме; обе кнопки ведут к следующей карточке. */
@@ -128,7 +158,7 @@ function grade(ok: boolean) {
     acceptCorrect()
     return
   }
-  emit('wrong', '')
+  emit('wrong', '', timing())
   emit('next')
 }
 
@@ -152,18 +182,20 @@ function onKey(event: KeyboardEvent) {
 
 onMounted(() => {
   if (props.oral) window.addEventListener('keydown', onKey)
+  document.addEventListener('visibilitychange', onVisibility)
 })
 
 onBeforeUnmount(() => {
   clearTimeout(flashTimer)
   window.removeEventListener('keydown', onKey)
+  document.removeEventListener('visibilitychange', onVisibility)
 })
 </script>
 
 <template>
   <section class="drill" :class="{ 'drill--oral': oral }">
     <header class="topbar drill__bar">
-      <button class="button button--ghost button--small topbar__back drill__quit" type="button" @click="emit('quit')"><Icon name="back" />выход</button>
+      <button class="button button--ghost button--small topbar__back drill__quit" type="button" @click="emit('quit')"><Icon name="back" />{{ answered > 0 ? 'закончить' : 'выход' }}</button>
       <span class="topbar__title drill__counter">{{ progress }}</span>
       <span class="topbar__aside drill__score">
         <Icon name="check" />{{ correct }}
@@ -172,8 +204,9 @@ onBeforeUnmount(() => {
     </header>
 
     <div class="drill__meter" aria-live="polite">
-      <div class="drill__meter-track">
-        <div class="drill__meter-fill" :style="{ width: `${((index) / total) * 100}%` }" />
+      <!-- в бесконечной сессии полоски нет: заканчиваете, когда хотите -->
+      <div v-if="total !== null" class="drill__meter-track">
+        <div class="drill__meter-fill" :style="{ width: `${(index / total) * 100}%` }" />
       </div>
       <span class="drill__meter-stats">
         <span v-if="accuracy !== null" class="drill__accuracy">{{ accuracy }}%</span>
@@ -214,6 +247,7 @@ onBeforeUnmount(() => {
       @next="emit('next')"
       @skip="skip"
       @own="acceptOwn"
+      @type="onType"
     />
   </section>
 </template>
@@ -254,6 +288,8 @@ onBeforeUnmount(() => {
 .drill__meter-stats {
   display: flex;
   justify-content: flex-end;
+  /* без полоски (бесконечная сессия) — всё равно справа */
+  margin-left: auto;
   gap: var(--space-3);
   min-width: 5.5rem;
   font-variant-numeric: tabular-nums;

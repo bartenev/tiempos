@@ -13,10 +13,6 @@ const props = defineProps<{
   deck: Deck
 }>()
 
-const emit = defineEmits<{
-  'train-weak': []
-}>()
-
 const stats = loadDeckStats(props.deck)
 
 const MASTERY_LABELS: Record<Mastery, string> = {
@@ -84,17 +80,6 @@ const totals = computed(() => {
       </div>
     </div>
 
-    <div class="screen__actions deck-progress__actions">
-      <button
-        class="button button--primary deck-progress__train"
-        type="button"
-        :disabled="totals.counts.weak === 0"
-        @click="emit('train-weak')"
-      >
-        Тренировать слабые
-        <span class="badge deck-progress__weak-count" :class="{ 'badge--hot': totals.counts.weak > 0 }">{{ totals.counts.weak }}</span>
-      </button>
-    </div>
 
     <h2 class="screen__section-title deck-progress__chapters-title">{{ deck === 'book' ? 'Главы' : 'Темы' }}</h2>
     <p class="deck-progress__legend">
@@ -125,10 +110,6 @@ const totals = computed(() => {
 <style scoped lang="scss">
 /* ===== deck-progress: прогресс колоды упражнений — по главам учебника или темам артиклей ===== */
 
-.deck-progress__train {
-  flex: 1 1 100%;
-  gap: var(--space-2);
-}
 
 .deck-progress__legend {
   display: flex;

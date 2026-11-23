@@ -55,6 +55,11 @@ export function cardBlanks(card: AnyCard): string[][] {
   return isBookCard(card) ? card.blanks : [[card.answer]]
 }
 
+/** Постоянный ключ карточки: форма глагола (cellKey) или упражнение колоды. */
+export function cardKey(card: AnyCard): string {
+  return isBookCard(card) ? card.key : cellKey(card.verb.infinitive, card.tense, card.person)
+}
+
 export function cardMistake(card: AnyCard, given: string): SessionMistake {
   const { answer } = card
   if (isBookCard(card)) {

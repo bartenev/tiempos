@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { BookConfig } from '../types'
 import {
-  bookWeakCount,
   buildBookSession,
   cardsForUnits,
   chapterCards,
@@ -96,13 +95,6 @@ describe('buildBookSession', () => {
     expect(() => buildBookSession(config({ units: [] }), {})).toThrow()
   })
 
-  it('weak mode shows only weak exercises and fails without them', () => {
-    const [first] = cardsForUnits([35])
-    const stats: StatsStore = { [first!.key]: weakStat }
-    const cards = buildBookSession(config({ mode: 'weak' }), stats)
-    expect(cards.map((c) => c.key)).toEqual([first!.key])
-    expect(() => buildBookSession(config({ mode: 'weak' }), {})).toThrow()
-  })
 
   it('smart mode brings new material in book order', () => {
     const cards = buildBookSession(config({ size: 6 }), {})
@@ -147,8 +139,6 @@ describe('progress', () => {
     expect(counts.weak).toBe(1)
     expect(counts.solid).toBe(1)
     expect(counts.new).toBe(chapterSize(chapter) - 2)
-    expect(bookWeakCount([34], stats)).toBe(1)
-    expect(bookWeakCount([35], stats)).toBe(0)
   })
 
   it('a retry keeps the exercise and marks the card', () => {
