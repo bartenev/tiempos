@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { exportFileName, exportJson } from '../lib/backup'
 import { settings } from '../lib/settingsState'
 import { setTheme, theme } from '../lib/theme'
 import type { SettingsMode, Track } from '../types'
@@ -47,6 +48,51 @@ const ANSWER_NOTES: Record<Track, { text: string; oral: string }> = {
 }
 
 const answerNote = computed(() => ANSWER_NOTES[settings.track][settings.answer])
+
+/** Что получилось с выгрузкой: «Скопировано», «Не удалось…». */
+const exportStatus = ref('')
+
+/** Старый способ копирования — если буфер обмена браузер не даёт (нет разрешения). */
+function copyViaSelection(text: string): boolean {
+  const area = document.createElement('textarea')
+  area.value = text
+  area.setAttribute('readonly', '')
+  area.style.position = 'fixed'
+  area.style.opacity = '0'
+  document.body.append(area)
+  area.select()
+  let ok = false
+  try {
+    ok = document.execCommand('copy')
+  } catch {
+    ok = false
+  }
+  area.remove()
+  return ok
+}
+
+async function copyData() {
+  const text = exportJson(__APP_VERSION__)
+  let ok = false
+  try {
+    await navigator.clipboard.writeText(text)
+    ok = true
+  } catch {
+    ok = copyViaSelection(text)
+  }
+  exportStatus.value = ok ? 'Скопировано в буфер обмена.' : 'Не удалось скопировать — сохраните файлом.'
+}
+
+function saveData() {
+  const blob = new Blob([exportJson(__APP_VERSION__)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = exportFileName()
+  link.click()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+  exportStatus.value = `Файл ${link.download} сохранён.`
+}
 </script>
 
 <template>
@@ -179,6 +225,19 @@ const answerNote = computed(() => ANSWER_NOTES[settings.track][settings.answer])
         </span>
       </label>
     </fieldset>
+
+    <fieldset class="group settings__data">
+      <legend class="group__legend settings__data-legend">Данные</legend>
+      <p class="group__note settings__data-note">
+        Вся история ответов и настройки одним JSON — чтобы разобрать её со стороны и подстроить тренажёр.
+        Данные остаются на устройстве, пока вы сами их не отправите.
+      </p>
+      <div class="screen__actions settings__data-actions">
+        <button class="button button--ghost settings__data-copy" type="button" @click="copyData">Скопировать</button>
+        <button class="button button--ghost settings__data-save" type="button" @click="saveData">Сохранить файлом</button>
+      </div>
+      <p v-if="exportStatus" class="notice notice--muted settings__data-status" role="status">{{ exportStatus }}</p>
+    </fieldset>
   </section>
 </template>
 
@@ -187,6 +246,14 @@ const answerNote = computed(() => ANSWER_NOTES[settings.track][settings.answer])
 
 .settings__labs-note {
   margin: 0 0 var(--space-2);
+}
+
+.settings__data-note {
+  margin: 0 0 var(--space-2);
+}
+
+.settings__data-actions {
+  margin-top: 0;
 }
 
 .settings__lab {

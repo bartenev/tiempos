@@ -31,7 +31,7 @@ import type { TempoRow, TempoSession } from './lib/tempo'
 import { createTempoSession, sessionTempo } from './lib/tempo'
 import { pluralRu } from './lib/plural'
 import { initTheme } from './lib/theme'
-import type { AnswerTiming } from './lib/timing'
+import type { AnswerTiming, TimingReason } from './lib/timing'
 import { dropTiming, loadTimings, recordTiming } from './lib/timing'
 import type {
   AnswerMode,
@@ -349,8 +349,14 @@ function revertGrade() {
 }
 
 /** Время ответа на форму глагола — для разогрева в умном режиме. */
-function saveTiming(card: AnyCard, ok: boolean, timing: AnswerTiming | null): GradeSnapshot['timing'] {
+function saveTiming(
+  card: AnyCard,
+  ok: boolean,
+  timing: AnswerTiming | null,
+  given = '',
+): GradeSnapshot['timing'] {
   if (!timing || isBookCard(card)) return null
+  const reason: TimingReason | undefined = card.retry ? 'retry' : card.sibling ? 'sibling' : card.reason
   const entry = {
     k: cardKey(card),
     at: Date.now(),
@@ -360,6 +366,8 @@ function saveTiming(card: AnyCard, ok: boolean, timing: AnswerTiming | null): Gr
     oral: run.value?.answer === 'oral',
     len: card.sentence.length,
     ...(card.retry ? { retry: true } : {}),
+    ...(given ? { given } : {}),
+    ...(reason ? { reason } : {}),
   }
   recordTiming(entry)
   return { k: entry.k, at: entry.at }
@@ -376,7 +384,7 @@ function onCorrect(timing: AnswerTiming | null = null) {
 }
 
 function onWrong(given: string, timing: AnswerTiming | null = null) {
-  if (current.value) rememberGrade(current.value, saveTiming(current.value, false, timing))
+  if (current.value) rememberGrade(current.value, saveTiming(current.value, false, timing, given))
   wrong.value += 1
   streak.value = 0
   const card = current.value
@@ -389,7 +397,10 @@ function onWrong(given: string, timing: AnswerTiming | null = null) {
     const at = Math.min(index.value + 1 + RETRY_GAP, cards.value.length)
     cards.value.splice(at, 0, retryOf(card))
     const sibling = siblingOf(card)
-    if (sibling) cards.value.splice(Math.min(at + 1 + SIBLING_GAP, cards.value.length), 0, sibling)
+    if (sibling) {
+      const next = isBookCard(sibling) ? sibling : { ...sibling, sibling: true }
+      cards.value.splice(Math.min(at + 1 + SIBLING_GAP, cards.value.length), 0, next)
+    }
   }
 }
 

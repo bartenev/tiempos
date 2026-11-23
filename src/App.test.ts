@@ -121,6 +121,23 @@ describe('App — бесконечная умная сессия', () => {
     expect(timings[0]!.k).toMatch(/\|presente\|/)
   })
 
+  it('logs what was typed on a mistake and why the card came', async () => {
+    const wrapper = await startVerbs()
+    const drill = wrapper.findComponent(DrillPanel)
+    drill.vm.$emit('wrong', 'hablas', { ms: 3000, total: 4000 })
+    drill.vm.$emit('next')
+    await flushPromises()
+    const [entry] = loadTimings()
+    expect(entry).toMatchObject({ ok: false, given: 'hablas' })
+    // без истории всё — новое
+    expect(entry!.reason).toBe('new')
+    // повтор после ошибки — через RETRY_GAP карточек, и в логе он помечен
+    for (let i = 0; i < 3; i++) await answer(wrapper)
+    expect((wrapper.findComponent(DrillPanel).props('card') as DrillCard).retry).toBe(true)
+    await answer(wrapper)
+    expect(loadTimings().at(-1)).toMatchObject({ retry: true, reason: 'retry' })
+  })
+
   it('undo takes the answer time back', async () => {
     const wrapper = await startVerbs({ ...verbs, answer: 'oral' })
     await answer(wrapper)

@@ -63,6 +63,8 @@ export interface DrillCard {
   retry?: boolean
   /** Почему пришла: умная очередь с темпом. */
   reason?: CardReason
+  /** После ошибки: то же правило на другом глаголе той же клетки. */
+  sibling?: boolean
 }
 
 /**
