@@ -228,13 +228,22 @@ describe('App — бесконечная умная сессия', () => {
       expect(drill.props('notice')).toBeNull()
     })
 
-    it('says when a group turns slow by time, not on every mistake', async () => {
+    it('says when a group turns slow by time', async () => {
       const wrapper = await startVerbs({ ...verbs, groups: ['ar'] })
       wrapper.findComponent(DrillPanel).vm.$emit('dismiss')
-      for (let i = 0; i < 4; i++) await answer(wrapper)
-      expect(wrapper.findComponent(DrillPanel).props('notice')).toBeNull()
+      // у группы первой карточки ещё не было ответов — один медленный верный делает её медленной
       await answer(wrapper, { ms: 30000, total: 31000 })
       expect(wrapper.findComponent(DrillPanel).props('notice')).toMatch(/^«Presente · -ar · .+» вспоминается медленно/)
+    })
+
+    it('a mistake is not a reason for a notice: it is seen anyway', async () => {
+      const wrapper = await startVerbs({ ...verbs, groups: ['ar'] })
+      const drill = wrapper.findComponent(DrillPanel)
+      drill.vm.$emit('dismiss')
+      drill.vm.$emit('wrong', 'xxx', { ms: 3000, total: 4000 })
+      drill.vm.$emit('next')
+      await flushPromises()
+      expect(wrapper.findComponent(DrillPanel).props('notice')).toBeNull()
     })
 
     it('says nothing with the switch off', async () => {
