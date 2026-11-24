@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { FADE_FULL_DAYS, fadeOf, heatByCell, lastByCell, repsToGreen, runColor, sumByTensePerson } from './heat'
+import { COLD_FADE, FADE_FROM_DAYS, fadeOf, heatByCell, lastByCell, repsToGreen, runColor, sumByTensePerson, tableStatus } from './heat'
 import { GREEN_RUN } from './runs'
 import type { CellStat, StatsStore } from './stats'
 
@@ -68,12 +68,35 @@ describe('heat / темп и давность', () => {
     expect(runColor(0, { slow: true })).toBe(runColor(0))
   })
 
-  it('a cell fades the longer it was not trained', () => {
+  it('a cooled-down cell fades by one step, not gradually', () => {
     expect(fadeOf(null)).toBe(0)
-    expect(fadeOf(1)).toBe(0)
-    expect(fadeOf(8)).toBeCloseTo(0.5)
-    expect(fadeOf(FADE_FULL_DAYS + 30)).toBe(1)
-    expect(runColor(GREEN_RUN, { fade: 1 })).not.toBe(runColor(GREEN_RUN))
+    expect(fadeOf(FADE_FROM_DAYS - 1)).toBe(0)
+    expect(fadeOf(FADE_FROM_DAYS)).toBe(COLD_FADE)
+    expect(fadeOf(40)).toBe(COLD_FADE)
+    expect(runColor(GREEN_RUN, { fade: fadeOf(3) })).toBe(runColor(GREEN_RUN, { fade: fadeOf(30) }))
+    expect(runColor(GREEN_RUN, { fade: fadeOf(3) })).not.toBe(runColor(GREEN_RUN))
+  })
+
+  it('tableStatus: a full table is only «green» when no cell is slow or cooled down', () => {
+    const now = 100 * DAY
+    const runs = Object.fromEntries(
+      ['yo', 'tú', 'él', 'nosotros', 'vosotros', 'ellos'].flatMap((p) =>
+        ['ar', 'er', 'ir'].map((g) => [`${g}|presente|${p}`, GREEN_RUN]),
+      ),
+    )
+    expect(tableStatus(heatByCell(runs, 'presente', { now }))).toEqual({ need: 0, slow: 0, cold: 0 })
+    const status = tableStatus(
+      heatByCell(runs, 'presente', {
+        slow: new Set(['ar|presente|yo']),
+        last: new Map([
+          ['ar|presente|yo', now - 10 * DAY],
+          ['er|presente|yo', now - 10 * DAY],
+          ['ir|presente|yo', now],
+        ]),
+        now,
+      }),
+    )
+    expect(status).toEqual({ need: 0, slow: 1, cold: 1 })
   })
 
   it('heatByCell marks slow cells and counts days since the last answer', () => {

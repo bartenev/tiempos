@@ -41,14 +41,18 @@ export interface HeatExtras {
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
-/** Клетка начинает бледнеть через FADE_FROM_DAYS без ответов, к FADE_FULL_DAYS — почти бесцветная. */
+/**
+ * Клетка остыла: столько дней без ответов (как у разогрева умного режима — такую он проверит).
+ * Остывшая клетка бледнеет одной ступенькой, без плавного перехода: иначе зелёная таблица
+ * пестрит оттенками и не понять, всё ли в порядке.
+ */
 export const FADE_FROM_DAYS = 2
-export const FADE_FULL_DAYS = 14
+/** Насколько бледнеет остывшая клетка. */
+export const COLD_FADE = 0.6
 
-/** Насколько клетка побледнела: 0 — свежая, 1 — давно не тренировали. */
+/** Насколько клетка побледнела: 0 — свежая, COLD_FADE — остыла. */
 export function fadeOf(days: number | null): number {
-  if (days === null) return 0
-  return Math.min(1, Math.max(0, (days - FADE_FROM_DAYS) / (FADE_FULL_DAYS - FADE_FROM_DAYS)))
+  return days !== null && days >= FADE_FROM_DAYS ? COLD_FADE : 0
 }
 
 /** Последний ответ по ячейкам «Таблиц» (runKey) — из истории правильных форм. */
@@ -100,6 +104,30 @@ export function repsToGreen(heat: TenseHeat): number {
       total + VERB_GROUPS.reduce((sum, group) => sum + Math.max(0, GREEN_RUN - (row![group].run ?? 0)), 0),
     0,
   )
+}
+
+/** Состояние таблицы времени: сколько верных до зелёной, сколько клеток медленных и остывших. */
+export interface TableStatus {
+  /** Верных подряд, которых не хватает до зелёной таблицы. */
+  need: number
+  /** Клеток с полной серией, но медленных (жёлтые). */
+  slow: number
+  /** Клеток с полной серией, но давно не тренированных (бледные). */
+  cold: number
+}
+
+export function tableStatus(heat: TenseHeat): TableStatus {
+  let slow = 0
+  let cold = 0
+  for (const row of Object.values(heat)) {
+    for (const group of VERB_GROUPS) {
+      const cell = row![group]
+      if ((cell.run ?? 0) < GREEN_RUN) continue
+      if (cell.slow) slow += 1
+      else if (fadeOf(cell.days) > 0) cold += 1
+    }
+  }
+  return { need: repsToGreen(heat), slow, cold }
 }
 
 /** Жёлтый — потолок медленной клетки: верно, но ещё не автоматически. */

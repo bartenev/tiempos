@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { TenseHeat } from '../lib/heat'
-import { FADE_FROM_DAYS, heatByCell, lastByCell, repsToGreen, sumByTensePerson } from '../lib/heat'
+import type { TableStatus } from '../lib/heat'
+import { FADE_FROM_DAYS, heatByCell, lastByCell, sumByTensePerson, tableStatus } from '../lib/heat'
 import { pluralRu } from '../lib/plural'
 import { GREEN_RUN, loadRuns } from '../lib/runs'
 import { loadStats } from '../lib/stats'
@@ -44,16 +45,26 @@ const heat = computed(() => {
   return map
 })
 
-/** Сколько верных ответов осталось до полностью зелёной таблицы времени. */
-const remaining = computed(() => {
-  const map = {} as Record<Tense, number>
-  for (const tense of TENSES) map[tense] = repsToGreen(heat.value[tense])
+/** Состояние каждой таблицы: сколько до зелёной, сколько клеток медленных и остывших. */
+const status = computed(() => {
+  const map = {} as Record<Tense, TableStatus>
+  for (const tense of TENSES) map[tense] = tableStatus(heat.value[tense])
   return map
 })
 
-function remainingText(n: number): string {
-  return `ещё ${n} ${pluralRu(n, 'верный ответ', 'верных ответа', 'верных ответов')} до зелёной таблицы`
+const cells = (n: number) => `${n} ${pluralRu(n, 'клетка', 'клетки', 'клеток')}`
+
+/** Подпись таблицы: «вся зелёная» — только когда все клетки ярко-зелёные. */
+function statusText({ need, slow, cold }: TableStatus): string {
+  if (need > 0) return `ещё ${need} ${pluralRu(need, 'верный ответ', 'верных ответа', 'верных ответов')} до зелёной таблицы`
+  const left: string[] = []
+  if (slow > 0) left.push(`${cells(slow)} ${pluralRu(slow, 'медленная', 'медленные', 'медленных')}`)
+  if (cold > 0) left.push(`${cells(cold)} ${pluralRu(cold, 'остыла', 'остыли', 'остыли')}`)
+  if (left.length === 0) return 'вся таблица зелёная ✓'
+  return `серии собраны, но ${left.join(', ')}`
 }
+
+const isDone = (s: TableStatus) => s.need === 0 && s.slow === 0 && s.cold === 0
 
 /** Цвет ячейки — по своей группе (-ar / -er / -ir), а не по всей строке. */
 function cellStyle(tense: Tense, person: Person, verb: Verb): { backgroundColor: string } {
@@ -100,7 +111,8 @@ function rowSum(tense: Tense, person: Person): number {
       </span>
       <span class="tables__legend-note tables__legend-tempo">
         <Icon name="clock" class="tables__legend-clock" /> верно, но медленно — клетка не зеленее жёлтой,
-        пока не разгонитесь. Давно не тренировали — клетка бледнеет.
+        пока не разгонитесь. Не тренировали {{ FADE_FROM_DAYS }} дня и больше — клетка бледная
+        (остыла, умный режим её проверит).
       </span>
     </p>
     <p class="tables__shared-note">
@@ -113,10 +125,10 @@ function rowSum(tense: Tense, person: Person): number {
         <h2 class="tables__tense-title">{{ TENSE_LABELS[tense] }}</h2>
         <span
           class="tables__goal"
-          :class="{ 'tables__goal--done': remaining[tense] === 0 }"
+          :class="{ 'tables__goal--done': isDone(status[tense]) }"
           :title="`Каждой ячейке нужно ${GREEN_RUN} верных ответов подряд в правильных глаголах её группы; ошибка обнуляет серию ячейки.`"
         >
-          {{ remaining[tense] === 0 ? 'вся таблица зелёная ✓' : remainingText(remaining[tense]) }}
+          {{ statusText(status[tense]) }}
         </span>
       </header>
       <div class="tables__wrap">
