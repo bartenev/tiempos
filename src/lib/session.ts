@@ -219,7 +219,7 @@ function spread(cells: Cell[]): Cell[] {
 export const TABLE_SMART_SHARE = 1 / 3
 
 /** Клетка «Таблиц» в фильтре: время × лицо × группа, все её правильные глаголы. */
-interface TableCell {
+export interface TableCell {
   run: number
   forms: Cell[]
 }
@@ -228,7 +228,7 @@ interface TableCell {
  * Незелёные клетки «Таблиц», худшая первой (меньше серия — раньше).
  * Только начатые: в нетронутые клетки новое вводят порции, а не эта доводка.
  */
-function unfinishedTables(cells: Cell[], runs: RunStore): TableCell[] {
+export function unfinishedTables(cells: Cell[], runs: RunStore): TableCell[] {
   const byKey = new Map<string, Cell[]>()
   for (const cell of cells) {
     if (!isRegularIn(cell.verb, cell.tense)) continue
