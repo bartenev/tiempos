@@ -45,6 +45,20 @@ describe('DrillPanel — подсказка умного режима', () => {
     expect(wrapper.emitted('correct')![0]).toEqual([{ ms: 1500, total: 1500 }])
   })
 
+  it('oral mode: no reveal button under the notice, the answer stays closed', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(0)
+    const wrapper = mountDrill()
+    await wrapper.setProps({ oral: true, notice: 'Сначала разогрев' })
+    expect(wrapper.find('.drill__dock').exists()).toBe(false)
+    vi.setSystemTime(1000)
+    await wrapper.find('.drill__notice').trigger('click')
+    await wrapper.setProps({ notice: null })
+    expect(wrapper.find('.drill__dock').exists()).toBe(true)
+    expect(wrapper.find('.drill__answer').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
   it('any key closes it and is not typed into the answer', async () => {
     vi.useFakeTimers()
     vi.setSystemTime(0)

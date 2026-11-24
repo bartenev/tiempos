@@ -183,7 +183,7 @@ function skip() {
 }
 
 function reveal() {
-  if (!props.oral || shown.value) return
+  if (!props.oral || shown.value || props.notice) return
   shown.value = true
   shownAt = Date.now()
   recalledAt = shownAt
@@ -191,7 +191,7 @@ function reveal() {
 
 /** Самооценка в устном режиме; обе кнопки ведут к следующей карточке. */
 function grade(ok: boolean) {
-  if (!shown.value || Date.now() - shownAt < GRADE_GUARD_MS) return
+  if (props.notice || !shown.value || Date.now() - shownAt < GRADE_GUARD_MS) return
   if (ok) {
     acceptCorrect()
     return
@@ -282,7 +282,9 @@ onBeforeUnmount(() => {
 
     <template v-if="oral">
       <RuleHint v-if="hint" class="drill__hint" :hint="hint" />
+      <!-- на телефоне док прибит к низу экрана поверх всего — пока подсказка, его нет -->
       <OralDock
+        v-if="!notice"
         :shown="shown"
         :can-undo="canUndo"
         :subject="isBookCard(card) ? 'ответ' : 'форму'"
@@ -319,7 +321,8 @@ onBeforeUnmount(() => {
 .drill__notice {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  /* выше прилипших к низу кнопок «Проверить / Пропустить» */
+  z-index: 4;
   min-height: 240px;
   display: flex;
   flex-direction: column;
