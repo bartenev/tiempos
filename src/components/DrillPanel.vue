@@ -28,7 +28,10 @@ const props = defineProps<{
   canUndo?: boolean
   /** К карточке вернулись отменой — ответ сразу открыт, ждём новую оценку. */
   reopened?: boolean
-  /** Подсказка над карточкой: «Разогрев пройден», «похоже на усталость». */
+  /**
+   * Что решил умный режим («Разогрев пройден», «похоже на усталость») — экраном
+   * вместо карточки: прочитали, тап — и карточка; её время считается с этого момента.
+   */
   notice?: string | null
 }>()
 
@@ -42,6 +45,8 @@ const emit = defineEmits<{
   undo: []
   /** Снять только что засчитанную ошибку: ответ был верным. */
   revert: []
+  /** Подсказку прочитали — показать карточку. */
+  dismiss: []
 }>()
 
 /** Проверка по полям ввода; null — ещё не проверяли или ответ принят. */
@@ -111,6 +116,37 @@ watch(
   },
   { immediate: true },
 )
+
+/** Подсказка на экране: клавиша, которой ответили на прошлую карточку, её не закрывает. */
+const NOTICE_GUARD_MS = 400
+let noticeAt = 0
+
+watch(
+  () => props.notice,
+  (text, before) => {
+    if (text) noticeAt = Date.now()
+    else if (before) {
+      // время карточки — с момента, когда её стало видно
+      cardAt = Date.now()
+      recalledAt = null
+      away = false
+    }
+  },
+  { immediate: true },
+)
+
+function dismiss() {
+  if (!props.notice || Date.now() - noticeAt < NOTICE_GUARD_MS) return
+  emit('dismiss')
+}
+
+/** Пока подсказка на экране, любая клавиша её закрывает и не попадает в поле ответа. */
+function onNoticeKey(event: KeyboardEvent) {
+  if (!props.notice || event.metaKey || event.ctrlKey || event.altKey) return
+  event.preventDefault()
+  event.stopImmediatePropagation()
+  dismiss()
+}
 
 /** Верно — сразу к следующему заданию, без «Дальше». */
 function acceptCorrect(time: AnswerTiming | null = timing()) {
@@ -183,6 +219,8 @@ function onKey(event: KeyboardEvent) {
 }
 
 onMounted(() => {
+  // раньше обработчика устного режима: клавиша, закрывшая подсказку, не оценивает карточку
+  window.addEventListener('keydown', onNoticeKey, { capture: true })
   if (props.oral) window.addEventListener('keydown', onKey)
   document.addEventListener('visibilitychange', onVisibility)
 })
@@ -190,6 +228,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearTimeout(flashTimer)
   window.removeEventListener('keydown', onKey)
+  window.removeEventListener('keydown', onNoticeKey, { capture: true })
   document.removeEventListener('visibilitychange', onVisibility)
 })
 </script>
@@ -216,7 +255,19 @@ onBeforeUnmount(() => {
       </span>
     </div>
 
-    <p v-if="notice" class="notice notice--muted drill__notice" role="status">{{ notice }}</p>
+    <div class="drill__body">
+    <!-- поле ответа остаётся в фокусе (клавиатура на телефоне не прячется), карточка закрыта -->
+    <div
+      v-if="notice"
+      class="drill__notice"
+      role="status"
+      @pointerdown.prevent
+      @mousedown.prevent
+      @click="dismiss"
+    >
+      <p class="drill__notice-text">{{ notice }}</p>
+      <p class="drill__notice-hint">тап или любая клавиша — дальше</p>
+    </div>
 
     <DrillPrompt
       :card="card"
@@ -253,14 +304,50 @@ onBeforeUnmount(() => {
       @own="acceptOwn"
       @type="onType"
     />
+    </div>
   </section>
 </template>
 
 <style scoped lang="scss">
 /* ===== drill: верх экрана ===== */
 
+.drill__body {
+  position: relative;
+}
+
+/* подсказка умного режима — поверх карточки и поля ответа, пока не прочитали */
 .drill__notice {
-  margin: 0 0 var(--space-3);
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.drill__notice-text {
+  margin: 0;
+  max-width: 32ch;
+  font-size: var(--text-lg);
+  line-height: 1.45;
+  text-wrap: balance;
+}
+
+.drill__notice-hint {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--muted);
 }
 
 .drill__score {

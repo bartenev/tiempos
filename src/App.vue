@@ -69,8 +69,8 @@ const REFILL_AT = 3
  */
 const LOOKAHEAD = 3
 
-/** Сколько карточек держится подсказка над карточкой («Разогрев пройден»). */
-const NOTICE_CARDS = 4
+/** Подсказка про отдельную группу — не чаще, чем раз в столько ответов. */
+const GROUP_NOTICE_GAP = 8
 
 /** Запуск сессии: как отвечаем и как собрать карточки (для «Ещё раз» — заново). */
 interface Run {
@@ -105,11 +105,14 @@ const tempoRows = ref<TempoRow[]>([])
 
 /** Темп текущей сессии глаголов (умный режим); null — карточки кусками. */
 let tempo: TempoSession | null = null
-/** Подсказка над карточкой и до какого ответа она держится. */
+/** Подсказка вместо карточки, пока её не закроют («Лаборатория» → «Подсказки умного режима»). */
 const notice = ref<string | null>(null)
-let noticeUntil = 0
-/** Важность подсказки: менее важная не перебивает ту, что ещё держится. */
+/** Важность подсказки: менее важная не перебивает ту, что ещё не закрыли. */
 let noticeRank = 0
+/** Когда в последний раз говорили про отдельную группу (номер ответа). */
+let groupSaidAt = -Infinity
+/** Последний ответ был верным: группа замедлилась по времени, а не из-за ошибки. */
+let lastOk = false
 /** Разогрев шёл в этой сессии / уже сказали, что он пройден / что похоже на усталость. */
 let warming = false
 let warmedSaid = false
@@ -190,6 +193,8 @@ function begin(next: Run) {
   startedAt.value = now
   notice.value = null
   noticeRank = 0
+  groupSaidAt = -Infinity
+  lastOk = false
   warming = false
   warmedSaid = false
   tiredSaid = false
@@ -279,10 +284,15 @@ function topUp() {
 const RANK = { group: 1, step: 2, tired: 3 } as const
 
 function say(text: string, rank: number = RANK.step) {
-  if (notice.value && answered.value < noticeUntil && rank < noticeRank) return
+  if (!settings.labs.tempoNotes) return
+  if (notice.value && rank < noticeRank) return
   notice.value = text
   noticeRank = rank
-  noticeUntil = answered.value + NOTICE_CARDS
+}
+
+function dismissNotice() {
+  notice.value = null
+  noticeRank = 0
 }
 
 /**
@@ -292,7 +302,6 @@ function say(text: string, rank: number = RANK.step) {
  */
 function checkTempo(next: DrillCard | undefined) {
   const state = tempo!.state()
-  if (notice.value && answered.value >= noticeUntil) notice.value = null
   const hot = new Set(state.hot)
 
   const portion = next ? tempo!.newPortion(next) : null
@@ -302,11 +311,17 @@ function checkTempo(next: DrillCard | undefined) {
   // «хороший» — только если правда: медленных групп нет и не устали
   const good = answered.value > 0 && state.slow === 0 && !state.tired
 
-  if (answered.value > 0) {
-    const slowed = state.hot.filter((k) => !prevHot.has(k))
+  // про отдельную группу — не на каждую ошибку (её и так видно) и не чаще GROUP_NOTICE_GAP
+  if (answered.value > 0 && answered.value - groupSaidAt >= GROUP_NOTICE_GAP) {
+    const slowed = lastOk ? state.hot.filter((k) => !prevHot.has(k)) : []
     const sped = prevPool.filter((g) => g.reason === 'slow' && !hot.has(g.key))
-    if (slowed.length > 0) say(`«${groupLabel(slowed[0]!)}» вспоминается медленно — повторим чаще.`, RANK.group)
-    else if (sped.length > 0 && state.pool.length > 0) say(`Разогналось: «${groupLabel(sped[0]!.key)}»`, RANK.group)
+    let text = ''
+    if (slowed.length > 0) text = `«${groupLabel(slowed[0]!)}» вспоминается медленно — повторим чаще.`
+    else if (sped.length > 0 && state.pool.length > 0) text = `Разогналось: «${groupLabel(sped[0]!.key)}»`
+    if (text) {
+      groupSaidAt = answered.value
+      say(text, RANK.group)
+    }
   }
 
   if (state.pool.length > 0 && !warming) {
@@ -423,6 +438,7 @@ function saveTiming(
 function onCorrect(timing: AnswerTiming | null = null) {
   if (current.value) rememberGrade(current.value, saveTiming(current.value, true, timing))
   correct.value += 1
+  lastOk = true
   streak.value += 1
   bestStreak.value = Math.max(bestStreak.value, streak.value)
   const card = current.value
@@ -433,6 +449,7 @@ function onCorrect(timing: AnswerTiming | null = null) {
 function onWrong(given: string, timing: AnswerTiming | null = null) {
   if (current.value) rememberGrade(current.value, saveTiming(current.value, false, timing, given))
   wrong.value += 1
+  lastOk = false
   streak.value = 0
   const card = current.value
   if (!card) return
@@ -551,6 +568,7 @@ restoreLastSession()
       @quit="quit"
       @undo="undoGrade"
       @revert="revertGrade"
+      @dismiss="dismissNotice"
     />
     <SummaryPanel
       v-else-if="screen === 'summary'"

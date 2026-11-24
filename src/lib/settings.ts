@@ -31,6 +31,8 @@ export interface LabsSettings {
   briefHints: boolean
   /** Глаголы: перевод предложения на карточке не показывается — время угадывается по испанскому. */
   hideVerbTranslation: boolean
+  /** Глаголы, умный режим: что решил алгоритм (разогрев, новое, усталость) — экраном вместо карточки. */
+  tempoNotes: boolean
 }
 
 export interface SetupSettings {
@@ -99,7 +101,7 @@ export const DEFAULT_SETTINGS: SetupSettings = {
   mode: 'smart',
   answer: 'text',
   simpleCards: false,
-  labs: { book: false, briefHints: false, hideVerbTranslation: false },
+  labs: { book: false, briefHints: false, hideVerbTranslation: false, tempoNotes: false },
 }
 
 const SIZES = new Set([10, 20, 30])

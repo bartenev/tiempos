@@ -1,12 +1,13 @@
 import type { VueWrapper } from '@vue/test-utils'
 import { flushPromises, mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App.vue'
 import DrillPanel from './components/DrillPanel.vue'
 import HomePanel from './components/HomePanel.vue'
 import HubPanel from './components/HubPanel.vue'
 import SummaryPanel from './components/SummaryPanel.vue'
 import { loadLastSession } from './lib/lastSession'
+import { settings } from './lib/settingsState'
 import { loadBookStats } from './lib/stats'
 import type { AnswerTiming } from './lib/timing'
 import { loadTimings } from './lib/timing'
@@ -191,6 +192,7 @@ describe('App — бесконечная умная сессия', () => {
   })
 
   it('starts with a warm-up of what cooled down, labelled on the card', async () => {
+    settings.labs.tempoNotes = true
     const old = Date.now() - 10 * 24 * 60 * 60 * 1000
     localStorage.setItem(
       'tiempos.stats.v1',
@@ -202,24 +204,44 @@ describe('App — бесконечная умная сессия', () => {
     expect(drill.props('notice')).toBe('Сначала разогрев: 1 группа медленная или остыла.')
     expect((drill.props('card') as DrillCard).reason).toBe('cold')
     // проба быстрая — группа сразу вышла из разогрева
+    drill.vm.$emit('dismiss')
     await answer(wrapper)
     expect(wrapper.findComponent(DrillPanel).props('notice')).toBe('Разогрев пройден — дальше новое и повторение.')
     random.mockRestore()
+    settings.labs.tempoNotes = false
   })
 
-  it('says out loud when it starts something new', async () => {
-    const wrapper = await startVerbs()
-    expect(wrapper.findComponent(DrillPanel).props('notice')).toBe('Начинаем с нового: «Presente · -ar»')
-  })
+  describe('подсказки умного режима («Лаборатория»)', () => {
+    beforeEach(() => {
+      settings.labs.tempoNotes = true
+    })
+    afterEach(() => {
+      settings.labs.tempoNotes = false
+    })
 
-  it('says when a group turns slow', async () => {
-    const wrapper = await startVerbs({ ...verbs, groups: ['ar'] })
-    for (let i = 0; i < 4; i++) await answer(wrapper)
-    const drill = wrapper.findComponent(DrillPanel)
-    drill.vm.$emit('wrong', 'xxx', { ms: 3000, total: 4000 })
-    drill.vm.$emit('next')
-    await flushPromises()
-    expect(wrapper.findComponent(DrillPanel).props('notice')).toMatch(/^«Presente · -ar · .+» вспоминается медленно/)
+    it('says out loud when it starts something new; closed by a tap', async () => {
+      const wrapper = await startVerbs()
+      const drill = wrapper.findComponent(DrillPanel)
+      expect(drill.props('notice')).toBe('Начинаем с нового: «Presente · -ar»')
+      drill.vm.$emit('dismiss')
+      await flushPromises()
+      expect(drill.props('notice')).toBeNull()
+    })
+
+    it('says when a group turns slow by time, not on every mistake', async () => {
+      const wrapper = await startVerbs({ ...verbs, groups: ['ar'] })
+      wrapper.findComponent(DrillPanel).vm.$emit('dismiss')
+      for (let i = 0; i < 4; i++) await answer(wrapper)
+      expect(wrapper.findComponent(DrillPanel).props('notice')).toBeNull()
+      await answer(wrapper, { ms: 30000, total: 31000 })
+      expect(wrapper.findComponent(DrillPanel).props('notice')).toMatch(/^«Presente · -ar · .+» вспоминается медленно/)
+    })
+
+    it('says nothing with the switch off', async () => {
+      settings.labs.tempoNotes = false
+      const wrapper = await startVerbs()
+      expect(wrapper.findComponent(DrillPanel).props('notice')).toBeNull()
+    })
   })
 
   it('«Проверка» keeps its length', async () => {

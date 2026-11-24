@@ -224,6 +224,13 @@ function saveData() {
           <span class="settings__lab-hint">не показывать русский перевод предложения на карточке</span>
         </span>
       </label>
+      <label class="choice settings__lab">
+        <input v-model="settings.labs.tempoNotes" class="choice__input settings__lab-input" type="checkbox" />
+        <span class="choice__label settings__lab-label">
+          Подсказки умного режима
+          <span class="settings__lab-hint">в глаголах — что решил алгоритм: разогрев, новое, медленная группа, усталость. Экраном вместо карточки: пока читаете, время ответа не идёт</span>
+        </span>
+      </label>
     </fieldset>
 
     <fieldset class="group settings__data">

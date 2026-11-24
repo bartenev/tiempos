@@ -19,6 +19,46 @@ function mountDrill() {
   })
 }
 
+describe('DrillPanel — подсказка умного режима', () => {
+  afterEach(() => vi.useRealTimers())
+
+  it('covers the card until a tap; the answer time starts after it', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(0)
+    const wrapper = mountDrill()
+    await wrapper.setProps({ notice: 'Темп хороший — добавляю новое: «Presente · -ar»' })
+    expect(wrapper.find('.drill__notice').text()).toContain('добавляю новое')
+
+    // сразу после появления тап не закрывает: это мог быть Enter прошлой карточки
+    await wrapper.find('.drill__notice').trigger('click')
+    expect(wrapper.emitted('dismiss')).toBeUndefined()
+
+    vi.setSystemTime(5000) // читали 5 секунд
+    await wrapper.find('.drill__notice').trigger('click')
+    expect(wrapper.emitted('dismiss')).toHaveLength(1)
+    await wrapper.setProps({ notice: null })
+    expect(wrapper.find('.drill__notice').exists()).toBe(false)
+
+    vi.setSystemTime(6500)
+    await wrapper.find('#answer').setValue('hablo')
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('correct')![0]).toEqual([{ ms: 1500, total: 1500 }])
+  })
+
+  it('any key closes it and is not typed into the answer', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(0)
+    const wrapper = mountDrill()
+    await wrapper.setProps({ notice: 'Разогрев пройден' })
+    vi.setSystemTime(1000)
+    const event = new KeyboardEvent('keydown', { key: 'h', cancelable: true })
+    window.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(true)
+    expect(wrapper.emitted('dismiss')).toHaveLength(1)
+    wrapper.unmount()
+  })
+})
+
 describe('DrillPanel', () => {
   it('correct answer goes straight to the next card', async () => {
     const wrapper = mountDrill()
