@@ -27,8 +27,8 @@ import { buildSession } from './lib/session'
 import { articleConfigFromSettings, bookConfigFromSettings, configFromSettings } from './lib/settings'
 import { settings } from './lib/settingsState'
 import type { CellStat } from './lib/stats'
-import type { TempoRow, TempoSession } from './lib/tempo'
-import { createTempoSession, sessionTempo } from './lib/tempo'
+import type { PoolGroup, TempoRow, TempoSession } from './lib/tempo'
+import { createTempoSession, groupLabel, portionLabel, sessionTempo } from './lib/tempo'
 import { pluralRu } from './lib/plural'
 import { initTheme } from './lib/theme'
 import type { AnswerTiming, TimingReason } from './lib/timing'
@@ -108,10 +108,17 @@ let tempo: TempoSession | null = null
 /** Подсказка над карточкой и до какого ответа она держится. */
 const notice = ref<string | null>(null)
 let noticeUntil = 0
+/** Важность подсказки: менее важная не перебивает ту, что ещё держится. */
+let noticeRank = 0
 /** Разогрев шёл в этой сессии / уже сказали, что он пройден / что похоже на усталость. */
 let warming = false
 let warmedSaid = false
 let tiredSaid = false
+/** Порции, о которых уже сказали «добавляю новое». */
+let announced = new Set<string>()
+/** Медленные группы и разогрев на прошлой проверке — чтобы заметить, что изменилось. */
+let prevHot = new Set<string>()
+let prevPool: PoolGroup[] = []
 
 /** Состояние до последнего ответа: отмена самооценки и «Мой ответ верный». */
 interface GradeSnapshot {
@@ -182,10 +189,14 @@ function begin(next: Run) {
   previous.value = false
   startedAt.value = now
   notice.value = null
+  noticeRank = 0
   warming = false
   warmedSaid = false
   tiredSaid = false
-  if (tempo) checkTempo()
+  announced = new Set()
+  prevHot = new Set()
+  prevPool = []
+  if (tempo) checkTempo(cards.value[0] as DrillCard | undefined)
   clearLastSession()
   screen.value = 'drill'
 }
@@ -264,15 +275,40 @@ function topUp() {
   }
 }
 
-function say(text: string) {
+/** Подсказки по важности: группа < разогрев и новое < усталость. */
+const RANK = { group: 1, step: 2, tired: 3 } as const
+
+function say(text: string, rank: number = RANK.step) {
+  if (notice.value && answered.value < noticeUntil && rank < noticeRank) return
   notice.value = text
+  noticeRank = rank
   noticeUntil = answered.value + NOTICE_CARDS
 }
 
-/** Вехи темпа: начало разогрева, разогрев пройден, похоже на усталость. */
-function checkTempo() {
+/**
+ * Что решил умный режим — вслух: разогрев начался и пройден, группа замедлилась
+ * или разогналась, вводится новая порция (и почему сейчас), похоже на усталость.
+ * `next` — карточка, которая сейчас появится.
+ */
+function checkTempo(next: DrillCard | undefined) {
   const state = tempo!.state()
   if (notice.value && answered.value >= noticeUntil) notice.value = null
+  const hot = new Set(state.hot)
+
+  const portion = next ? tempo!.newPortion(next) : null
+  const fresh = portion !== null && !announced.has(portion)
+  if (fresh) announced.add(portion)
+  const what = fresh ? `«${portionLabel(portion)}»` : ''
+  // «хороший» — только если правда: медленных групп нет и не устали
+  const good = answered.value > 0 && state.slow === 0 && !state.tired
+
+  if (answered.value > 0) {
+    const slowed = state.hot.filter((k) => !prevHot.has(k))
+    const sped = prevPool.filter((g) => g.reason === 'slow' && !hot.has(g.key))
+    if (slowed.length > 0) say(`«${groupLabel(slowed[0]!)}» вспоминается медленно — повторим чаще.`, RANK.group)
+    else if (sped.length > 0 && state.pool.length > 0) say(`Разогналось: «${groupLabel(sped[0]!.key)}»`, RANK.group)
+  }
+
   if (state.pool.length > 0 && !warming) {
     warming = true
     if (answered.value === 0) {
@@ -281,12 +317,23 @@ function checkTempo() {
     }
   } else if (state.pool.length === 0 && warming && !warmedSaid) {
     warmedSaid = true
-    say('Разогрев пройден — дальше новое и повторение.')
+    say(
+      fresh && good
+        ? `Разогрев пройден, темп хороший — добавляю новое: ${what}`
+        : 'Разогрев пройден — дальше новое и повторение.',
+    )
+  } else if (fresh) {
+    if (answered.value === 0) say(`Начинаем с нового: ${what}`)
+    else if (good) say(`Темп хороший — добавляю новое: ${what}`)
+    else say(`Дальше новое: ${what}`)
   }
+
   if (state.tired && !tiredSaid) {
     tiredSaid = true
-    say('Темп упал сразу везде — похоже на усталость. Хорошая точка, чтобы закончить.')
+    say('Темп упал сразу везде — похоже на усталость. Хорошая точка, чтобы закончить.', RANK.tired)
   }
+  prevHot = hot
+  prevPool = state.pool
 }
 
 function goNext() {
@@ -294,7 +341,7 @@ function goNext() {
   if (tempo) {
     try {
       topUp()
-      checkTempo()
+      checkTempo(cards.value[index.value + 1] as DrillCard | undefined)
     } catch {
       /* выбрать не из чего — сессия закончится на последней карточке */
     }

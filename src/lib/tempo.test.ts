@@ -13,6 +13,7 @@ import {
   createTempoSession,
   groupLabel,
   groupOf,
+  portionLabel,
   groupTempos,
   sessionTempo,
   slowTableCells,
@@ -173,6 +174,29 @@ describe('createTempoSession', () => {
     expect(t.state().pool).toEqual([])
     const cards = Array.from({ length: 20 }, () => t.next([], []))
     expect(cards.some((c) => c.reason === 'new')).toBe(true)
+  })
+
+  it('lists slow groups', () => {
+    expect(session(0).state().hot).toEqual(['presente|ar|tú'])
+  })
+
+  it('a new form is «new» only while its portion is not mastered yet', () => {
+    const fast = PERSONS.map((p, i) => timing(`hablar|presente|${p}`, NOW - 1000 + i, 2000))
+    const t = session(0.99, fast)
+    // presente -ar освоено на hablar: cantar — новый глагол по знакомому правилу
+    const cards = Array.from({ length: 20 }, () => t.next([], []))
+    for (const c of cards.filter((c) => c.reason === 'new')) expect(t.newPortion(c)).toBeNull()
+
+    const blank = createTempoSession(config, NOW, { stats: () => ({}), runs: () => ({}), timings: () => [] })
+    const first = blank.next([], [])
+    expect(first.reason).toBe('new')
+    expect(blank.newPortion(first)).toBe('presente|ar')
+    expect(blank.newPortion({ ...first, retry: true })).toBeNull()
+  })
+
+  it('labels portions for people', () => {
+    expect(portionLabel('presente|ar')).toBe('Presente · -ar')
+    expect(portionLabel('presente|e>ie')).toBe('Presente · e → ie')
   })
 })
 

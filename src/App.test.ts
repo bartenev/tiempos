@@ -207,6 +207,21 @@ describe('App — бесконечная умная сессия', () => {
     random.mockRestore()
   })
 
+  it('says out loud when it starts something new', async () => {
+    const wrapper = await startVerbs()
+    expect(wrapper.findComponent(DrillPanel).props('notice')).toBe('Начинаем с нового: «Presente · -ar»')
+  })
+
+  it('says when a group turns slow', async () => {
+    const wrapper = await startVerbs({ ...verbs, groups: ['ar'] })
+    for (let i = 0; i < 4; i++) await answer(wrapper)
+    const drill = wrapper.findComponent(DrillPanel)
+    drill.vm.$emit('wrong', 'xxx', { ms: 3000, total: 4000 })
+    drill.vm.$emit('next')
+    await flushPromises()
+    expect(wrapper.findComponent(DrillPanel).props('notice')).toMatch(/^«Presente · -ar · .+» вспоминается медленно/)
+  })
+
   it('«Проверка» keeps its length', async () => {
     const wrapper = await startVerbs({ ...verbs, mode: 'random', size: 10 })
     expect(wrapper.findComponent(DrillPanel).props('total')).toBe(10)

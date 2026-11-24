@@ -2,6 +2,7 @@ import type { CardReason, DrillCard, Person, SessionConfig, Tense, Verb, VerbGro
 import { TENSE_LABELS, VERB_GROUPS, personLabel } from '../types'
 import type { Pattern } from './patterns'
 import { PATTERN_LABELS, portionOf } from './patterns'
+import { portionKey, portionStatuses } from './portions'
 import type { Cell } from './session'
 import { buildSession, cellsForConfig, makeCard, shuffle } from './session'
 import type { RunStore } from './runs'
@@ -181,6 +182,8 @@ export interface TempoState {
   slow: number
   /** Остывших групп, которые ещё можно проверить в этой сессии. */
   cold: number
+  /** Все медленные группы фильтра (и в разогреве, и ждущие очереди). */
+  hot: string[]
 }
 
 interface Context {
@@ -218,6 +221,7 @@ export function tempoState({ cells, timings, sessionStart }: Context): TempoStat
   const slowBefore: { key: string; ewma: number }[] = []
   const cold: { key: string; last: number; reason: 'cold' | 'probe' }[] = []
   let probed = 0
+  const hot: string[] = []
   for (const key of known) {
     const t = tempos.get(key)
     const last = Math.max(t?.lastBefore ?? 0, seen.get(key) ?? 0)
@@ -226,6 +230,7 @@ export function tempoState({ cells, timings, sessionStart }: Context): TempoStat
     const touched = (t?.inSession ?? 0) > 0
     if (wasCold && touched) probed += 1
     if (t?.hot) {
+      hot.push(key)
       if (touched) inProgress.push({ key, reason: 'slow' })
       else slowBefore.push({ key, ewma: t.ewma! })
     } else if (wasCold && !touched) {
@@ -241,7 +246,7 @@ export function tempoState({ cells, timings, sessionStart }: Context): TempoStat
     ...slowBefore.map(({ key }) => ({ key, reason: 'slow' as const })),
     ...probes.map(({ key, reason }) => ({ key, reason })),
   ].slice(0, POOL_SIZE)
-  return { pool, slow: inProgress.length + slowBefore.length, cold: probes.length }
+  return { pool, slow: inProgress.length + slowBefore.length, cold: probes.length, hot }
 }
 
 /**
@@ -288,6 +293,11 @@ export interface TempoSession {
   next(upcoming: DrillCard[], recent: DrillCard[]): DrillCard
   /** Состояние разогрева сейчас. */
   state(): TempoState & { tired: boolean }
+  /**
+   * Новая форма из ещё не освоенной порции — ключ порции; иначе null
+   * (новый глагол по знакомому правилу — это не «новое»).
+   */
+  newPortion(card: DrillCard): string | null
 }
 
 export interface TempoSources {
@@ -374,6 +384,14 @@ export function createTempoSession(
       const ctx = context()
       return { ...tempoState(ctx), tired: isTired(ctx.timings, sessionStart) }
     },
+    newPortion(card) {
+      if (card.retry || card.sibling || card.reason !== 'new') return null
+      const ctx = context()
+      if (ctx.stats[cardKeyOf(card)]) return null
+      const key = portionKey(card.tense, portionOf(card.verb, card.tense, card.person))
+      const status = portionStatuses(ctx.cells).find((s) => portionKey(s.tense, s.portion) === key)
+      return status && status.state !== 'mastered' ? key : null
+    },
   }
 }
 
@@ -399,6 +417,15 @@ export function groupLabel(key: string): string {
     return `${TENSE_LABELS[tense]} · -${parts[1]} · ${personLabel(tense, parts[2] as Person)}`
   }
   return `${TENSE_LABELS[tense]} · ${PATTERN_LABELS[parts[1] as Pattern] ?? parts[1]}`
+}
+
+/** Подпись порции: «Indefinido · -ar», «Presente · e → ie». */
+export function portionLabel(key: string): string {
+  const [tense, portion] = key.split('|') as [Tense, string]
+  const name = (VERB_GROUPS as string[]).includes(portion)
+    ? `-${portion}`
+    : (PATTERN_LABELS[portion as Pattern] ?? portion)
+  return `${TENSE_LABELS[tense]} · ${name}`
 }
 
 /** Темп группы за сессию: время вспоминания первого и последнего верного ответа, ms. */
