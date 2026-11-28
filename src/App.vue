@@ -28,8 +28,8 @@ import { articleConfigFromSettings, bookConfigFromSettings, configFromSettings }
 import { settings } from './lib/settingsState'
 import type { CellStat } from './lib/stats'
 import { loadStats } from './lib/stats'
-import type { PoolGroup, TempoRow, TempoSession } from './lib/tempo'
-import { createTempoSession, groupLabel, portionLabel, sessionTempo } from './lib/tempo'
+import type { PoolGroup, TempoRow, TempoSession, Trend } from './lib/tempo'
+import { createTempoSession, groupLabel, portionLabel, sessionTempo, sessionTrend } from './lib/tempo'
 import { pluralRu } from './lib/plural'
 import { initTheme } from './lib/theme'
 import type { AnswerTiming, TimingReason } from './lib/timing'
@@ -83,6 +83,8 @@ interface Run {
   size: number | null
   /** Глаголы в умном режиме: выбор карточек на ходу по темпу. */
   tempo?: (sessionStart: number) => TempoSession
+  /** Глаголы: по ответам пишется время — по нему стрелка темпа. */
+  verbs?: boolean
 }
 
 /** Начало — список тренажёров; из него — главная выбранного тренажёра. */
@@ -108,6 +110,8 @@ const tempoRows = ref<TempoRow[]>([])
 let tempo: TempoSession | null = null
 /** Подсказка вместо карточки, пока её не закроют («Лаборатория» → «Подсказки умного режима»). */
 const notice = ref<string | null>(null)
+/** Стрелка темпа: как идёт занятие («Лаборатория» → «Стрелка темпа»). */
+const trend = ref<Trend | null>(null)
 /** Важность подсказки: менее важная не перебивает ту, что ещё не закрыли. */
 let noticeRank = 0
 /** Когда в последний раз говорили про отдельную группу (номер ответа). */
@@ -202,6 +206,7 @@ function begin(next: Run) {
   announced = new Set()
   prevHot = new Set()
   prevPool = []
+  trend.value = null
   if (tempo) checkTempo(cards.value[0] as DrillCard | undefined)
   clearLastSession()
   screen.value = 'drill'
@@ -219,6 +224,7 @@ function start(cfg: SessionConfig) {
     size: sizeOf(cfg),
     build: (size) => buildSession({ ...cfg, size }),
     tempo: cfg.mode === 'smart' ? (sessionStart) => createTempoSession(cfg, sessionStart) : undefined,
+    verbs: true,
   })
 }
 
@@ -352,8 +358,15 @@ function checkTempo(next: DrillCard | undefined) {
   prevPool = state.pool
 }
 
+/** Пересчитать стрелку по свежему логу: прошлое значение держит её от дрожания на границе. */
+function updateTrend() {
+  trend.value =
+    settings.labs.tempoTrend && run.value?.verbs ? sessionTrend(loadTimings(), startedAt.value, trend.value) : null
+}
+
 function goNext() {
   reopenedIndex.value = null
+  updateTrend()
   if (tempo) {
     try {
       topUp()
@@ -396,6 +409,7 @@ function restoreGrade(snap: GradeSnapshot) {
   restoreCard(snap.card, snap.stat, snap.run)
   if (snap.timing) dropTiming(snap.timing.k, snap.timing.at)
   lastGrade.value = null
+  updateTrend()
 }
 
 /** Отменить последнюю самооценку и вернуться к той карточке с открытым ответом. */
@@ -564,6 +578,7 @@ restoreLastSession()
       :can-undo="lastGrade !== null"
       :reopened="reopenedIndex === index"
       :notice="notice"
+      :trend="trend"
       @correct="onCorrect"
       @wrong="onWrong"
       @skip="onSkip"

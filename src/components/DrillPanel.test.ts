@@ -509,3 +509,16 @@ describe('DrillPanel — время ответа', () => {
     wrapper.unmount()
   })
 })
+
+describe('DrillPanel — стрелка темпа', () => {
+  it('a small arrow by the accuracy, nothing covers the card', async () => {
+    const wrapper = mountDrill()
+    expect(wrapper.find('.drill__trend').exists()).toBe(false)
+    await wrapper.setProps({ trend: 'down', correct: 3, wrong: 2 })
+    const arrow = wrapper.find('.drill__trend')
+    expect(arrow.classes()).toContain('drill__trend--down')
+    expect(arrow.attributes('aria-label')).toBe('темп хуже обычного')
+    expect(wrapper.find('.drill__notice').exists()).toBe(false)
+    expect(wrapper.find('#answer').exists()).toBe(true)
+  })
+})

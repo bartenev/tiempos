@@ -277,6 +277,46 @@ export function isTired(timings: Timing[], sessionStart: number): boolean {
   return median(session.slice(-FATIGUE_WINDOW)) - best >= FATIGUE_DROP
 }
 
+/** Как идёт занятие: лучше обычного, ровно или хуже. */
+export type Trend = 'up' | 'flat' | 'down'
+
+/** Стрелка появляется после стольких ответов в сессии: раньше сравнивать нечего. */
+export const TREND_MIN_ANSWERS = 5
+/** Сколько последних ответов сессии смотрим. */
+const TREND_WINDOW = 8
+/** «Обычно» — средняя медленность стольких ответов до сессии. */
+const TREND_USUAL_WINDOW = 200
+const TREND_USUAL_MIN = 20
+/** Стрелка поворачивается, когда отличие от обычного больше TREND_ENTER (log2: ~×1.27)… */
+export const TREND_ENTER = 0.35
+/** …и возвращается к «ровно», только когда отличие меньше TREND_EXIT: не дёргается на границе. */
+export const TREND_EXIT = 0.15
+
+/**
+ * Тенденция занятия: средняя медленность последних TREND_WINDOW ответов (ошибка —
+ * как очень медленный ответ, так что точность тоже считается) против вашей обычной.
+ * Пока истории мало, «обычная» — средняя по этой же сессии. prev — прошлое значение,
+ * для гистерезиса. null — ответов в сессии ещё мало.
+ */
+export function sessionTrend(timings: Timing[], sessionStart: number, prev: Trend | null = null): Trend | null {
+  const base = baselines(timings)
+  const counts = (t: Timing) => !t.retry && !t.first
+  const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length
+  const session = timings.filter((t) => t.at >= sessionStart && counts(t)).map((t) => slowness(t, base))
+  if (session.length < TREND_MIN_ANSWERS) return null
+  const before = timings
+    .filter((t) => t.at < sessionStart && counts(t))
+    .slice(-TREND_USUAL_WINDOW)
+    .map((t) => slowness(t, base))
+  const usual = mean(before.length >= TREND_USUAL_MIN ? before : session)
+  const diff = mean(session.slice(-TREND_WINDOW)) - usual
+  if (prev === 'up' && diff < -TREND_EXIT) return 'up'
+  if (prev === 'down' && diff > TREND_EXIT) return 'down'
+  if (diff <= -TREND_ENTER) return 'up'
+  if (diff >= TREND_ENTER) return 'down'
+  return 'flat'
+}
+
 /**
  * Форма группы для разогрева: знакомая, давно не виденная — разогрев меряет, что вы помните.
  * Незнакомый глагол у клетки — только если знакомых не осталось; у модели — никогда (это новое).

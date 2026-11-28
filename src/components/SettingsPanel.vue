@@ -231,6 +231,13 @@ function saveData() {
           <span class="settings__lab-hint">в глаголах — что решил алгоритм: разогрев, новое, медленная группа, усталость. Экраном вместо карточки: пока читаете, время ответа не идёт</span>
         </span>
       </label>
+      <label class="choice settings__lab">
+        <input v-model="settings.labs.tempoTrend" class="choice__input settings__lab-input" type="checkbox" />
+        <span class="choice__label settings__lab-label">
+          Стрелка темпа
+          <span class="settings__lab-hint">в глаголах — маленькая стрелка над карточкой: последние ответы быстрее и точнее обычного, как обычно или хуже. Ничего не перекрывает</span>
+        </span>
+      </label>
     </fieldset>
 
     <fieldset class="group settings__data">

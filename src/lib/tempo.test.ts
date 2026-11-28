@@ -20,6 +20,7 @@ import {
   sessionTempo,
   slowTableCells,
   isTired,
+  sessionTrend,
   slowness,
   tempoState,
 } from './tempo'
@@ -235,6 +236,41 @@ describe('isTired', () => {
     expect(isTired(steady, NOW)).toBe(false)
     const tired = [...steady, ...Array.from({ length: 10 }, (_, i) => timing('cantar|presente|tú', NOW + 100 + i, 5000))]
     expect(isTired(tired, NOW)).toBe(true)
+  })
+})
+
+describe('sessionTrend', () => {
+  const usual = Array.from({ length: 40 }, (_, i) => timing('hablar|presente|yo', NOW - 1000 + i, 2000))
+  const session = (ms: number[], extra: Partial<Timing> = {}) =>
+    ms.map((m, i) => timing('cantar|presente|tú', NOW + i, m, extra))
+
+  it('no arrow until a few answers in the session', () => {
+    expect(sessionTrend([...usual, ...session([2000, 2000, 2000, 2000])], NOW)).toBeNull()
+  })
+
+  it('faster than usual — up, as usual — flat, slower or wrong — down', () => {
+    expect(sessionTrend([...usual, ...session(Array(8).fill(1200))], NOW)).toBe('up')
+    expect(sessionTrend([...usual, ...session(Array(8).fill(2100))], NOW)).toBe('flat')
+    expect(sessionTrend([...usual, ...session(Array(8).fill(3200))], NOW)).toBe('down')
+    const errors = [...session(Array(6).fill(2000)), ...session([2000, 2000], { ok: false }).map((t, i) => ({ ...t, at: NOW + 10 + i }))]
+    expect(sessionTrend([...usual, ...errors], NOW)).toBe('down')
+  })
+
+  it('does not flip back on a small wobble near the threshold', () => {
+    // ~1.2× быстрее обычного: сама по себе не «лучше», но и стрелку «лучше» не сбрасывает
+    const near = [...usual, ...session(Array(8).fill(1700))]
+    expect(sessionTrend(near, NOW, null)).toBe('flat')
+    expect(sessionTrend(near, NOW, 'up')).toBe('up')
+  })
+
+  it('retries and first-ever answers do not count', () => {
+    const noisy = [...usual, ...session(Array(8).fill(2000)), ...session(Array(8).fill(9000), { first: true }).map((t, i) => ({ ...t, at: NOW + 20 + i }))]
+    expect(sessionTrend(noisy, NOW)).toBe('flat')
+  })
+
+  it('without history compares with the session itself', () => {
+    const own = session([2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 6000, 6000, 6000, 6000, 6000, 6000, 6000, 6000])
+    expect(sessionTrend(own, NOW)).toBe('down')
   })
 })
 

@@ -5,6 +5,7 @@ import { explainForm } from '../lib/explain'
 import type { AnswerCheck } from '../lib/normalize'
 import { checkBlanks, overallCheck } from '../lib/normalize'
 import { settings } from '../lib/settingsState'
+import type { Trend } from '../lib/tempo'
 import type { AnswerTiming } from '../lib/timing'
 import type { AnyCard } from '../types'
 import { isBookCard } from '../types'
@@ -33,6 +34,8 @@ const props = defineProps<{
    * вместо карточки: прочитали, тап — и карточка; её время считается с этого момента.
    */
   notice?: string | null
+  /** Как идёт занятие («Лаборатория» → «Стрелка темпа»); null — не показываем. */
+  trend?: Trend | null
 }>()
 
 const emit = defineEmits<{
@@ -87,6 +90,12 @@ let flashTimer: ReturnType<typeof setTimeout> | undefined
 const progress = computed(() =>
   props.total === null ? `${props.index + 1}` : `${props.index + 1} / ${props.total}`,
 )
+const TREND_LABELS: Record<Trend, string> = {
+  up: 'темп лучше обычного',
+  flat: 'темп как обычно',
+  down: 'темп хуже обычного',
+}
+
 const answered = computed(() => props.correct + props.wrong)
 const accuracy = computed(() =>
   answered.value === 0 ? null : Math.round((props.correct / answered.value) * 100),
@@ -250,6 +259,14 @@ onBeforeUnmount(() => {
         <div class="drill__meter-fill" :style="{ width: `${(index / total) * 100}%` }" />
       </div>
       <span class="drill__meter-stats">
+        <span
+          v-if="trend"
+          class="drill__trend"
+          :class="`drill__trend--${trend}`"
+          role="img"
+          :aria-label="TREND_LABELS[trend]"
+          :title="TREND_LABELS[trend]"
+        ><Icon name="trend" /></span>
         <span v-if="accuracy !== null" class="drill__accuracy">{{ accuracy }}%</span>
         <span v-if="streak >= 2" class="drill__streak"><Icon name="flame" />{{ streak }}</span>
       </span>
@@ -391,6 +408,38 @@ onBeforeUnmount(() => {
   gap: var(--space-3);
   min-width: 5.5rem;
   font-variant-numeric: tabular-nums;
+}
+
+.drill__trend {
+  display: inline-flex;
+  align-items: center;
+}
+
+.drill__trend .icon {
+  width: 1.4em;
+  height: 1.4em;
+  stroke-width: 2.5;
+  transition: transform 0.4s ease, color 0.4s ease;
+}
+
+.drill__trend--up {
+  color: var(--ok);
+}
+
+.drill__trend--up .icon {
+  transform: rotate(-45deg);
+}
+
+.drill__trend--flat {
+  color: var(--almost);
+}
+
+.drill__trend--down {
+  color: var(--bad);
+}
+
+.drill__trend--down .icon {
+  transform: rotate(45deg);
 }
 
 .drill__streak {

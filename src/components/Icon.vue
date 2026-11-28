@@ -19,6 +19,7 @@ export type IconName =
   | 'progress'
   | 'tables'
   | 'clock'
+  | 'trend'
 
 defineProps<{
   name: IconName
@@ -39,6 +40,7 @@ defineProps<{
     focusable="false"
   >
     <path v-if="name === 'back'" d="M15 18l-6-6 6-6" />
+    <path v-else-if="name === 'trend'" d="M5 12h14M13 6l6 6-6 6" />
     <path v-else-if="name === 'forward'" d="M9 18l6-6-6-6" />
     <path v-else-if="name === 'check'" d="M20 6L9 17l-5-5" />
     <path v-else-if="name === 'cross'" d="M18 6L6 18M6 6l12 12" />
