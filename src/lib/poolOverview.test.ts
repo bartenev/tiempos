@@ -98,15 +98,25 @@ describe('poolOverview', () => {
     expect(p.hints).toContain('thin')
   })
 
-  it('slow groups hold new back', () => {
-    const k = cellKey('hablar', 'presente', 'yo')
-    const p = poolOverview(config, {
-      stats: { [k]: { ok: 1, bad: 0, streak: 1, last: NOW - HOUR } },
+  it('slow groups hold new back — from two on; one does not', () => {
+    const yo = cellKey('hablar', 'presente', 'yo')
+    const tu = cellKey('hablar', 'presente', 'tú')
+    const stat = { ok: 1, bad: 0, streak: 1, last: NOW - HOUR }
+    const one = poolOverview(config, {
+      stats: { [yo]: stat },
       runs: {},
-      timings: [timing(k, 9000)],
+      timings: [timing(yo, 9000), timing(yo, 9000)],
       now: NOW,
     })
-    expect(p.slow).toBe(1)
-    expect(p.hints).toContain('new-waits')
+    expect(one.slow).toBe(1)
+    expect(one.hints).not.toContain('new-waits')
+    const two = poolOverview(config, {
+      stats: { [yo]: stat, [tu]: stat },
+      runs: {},
+      timings: [timing(yo, 9000), timing(yo, 9000), timing(tu, 9000), timing(tu, 9000)],
+      now: NOW,
+    })
+    expect(two.slow).toBe(2)
+    expect(two.hints).toContain('new-waits')
   })
 })

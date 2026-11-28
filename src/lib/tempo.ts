@@ -24,13 +24,20 @@ import { loadTimings } from './timing'
  *
  * Сессия: сначала разогрев — медленные группы (и с прошлого раза тоже) и проба остывших,
  * не больше POOL_SIZE групп сразу, вперемешку с обычной умной очередью. Группа уходит
- * из разогрева, когда снова быстрая. Новое не вводится, пока есть медленные группы.
+ * из разогрева, когда снова быстрая. Новое не вводится, пока медленных групп GATE_NEW_SLOW и больше.
+ *
+ * Первый в жизни ответ на форму темп правила не меряет: новый глагол вспоминается
+ * медленнее знакомого, и это про глагол, а не про окончание.
  */
 
 /** Медленный ответ: вдвое дольше обычного быстрого. */
 export const SLOW = 1
 /** Из разогрева группа уходит, когда среднее не дольше ~1.5× обычного. */
 export const FAST = 0.6
+/** Медленной группа становится не раньше стольких ответов: один медленный ответ — ещё шум. */
+export const MIN_HOT_ANSWERS = 2
+/** Новое ждёт, пока медленных групп столько или больше; одна медленная группа новому не мешает. */
+export const GATE_NEW_SLOW = 2
 /** Ошибка — как очень медленный ответ. */
 export const ERROR_SLOWNESS = 2
 /** Пределы одного ответа: отвлеклись на 40 с — группа не должна «утонуть». */
@@ -142,26 +149,31 @@ export interface GroupTempo {
   inSession: number
 }
 
-/** Темп групп по логу ответов. Повторы после ошибки не считаются: форма была на экране. */
+/**
+ * Темп групп по логу ответов. Повторы после ошибки не считаются: форма была на экране.
+ * Первый ответ на форму темп не меняет, но группу «трогает»: проба состоялась.
+ */
 export function groupTempos(timings: Timing[], sessionStart: number, base: Baselines = baselines(timings)) {
-  const groups = new Map<string, GroupTempo & { last: number | null }>()
+  const groups = new Map<string, GroupTempo & { last: number | null; n: number }>()
   const keyGroup = new Map<string, string | null>()
   for (const t of timings) {
     if (t.retry) continue
     if (!keyGroup.has(t.k)) keyGroup.set(t.k, groupOfKey(t.k))
     const key = keyGroup.get(t.k)
     if (!key) continue
-    const g = groups.get(key) ?? { ewma: null, hot: false, lastBefore: null, inSession: 0, last: null }
+    const g = groups.get(key) ?? { ewma: null, hot: false, lastBefore: null, inSession: 0, last: null, n: 0 }
+    if (t.at < sessionStart) g.lastBefore = t.at
+    else g.inSession += 1
+    groups.set(key, g)
+    if (t.first) continue
     const s = slowness(t, base)
     const gap = g.last !== null && t.at - g.last >= COLD_MS
     const alpha = gap ? ALPHA_AFTER_GAP : ALPHA
     g.ewma = g.ewma === null ? s : g.ewma + alpha * (s - g.ewma)
-    if (g.ewma > SLOW) g.hot = true
+    g.n += 1
+    if (g.ewma > SLOW && g.n >= MIN_HOT_ANSWERS) g.hot = true
     else if (g.ewma <= FAST) g.hot = false
-    if (t.at < sessionStart) g.lastBefore = t.at
-    else g.inSession += 1
     g.last = t.at
-    groups.set(key, g)
   }
   return groups as Map<string, GroupTempo>
 }
@@ -255,7 +267,7 @@ export function tempoState({ cells, timings, sessionStart }: Context): TempoStat
  */
 export function isTired(timings: Timing[], sessionStart: number): boolean {
   const base = baselines(timings)
-  const session = timings.filter((t) => t.at >= sessionStart && !t.retry).map((t) => slowness(t, base))
+  const session = timings.filter((t) => t.at >= sessionStart && !t.retry && !t.first).map((t) => slowness(t, base))
   if (session.length < FATIGUE_MIN_ANSWERS) return false
   const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]!
   let best = Infinity
@@ -265,13 +277,16 @@ export function isTired(timings: Timing[], sessionStart: number): boolean {
   return median(session.slice(-FATIGUE_WINDOW)) - best >= FATIGUE_DROP
 }
 
-/** Форма группы для разогрева: у клетки — другой глагол, давно не виденный; у модели — знакомая форма. */
+/**
+ * Форма группы для разогрева: знакомая, давно не виденная — разогрев меряет, что вы помните.
+ * Незнакомый глагол у клетки — только если знакомых не осталось; у модели — никогда (это новое).
+ */
 function pickForm(cells: Cell[], key: string, avoid: Set<string>): Cell | null {
   const inGroup = cells.filter((c) => groupOf(c.verb, c.tense, c.person) === key)
   // у модели неправильности незнакомая форма — это новое, а не разогрев
-  const pool = (isTableGroup(key) ? inGroup : inGroup.filter((c) => c.stat)).filter(
-    (c) => !avoid.has(cellKey(c.verb.infinitive, c.tense, c.person)),
-  )
+  const free = inGroup.filter((c) => !avoid.has(cellKey(c.verb.infinitive, c.tense, c.person)))
+  const known = free.filter((c) => c.stat)
+  const pool = known.length > 0 || !isTableGroup(key) ? known : free
   if (pool.length === 0) return null
   const seen = (c: Cell) => c.stat?.last ?? -Infinity
   return shuffle(pool).sort((a, b) => seen(a) - seen(b))[0]!
@@ -374,7 +389,7 @@ export function createTempoSession(
 
       const card =
         (state.pool.length > 0 && random() < WARM_SHARE ? warm() : null) ??
-        fromBacklog(ctx.stats, state.slow > 0, avoid, state.pool) ??
+        fromBacklog(ctx.stats, state.slow >= GATE_NEW_SLOW, avoid, state.pool) ??
         warm() ??
         fromBacklog(ctx.stats, false, new Set())
       if (!card) throw new Error('Нет форм для выбранного фильтра')

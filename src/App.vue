@@ -27,6 +27,7 @@ import { buildSession } from './lib/session'
 import { articleConfigFromSettings, bookConfigFromSettings, configFromSettings } from './lib/settings'
 import { settings } from './lib/settingsState'
 import type { CellStat } from './lib/stats'
+import { loadStats } from './lib/stats'
 import type { PoolGroup, TempoRow, TempoSession } from './lib/tempo'
 import { createTempoSession, groupLabel, portionLabel, sessionTempo } from './lib/tempo'
 import { pluralRu } from './lib/plural'
@@ -428,6 +429,8 @@ function saveTiming(
     oral: run.value?.answer === 'oral',
     len: card.sentence.length,
     ...(card.retry ? { retry: true } : {}),
+    // ответ ещё не записан в статистику: формы там нет — значит, видим её впервые
+    ...(!card.retry && !loadStats()[cardKey(card)] ? { first: true } : {}),
     ...(given ? { given } : {}),
     ...(reason ? { reason } : {}),
   }

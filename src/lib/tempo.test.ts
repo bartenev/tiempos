@@ -7,6 +7,8 @@ import { cellsForConfig } from './session'
 import {
   DEFAULT_BASE,
   ERROR_SLOWNESS,
+  GATE_NEW_SLOW,
+  MIN_HOT_ANSWERS,
   POOL_SIZE,
   PROBE_LIMIT,
   baseline,
@@ -93,6 +95,17 @@ describe('groupTempos', () => {
     expect(groupTempos(back, NOW).get('presente|ar|yo')!.hot).toBe(true)
   })
 
+  it(`one slow answer is noise: a group turns hot from ${MIN_HOT_ANSWERS} answers on`, () => {
+    expect(groupTempos([timing(key, 1, 20000)], NOW).get('presente|ar|yo')!.hot).toBe(false)
+    expect(groupTempos([timing(key, 1, 20000), timing(key, 2, 9000)], NOW).get('presente|ar|yo')!.hot).toBe(true)
+  })
+
+  it('the first answer to a form ever does not measure the rule, but the group is touched', () => {
+    const list = [timing(key, 1, 20000, { first: true }), timing('cantar|presente|yo', 2, 20000, { first: true })]
+    const g = groupTempos(list, 0).get('presente|ar|yo')!
+    expect(g).toMatchObject({ ewma: null, hot: false, inSession: 2 })
+  })
+
   it('repeats right after a mistake do not count', () => {
     const list = [timing(key, 1, 9000, { retry: true })]
     expect(groupTempos(list, NOW).size).toBe(0)
@@ -117,7 +130,11 @@ describe('tempoState', () => {
       'hablar|presente|yo': seen(NOW - 1000),
       'hablar|presente|tú': seen(NOW - 1000),
     }
-    const timings = [timing('hablar|presente|yo', NOW - 1000, 2000), timing('hablar|presente|tú', NOW - 900, 12000)]
+    const timings = [
+      timing('hablar|presente|yo', NOW - 1000, 2000),
+      timing('hablar|presente|tú', NOW - 900, 12000),
+      timing('hablar|presente|tú', NOW - 800, 12000),
+    ]
     const state = tempoState({ cells: cellsForConfig(config, stats), timings, sessionStart: NOW, now: NOW })
     expect(state.pool).toEqual([{ key: 'presente|ar|tú', reason: 'slow' }])
     expect(state.slow).toBe(1)
@@ -139,7 +156,12 @@ describe('tempoState', () => {
 
 describe('createTempoSession', () => {
   const stats: StatsStore = Object.fromEntries(PERSONS.map((p) => [`hablar|presente|${p}`, seen(NOW - 1000)]))
-  const measured = PERSONS.map((p, i) => timing(`hablar|presente|${p}`, NOW - 1000 + i, p === 'tú' ? 12000 : 2000))
+  const slowIn = (persons: string[]) =>
+    PERSONS.flatMap((p, i) => {
+      const ms = persons.includes(p) ? 12000 : 2000
+      return [timing(`hablar|presente|${p}`, NOW - 1000 + i, ms), timing(`hablar|presente|${p}`, NOW - 500 + i, ms)]
+    })
+  const measured = slowIn(['tú'])
 
   function session(random: number, timings = measured) {
     return createTempoSession(config, NOW, {
@@ -151,17 +173,24 @@ describe('createTempoSession', () => {
     })
   }
 
-  it('warms up the slow group, each time with another verb', () => {
+  it('warms up the slow group with a known verb first, then with another one', () => {
     const t = session(0)
     const first = t.next([], [])
     expect(first).toMatchObject({ tense: 'presente', person: 'tú', reason: 'slow' })
+    expect(first.verb.infinitive).toBe('hablar')
     const second = t.next([first], [])
     expect(second.person).toBe('tú')
     expect(second.verb.infinitive).not.toBe(first.verb.infinitive)
   })
 
-  it('no new forms while something is slow', () => {
+  it('one slow group does not hold new back', () => {
     const t = session(0.99)
+    const cards = Array.from({ length: 20 }, () => t.next([], []))
+    expect(cards.some((c) => c.reason === 'new')).toBe(true)
+  })
+
+  it(`no new forms while ${GATE_NEW_SLOW} or more groups are slow`, () => {
+    const t = session(0.99, slowIn(['tú', 'él']))
     for (let i = 0; i < 20; i++) {
       const card = t.next([], [])
       expect(stats[`${card.verb.infinitive}|presente|${card.person}`] ?? card.reason === 'slow').toBeTruthy()

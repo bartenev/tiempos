@@ -8,7 +8,7 @@ import { GREEN_RUN, loadRuns } from './runs'
 import { cellsForConfig, unfinishedTables } from './session'
 import type { StatsStore } from './stats'
 import { loadStats } from './stats'
-import { tempoState } from './tempo'
+import { GATE_NEW_SLOW, tempoState } from './tempo'
 import type { Timing } from './timing'
 import { loadTimings } from './timing'
 
@@ -82,7 +82,7 @@ export function poolOverview(config: SessionConfig, sources: PoolSources = {}): 
       hints.push(busy ? 'no-new' : 'nothing')
     }
     if (cells.length < THIN_FORMS) hints.push('thin')
-    if (tempo.slow > 0 && queue.length > 0) hints.push('new-waits')
+    if (tempo.slow >= GATE_NEW_SLOW && queue.length > 0) hints.push('new-waits')
   }
 
   return {

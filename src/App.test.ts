@@ -120,6 +120,10 @@ describe('App — бесконечная умная сессия', () => {
     expect(timings).toHaveLength(25)
     expect(timings[0]).toMatchObject({ ms: 1200, total: 2000, ok: true, oral: false })
     expect(timings[0]!.k).toMatch(/\|presente\|/)
+    // форму видят впервые — её время не меряет темп правила; повтор той же формы — уже меряет
+    expect(timings[0]!.first).toBe(true)
+    const again = timings.findIndex((t, i) => i > 0 && timings.slice(0, i).some((p) => p.k === t.k))
+    if (again !== -1) expect(timings[again]!.first).toBeUndefined()
   })
 
   it('logs what was typed on a mistake and why the card came', async () => {
@@ -230,8 +234,14 @@ describe('App — бесконечная умная сессия', () => {
 
     it('says when a group turns slow by time', async () => {
       const wrapper = await startVerbs({ ...verbs, groups: ['ar'] })
-      wrapper.findComponent(DrillPanel).vm.$emit('dismiss')
-      // у группы первой карточки ещё не было ответов — один медленный верный делает её медленной
+      const drill = wrapper.findComponent(DrillPanel)
+      drill.vm.$emit('dismiss')
+      // форма уже знакома, у группы один медленный ответ — ещё не медленная; второй делает её медленной
+      const card = drill.props('card') as DrillCard
+      const k = `${card.verb.infinitive}|${card.tense}|${card.person}`
+      localStorage.setItem('tiempos.stats.v1', JSON.stringify({ [k]: { ok: 1, bad: 0, streak: 1, last: Date.now() - 1000 } }))
+      const old = { k, at: Date.now() - 1000, ms: 30000, total: 31000, ok: true, oral: false, len: 40 }
+      localStorage.setItem('tiempos.timing.v1', JSON.stringify([old]))
       await answer(wrapper, { ms: 30000, total: 31000 })
       expect(wrapper.findComponent(DrillPanel).props('notice')).toMatch(/^«Presente · -ar · .+» вспоминается медленно/)
     })
